@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pro Limo
 
-## Getting Started
+Private chauffeur service for travelers and businesses — in 500+ cities, with flat rates, professional drivers, and a flawless arrival every time.
 
-First, run the development server:
+A Corvus Inc. service. Built with Next.js 16, React 19, Tailwind CSS v4.
+
+## Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org) (App Router, Turbopack)
+- **Language**: TypeScript
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com) (CSS-first config)
+- **Type**: Cormorant Garamond (display) + Geist (sans) + Geist Mono
+- **Images**: SVG illustrations + dynamic Open Graph via `next/og`
+- **SEO**: JSON-LD structured data, sitemap, robots, programmatic city × service pages
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+Output is fully static for the marketing surface (~85 prerendered pages: home, cities index, 12 city pages, services index, 5 service pages, 60 city × service combos, business, plus sitemap/robots).
 
-To learn more about Next.js, take a look at the following resources:
+## Programmatic SEO routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Path | Pages | Notes |
+|---|---|---|
+| `/` | 1 | Home (Hero, Services, Fleet, Experience, Cities, Standards, Testimonial, App, CTA) |
+| `/cities` | 1 | All-cities index with regional grouping |
+| `/cities/[city]` | 12 | One per city in `src/data/cities.ts` |
+| `/cities/[city]/[service]` | 60 | City × service combo (e.g. `/cities/london/airport-transfer`) |
+| `/services` | 1 | All-services index |
+| `/services/[service]` | 5 | One per service in `src/data/services.ts` |
+| `/business` | 1 | Pro Limo for Business |
+| `/api/og` | dynamic | Edge-rendered Open Graph images, themed per page |
+| `/sitemap.xml` | 1 | Auto-generated from data |
+| `/robots.txt` | 1 | Auto-generated |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Adding a city
 
-## Deploy on Vercel
+1. Add an entry to `src/data/cities.ts`.
+2. The city is automatically added to the sitemap, the cities index, and all city × service combos.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Adding a service
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Add an entry to `src/data/services.ts`.
+2. The service is automatically added to the sitemap, the services index, and all city × service combos.
+
+## Architecture notes
+
+- All marketing pages are React Server Components. Only interactive widgets (Nav, BookingCard, Reveal) are `"use client"`.
+- The hero booking form is intentionally inert — the dispatch backend is out of scope for this repo.
+- The Reveal component uses IntersectionObserver to fade-in sections as they scroll into view.
+- The "rise" CSS animation (in `globals.css`) handles the on-load hero stagger without JS.
+
+## License
+
+© Corvus Inc. All rights reserved.

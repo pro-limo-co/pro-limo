@@ -1,0 +1,109 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Logo } from "./Logo";
+
+const links = [
+  { label: "Services", href: "#services" },
+  { label: "Fleet", href: "#fleet" },
+  { label: "Cities", href: "#cities" },
+  { label: "Business", href: "#business" },
+];
+
+export function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <header
+      className={[
+        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+        scrolled
+          ? "backdrop-blur-md bg-[color:color-mix(in_oklab,var(--color-ink)_72%,transparent)] border-b border-[color:var(--color-divider-soft)]"
+          : "bg-transparent",
+      ].join(" ")}
+    >
+      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 lg:px-10 h-[72px]">
+        <a href="#top" aria-label="Pro Limo home" className="text-[color:var(--color-bone)]">
+          <Logo />
+        </a>
+
+        <nav className="hidden md:flex items-center gap-9 text-[0.85rem] tracking-wide">
+          {links.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="link-gold text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors"
+            >
+              {l.label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <a
+            href="#signin"
+            className="hidden sm:inline-flex text-[0.85rem] tracking-wide text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors px-3 py-2"
+          >
+            Sign in
+          </a>
+          <a href="#book" className="btn btn-primary !h-11 !px-5 !text-[0.78rem]">
+            Reserve
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            className="md:hidden ml-1 inline-flex items-center justify-center w-10 h-10 rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)]"
+            aria-expanded={open}
+            aria-label="Toggle menu"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+              {open ? (
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="md:hidden border-t border-[color:var(--color-divider-soft)] bg-[color:var(--color-ink-soft)]">
+          <ul className="flex flex-col px-6 py-4">
+            {links.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="block py-3 text-[1rem] text-[color:var(--color-bone-dim)] border-b border-[color:var(--color-divider-soft)] last:border-b-0"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a
+                href="#signin"
+                onClick={() => setOpen(false)}
+                className="block py-3 text-[1rem] text-[color:var(--color-bone-dim)]"
+              >
+                Sign in
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
+    </header>
+  );
+}
