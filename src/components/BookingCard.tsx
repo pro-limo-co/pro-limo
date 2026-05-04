@@ -33,7 +33,7 @@ export function BookingCard() {
               aria-selected={active}
               onClick={() => setTab(t.id)}
               className={[
-                "flex-1 h-11 rounded-lg text-[0.78rem] tracking-[0.06em] uppercase font-medium transition-colors",
+                "flex-1 h-11 rounded-lg font-condensed text-[0.78rem] tracking-[0.16em] uppercase font-medium transition-colors",
                 active
                   ? "bg-[color:var(--color-bone)] text-[color:var(--color-ink)]"
                   : "text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)]",
@@ -80,7 +80,7 @@ export function BookingCard() {
         </a>
       </div>
 
-      <div className="flex items-center gap-3 px-3 pt-4 pb-2 text-[0.72rem] tracking-[0.16em] uppercase text-[color:var(--color-pewter)]">
+      <div className="flex items-center gap-3 px-3 pt-4 pb-2 font-condensed text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
         <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[color:var(--color-champagne)]" />
         Flat all-inclusive rates · Free 60-min wait at airports
       </div>
@@ -106,7 +106,7 @@ function Field({ id, label, placeholder, type = "text", options, icon }: FieldPr
       <div className="flex items-center gap-3">
         <Icon name={icon} />
         <div className="flex-1 min-w-0">
-          <span className="block text-[0.68rem] tracking-[0.18em] uppercase text-[color:var(--color-pewter)]">
+          <span className="block font-condensed text-[0.68rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
             {label}
           </span>
           {type === "select" ? (

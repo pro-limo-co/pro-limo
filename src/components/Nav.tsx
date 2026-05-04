@@ -7,7 +7,7 @@ const links = [
   { label: "Services", href: "#services" },
   { label: "Fleet", href: "#fleet" },
   { label: "Cities", href: "#cities" },
-  { label: "Business", href: "#business" },
+  { label: "Business", href: "/business" },
 ];
 
 export function Nav() {
@@ -24,18 +24,34 @@ export function Nav() {
   return (
     <header
       className={[
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled
-          ? "backdrop-blur-md bg-[color:color-mix(in_oklab,var(--color-ink)_72%,transparent)] border-b border-[color:var(--color-divider-soft)]"
-          : "bg-transparent",
+          ? "backdrop-blur-md bg-[color:color-mix(in_oklab,var(--color-ink)_82%,transparent)] border-b border-[color:var(--color-divider-soft)]"
+          : "bg-transparent border-b border-transparent",
       ].join(" ")}
     >
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 lg:px-10 h-[72px]">
-        <a href="#top" aria-label="Pro Limo home" className="text-[color:var(--color-bone)]">
+      {/* Monocle-style metadata strip */}
+      <div className="hidden md:block border-b border-[color:var(--color-divider-soft)]/80">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10 h-7 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--color-pewter-dim)] font-condensed">
+          <div className="flex items-center gap-5">
+            <span className="text-[color:var(--color-champagne)]">★</span>
+            <span>Filed under · Private chauffeur</span>
+            <span className="hidden lg:inline">In service · 500+ cities</span>
+            <span className="hidden xl:inline">Issue 01 / 2026</span>
+          </div>
+          <div className="flex items-center gap-5">
+            <span className="hidden lg:inline">EN · DE · FR · 中文 · 日本語 · العربية</span>
+            <span>Concierge · 24 / 7</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 lg:px-10 h-[68px]">
+        <a href="/#top" aria-label="Pro Limo home" className="text-[color:var(--color-bone)]">
           <Logo />
         </a>
 
-        <nav className="hidden md:flex items-center gap-9 text-[0.85rem] tracking-wide">
+        <nav className="hidden md:flex items-center gap-9 font-condensed text-[0.78rem] tracking-[0.16em] uppercase">
           {links.map((l) => (
             <a
               key={l.href}
@@ -50,13 +66,13 @@ export function Nav() {
         <div className="flex items-center gap-3">
           <a
             href="#signin"
-            className="hidden sm:inline-flex text-[0.85rem] tracking-wide text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors px-3 py-2"
+            className="hidden sm:inline-flex font-condensed text-[0.78rem] tracking-[0.16em] uppercase text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors px-3 py-2"
           >
             Sign in
           </a>
-          <a href="#book" className="btn btn-primary !h-11 !px-5 !text-[0.78rem]">
+          <a href="/#book" className="btn btn-primary !h-10 !px-5 !text-[0.7rem]">
             Reserve
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
@@ -86,7 +102,7 @@ export function Nav() {
                 <a
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 text-[1rem] text-[color:var(--color-bone-dim)] border-b border-[color:var(--color-divider-soft)] last:border-b-0"
+                  className="block py-3 font-condensed tracking-[0.14em] uppercase text-[0.85rem] text-[color:var(--color-bone-dim)] border-b border-[color:var(--color-divider-soft)] last:border-b-0"
                 >
                   {l.label}
                 </a>
@@ -96,7 +112,7 @@ export function Nav() {
               <a
                 href="#signin"
                 onClick={() => setOpen(false)}
-                className="block py-3 text-[1rem] text-[color:var(--color-bone-dim)]"
+                className="block py-3 font-condensed tracking-[0.14em] uppercase text-[0.85rem] text-[color:var(--color-bone-dim)]"
               >
                 Sign in
               </a>

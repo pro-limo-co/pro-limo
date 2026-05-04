@@ -32,7 +32,7 @@ export function Footer() {
             </p>
 
             <form className="mt-10 max-w-sm">
-              <label className="font-mono text-[0.7rem] tracking-[0.2em] uppercase text-[color:var(--color-pewter)]">
+              <label className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
                 The dispatch — quarterly
               </label>
               <div className="mt-3 flex items-center gap-2 border-b border-[color:var(--color-divider)] focus-within:border-[color:var(--color-champagne)] transition-colors">
@@ -56,7 +56,7 @@ export function Footer() {
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-10">
             {cols.map((c) => (
               <div key={c.label}>
-                <h4 className="font-mono text-[0.7rem] tracking-[0.2em] uppercase text-[color:var(--color-pewter)]">
+                <h4 className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
                   {c.label}
                 </h4>
                 <ul className="mt-5 space-y-3">

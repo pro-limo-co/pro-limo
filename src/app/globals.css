@@ -1,31 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  /* Palette — warm-black luxury */
-  --color-ink: #0A0907;
-  --color-ink-soft: #121110;
-  --color-ink-raised: #1A1916;
-  --color-ink-elevated: #232220;
-  --color-divider: #2A2823;
-  --color-divider-soft: #1F1E1B;
+  /* Cinema-black surface (Bugatti × Open Design luxury) */
+  --color-ink: #000000;
+  --color-ink-soft: #0A0A0A;
+  --color-ink-raised: #131312;
+  --color-ink-elevated: #1B1A18;
+  --color-divider: #232220;
+  --color-divider-soft: #161514;
 
-  --color-bone: #F2EEE5;
-  --color-bone-dim: #C9C3B8;
-  --color-pewter: #8A847B;
-  --color-pewter-dim: #5C5851;
+  /* Three-tone monochrome discipline */
+  --color-bone: #FFFFFF;
+  --color-bone-dim: #C9C7C2;
+  --color-pewter: #8A8884;
+  --color-pewter-dim: #565552;
 
+  /* Sole accent — used sparingly */
   --color-champagne: #C8A96A;
   --color-champagne-bright: #E5C98F;
   --color-champagne-dim: #8C7848;
-
-  --color-emerald-deep: #1E2D26;
 
   /* Type */
   --font-display: var(--font-display), "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: var(--font-sans), "Geist", -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-mono: var(--font-mono), "Geist Mono", ui-monospace, monospace;
+  --font-condensed: var(--font-condensed), "Oswald", "Bebas Neue", "Impact", sans-serif;
 
-  /* Easing */
+  /* Easing — Open Design luxury spec: 150–250ms stable */
   --ease-stage: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -61,23 +62,52 @@ body {
   color: var(--color-ink);
 }
 
-/* Hairline divider */
 .hairline {
   border-color: color-mix(in oklab, var(--color-bone) 9%, transparent);
 }
 
-/* Editorial display type */
+/* Typography roles */
 .font-display {
   font-family: var(--font-display);
   font-feature-settings: "lnum", "ss01";
   letter-spacing: -0.012em;
 }
+.font-mono { font-family: var(--font-mono); }
+.font-condensed { font-family: var(--font-condensed); }
 
-.font-mono {
-  font-family: var(--font-mono);
+/* Eyebrow — Oswald, condensed, ALL CAPS, premium-mono feel (Bugatti-inspired) */
+.eyebrow {
+  font-family: var(--font-condensed);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-pewter);
 }
 
-/* Subtle grain overlay used throughout dark sections */
+/* Filed-under-style metadata strip (Monocle-inspired) */
+.metastrip {
+  font-family: var(--font-condensed);
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-pewter);
+}
+
+/* Folio number — large, condensed, set on edge */
+.folio {
+  font-family: var(--font-condensed);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  font-feature-settings: "lnum", "tnum";
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Subtle grain — quieter than before per Bugatti monochrome austerity */
 .grain {
   position: relative;
   isolation: isolate;
@@ -88,16 +118,16 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
+  opacity: 0.35;
   mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.42 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* Spotlight gradient */
+/* Spotlight — restrained */
 .spotlight {
   background:
-    radial-gradient(60% 40% at 50% 0%, color-mix(in oklab, var(--color-champagne) 10%, transparent), transparent 60%),
-    radial-gradient(80% 60% at 50% 110%, color-mix(in oklab, #1d2b22 60%, transparent), transparent 70%),
+    radial-gradient(60% 40% at 50% 0%, color-mix(in oklab, var(--color-champagne) 6%, transparent), transparent 60%),
+    radial-gradient(80% 60% at 50% 110%, color-mix(in oklab, #14110b 70%, transparent), transparent 70%),
     var(--color-ink);
 }
 
@@ -119,7 +149,7 @@ body {
   to { transform: translateX(-50%); }
 }
 .marquee-track {
-  animation: marquee 60s linear infinite;
+  animation: marquee 80s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
@@ -153,22 +183,22 @@ body {
   animation: halo 9s ease-in-out infinite;
 }
 
-/* Letterspaced eyebrow label */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.22em;
+/* Display sizes — Bugatti's monumental scale (ALL CAPS at extreme) */
+.display-mega {
+  font-family: var(--font-condensed);
+  font-weight: 300;
+  font-size: clamp(5rem, 18vw, 18rem);
+  line-height: 0.86;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
-  color: var(--color-pewter);
 }
 
-/* Big editorial heading clamp */
 .display-xl {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(3.25rem, 9vw, 8.5rem);
-  line-height: 0.9;
-  letter-spacing: -0.025em;
+  font-size: clamp(3.5rem, 10vw, 9.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.028em;
 }
 
 .display-lg {
@@ -193,14 +223,14 @@ body {
 /* Card surfaces */
 .surface {
   background: color-mix(in oklab, var(--color-ink-soft) 80%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-bone) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
   backdrop-filter: blur(14px);
 }
 .surface-raised {
   background: linear-gradient(180deg,
     color-mix(in oklab, var(--color-ink-raised) 86%, transparent),
     color-mix(in oklab, var(--color-ink-soft) 90%, transparent));
-  border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-bone) 10%, transparent);
 }
 
 /* Input reset */
@@ -216,25 +246,26 @@ body {
   color: var(--color-pewter-dim);
 }
 
-/* Button base */
+/* Button base — Bugatti-pill (9999px) with 1px hairline border */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   height: 3.25rem;
-  padding-inline: 1.5rem;
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
+  padding-inline: 1.6rem;
+  font-family: var(--font-condensed);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 500;
-  border-radius: 999px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
   transition:
-    background 320ms var(--ease-stage),
-    color 320ms var(--ease-stage),
-    border-color 320ms var(--ease-stage),
-    transform 320ms var(--ease-stage);
+    background 220ms var(--ease-stage),
+    color 220ms var(--ease-stage),
+    border-color 220ms var(--ease-stage),
+    transform 220ms var(--ease-stage);
 }
 .btn-primary {
   background: var(--color-bone);
@@ -246,11 +277,11 @@ body {
 .btn-ghost {
   background: transparent;
   color: var(--color-bone);
-  border: 1px solid color-mix(in oklab, var(--color-bone) 22%, transparent);
+  border-color: color-mix(in oklab, var(--color-bone) 28%, transparent);
 }
 .btn-ghost:hover {
-  border-color: var(--color-champagne);
-  color: var(--color-champagne-bright);
+  border-color: var(--color-bone);
+  color: var(--color-bone);
 }
 .btn-gold {
   background: var(--color-champagne);
@@ -260,18 +291,34 @@ body {
   background: var(--color-champagne-bright);
 }
 
-/* Focus rings */
-:where(button, a, input, [tabindex]):focus-visible {
+/* Focus rings — explicit (luxury system: "Ensure hover, focus-visible, active, disabled, and loading states are explicit") */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-champagne);
-  outline-offset: 2px;
+  outline-offset: 3px;
   border-radius: 4px;
 }
 
 /* Page section spacing */
 .section {
-  padding-block: clamp(5rem, 10vw, 9rem);
+  padding-block: clamp(5.5rem, 11vw, 10rem);
 }
 
 /* Hide scrollbars on horizontal scrollers */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
+
+/* Page-level hairline frame (atelier-zero "every surface earns its lines") */
+.page-frame::before,
+.page-frame::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 60;
+  background: color-mix(in oklab, var(--color-bone) 8%, transparent);
+}
+.page-frame::before {
+  top: 0; left: 0; right: 0; height: 1px;
+}
+.page-frame::after {
+  bottom: 0; left: 0; right: 0; height: 1px;
+}

@@ -5,7 +5,7 @@ export function Hero() {
     <section
       id="top"
       aria-labelledby="hero-heading"
-      className="relative min-h-[100svh] grain spotlight overflow-hidden pt-[88px] lg:pt-[112px]"
+      className="relative min-h-[100svh] grain spotlight overflow-hidden pt-[100px] lg:pt-[140px]"
     >
       {/* Atmospheric halo */}
       <div className="pointer-events-none absolute inset-x-0 -top-40 h-[800px] flex items-start justify-center" aria-hidden>
@@ -81,10 +81,10 @@ export function Hero() {
 function Fact({ value, label }: { value: string; label: string }) {
   return (
     <div>
-      <dt className="font-display text-[2.1rem] leading-none text-[color:var(--color-bone)] tabular">
+      <dt className="font-condensed font-light text-[2.4rem] leading-none text-[color:var(--color-bone)] tabular tracking-tight">
         {value}
       </dt>
-      <dd className="mt-2 text-[0.7rem] tracking-[0.2em] uppercase text-[color:var(--color-pewter)]">
+      <dd className="mt-2 font-condensed text-[0.68rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
         {label}
       </dd>
     </div>
