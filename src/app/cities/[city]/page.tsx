@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { city: slug } = await params;
   const c = getCity(slug);
   if (!c) return {};
-  const title = `Private chauffeur in ${c.name} — Pro Limo`;
-  const description = `Hire a private chauffeur in ${c.name}, ${c.country}. Flat rates, professional drivers, airport transfers from ${c.airports.map((a) => a.code).join(", ")}, and intercity routes.`;
+  const title = `${c.name}, ${c.stateCode} Chauffeur Service`;
+  const description = `Hire a private chauffeur in ${c.name}, ${c.state}. Flat rates, professional drivers, airport pickup and drop-off from ${c.airports.map((a) => a.code).join(", ")}, and intercity routes.`;
   const url = `${siteConfig.url}/cities/${c.slug}`;
 
   return {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       url,
       images: [
         {
-          url: `/api/og?title=${encodeURIComponent(c.name)}&eyebrow=${encodeURIComponent(`Pro Limo · ${c.country}`)}&subtitle=${encodeURIComponent(c.tagline)}`,
+          url: `/api/og?title=${encodeURIComponent(`${c.name} chauffeur service`)}&eyebrow=${encodeURIComponent(`${c.stateCode} location`)}&subtitle=${encodeURIComponent(c.tagline)}`,
           width: 1200,
           height: 630,
         },
@@ -57,10 +57,10 @@ export default async function CityPage({ params }: { params: Params }) {
       <Nav />
       <main>
         <PageHeader
-          eyebrow={`Pro Limo · ${c.country}`}
+          eyebrow={`Location · ${c.stateCode}`}
           title={
             <>
-              {c.name},
+              {c.name} chauffeur service,
               <span className="block italic text-[color:var(--color-champagne-bright)]">
                 in cabin silence.
               </span>
@@ -80,7 +80,7 @@ export default async function CityPage({ params }: { params: Params }) {
             <Reveal delay={120}>
               <div className="mt-12 border-t border-[color:var(--color-divider-soft)] pt-8 grid grid-cols-2 gap-y-8 gap-x-10">
                 <Stat label="Airports served" items={c.airports.map((a) => `${a.code} · ${a.name}`)} />
-                <Stat label="Neighborhoods" items={c.neighborhoods} />
+                <Stat label="Areas served" items={c.neighborhoods} />
                 <Stat label="Popular routes" items={c.popularRoutes} />
                 <Stat label="Local time zone" items={[c.timezone]} />
               </div>

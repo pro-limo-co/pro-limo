@@ -30,31 +30,34 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://prolimo.com"),
+  metadataBase: new URL("https://prolimodriver.com"),
   title: {
-    default: "Pro Limo — Private Chauffeur, Worldwide",
-    template: "%s — Pro Limo",
+    default: "Professional Limousine Driver - Portland Chauffeur Service",
+    template: "%s - Professional Limousine Driver",
   },
   description:
-    "An hour earlier than you need. A vehicle quieter than the city. Pro Limo is private chauffeur service for travelers and businesses in 500+ cities — flat rates, professional drivers, and a flawless arrival every time.",
+    "Professional Limousine Driver provides private chauffeur, black car, and airport transfer service around Portland, including Seattle, Eugene, Cannon Beach, Seaside, Astoria, and high-demand metro cities.",
   keywords: [
+    "Portland limo service",
+    "Portland chauffeur service",
+    "PDX airport car service",
     "private chauffeur",
     "limo service",
     "airport transfer",
     "executive car service",
     "luxury transportation",
-    "Pro Limo",
+    "Professional Limousine Driver",
   ],
   openGraph: {
-    title: "Pro Limo — Private Chauffeur, Worldwide",
+    title: "Professional Limousine Driver - Portland Chauffeur Service",
     description:
-      "Private chauffeur service in 500+ cities. Flat rates. Professional drivers. A flawless arrival every time.",
+      "Private chauffeur, black car, and airport transfer service around Portland and the current regional service area.",
     type: "website",
-    siteName: "Pro Limo",
+    siteName: "Professional Limousine Driver",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pro Limo — Private Chauffeur, Worldwide",
+    title: "Professional Limousine Driver - Portland Chauffeur Service",
   },
   icons: {
     icon: [

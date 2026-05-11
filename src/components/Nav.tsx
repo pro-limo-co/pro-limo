@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 
 const links = [
   { label: "Services", href: "#services" },
   { label: "Fleet", href: "#fleet" },
-  { label: "Cities", href: "#cities" },
+  { label: "Locations", href: "#cities" },
   { label: "Business", href: "/business" },
 ];
 
@@ -36,20 +37,20 @@ export function Nav() {
           <div className="flex items-center gap-5">
             <span className="text-[color:var(--color-champagne)]">★</span>
             <span>Filed under · Private chauffeur</span>
-            <span className="hidden lg:inline">In service · 500+ cities</span>
+            <span className="hidden lg:inline">Portland-centered service area</span>
             <span className="hidden xl:inline">Issue 01 / 2026</span>
           </div>
           <div className="flex items-center gap-5">
-            <span className="hidden lg:inline">EN · DE · FR · 中文 · 日本語 · العربية</span>
+            <span className="hidden lg:inline">PDX · SEA · EUG · Coast · Valley</span>
             <span>Concierge · 24 / 7</span>
           </div>
         </div>
       </div>
 
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 lg:px-10 h-[68px]">
-        <a href="/#top" aria-label="Pro Limo home" className="text-[color:var(--color-bone)]">
+        <Link href="/#top" aria-label="Professional Limousine Driver home" className="text-[color:var(--color-bone)]">
           <Logo />
-        </a>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-9 font-condensed text-[0.78rem] tracking-[0.16em] uppercase">
           {links.map((l) => (
@@ -70,12 +71,12 @@ export function Nav() {
           >
             Sign in
           </a>
-          <a href="/#book" className="btn btn-primary !h-10 !px-5 !text-[0.7rem]">
+          <Link href="/#book" className="btn btn-primary !h-10 !px-5 !text-[0.7rem]">
             Reserve
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </a>
+          </Link>
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}

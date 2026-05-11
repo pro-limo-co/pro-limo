@@ -8,12 +8,12 @@ import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Pro Limo for Business — Corporate chauffeur service",
+  title: "For Business - Corporate Chauffeur Service",
   description:
     "Centralize ground transportation for your company. Single dashboard, traveler profiles, duty-of-care reporting, and a dedicated account director.",
   alternates: { canonical: "/business" },
   openGraph: {
-    title: "Pro Limo for Business",
+    title: "Professional Limousine Driver for Business",
     description: "Corporate chauffeur travel, simplified.",
     url: `${siteConfig.url}/business`,
     images: [{ url: `/api/og?title=${encodeURIComponent("For Business")}&subtitle=${encodeURIComponent("Centralized travel · Duty of care · One concierge desk")}`, width: 1200, height: 630 }],
@@ -27,7 +27,7 @@ const features = [
   },
   {
     title: "Traveler profiles",
-    body: "Once-saved chauffeur preferences, climate, music, and dietary notes travel with each employee globally.",
+    body: "Once-saved chauffeur preferences, climate, music, and dietary notes travel with each employee across the service area.",
   },
   {
     title: "Duty-of-care reports",
@@ -54,11 +54,11 @@ export default function BusinessPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "Service",
-          name: "Pro Limo for Business",
+          name: "Professional Limousine Driver for Business",
           serviceType: "Corporate chauffeur service",
           provider: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
-          description: "Centralized chauffeur travel for businesses worldwide.",
-          areaServed: "Worldwide",
+          description: "Centralized chauffeur travel for businesses around Portland and regional routes.",
+          areaServed: ["Portland metro", "Oregon Coast", "Willamette Valley", "Puget Sound"],
         }}
       />
       <Nav />
@@ -71,7 +71,7 @@ export default function BusinessPage() {
               <span className="block italic text-[color:var(--color-champagne-bright)]">simplified.</span>
             </>
           }
-          subtitle="A single dispatch desk for the entire company. Traveler profiles travel globally, invoices land monthly, and duty-of-care is auditable in real time."
+          subtitle="A single dispatch desk for the entire company. Traveler profiles carry across the service area, invoices land monthly, and duty-of-care is auditable in real time."
         />
 
         <section className="mx-auto max-w-[1400px] px-6 lg:px-10 pb-20">
@@ -97,11 +97,11 @@ export default function BusinessPage() {
                 <p className="eyebrow">Talk to sales</p>
                 <h2 className="display-md mt-4 max-w-[18ch]">
                   A single line for every chauffeur,
-                  <span className="italic text-[color:var(--color-champagne-bright)]"> in every city.</span>
+                  <span className="italic text-[color:var(--color-champagne-bright)]"> in every covered city.</span>
                 </h2>
               </div>
               <div className="lg:col-span-5 flex flex-col sm:flex-row gap-3 lg:justify-end">
-                <a href="mailto:business@prolimo.com" className="btn btn-gold">
+                <a href="mailto:business@prolimodriver.com" className="btn btn-gold">
                   Email business desk
                 </a>
                 <Link href="/services" className="btn btn-ghost">View all services</Link>

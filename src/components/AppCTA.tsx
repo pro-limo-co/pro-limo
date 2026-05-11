@@ -20,7 +20,7 @@ export function AppCTA() {
               <p className="mt-7 max-w-xl text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
                 Live arrival map. Chauffeur identity card. Saved trips and
                 preferences. Receipts auto-routed to your business account. The
-                Pro Limo app keeps your travel as quiet as your driver does.
+                Professional Limousine Driver app keeps your travel as quiet as your driver does.
               </p>
             </Reveal>
 
@@ -84,7 +84,7 @@ function PhoneMock() {
       <div className="relative h-full w-full rounded-[36px] overflow-hidden bg-gradient-to-b from-[color:var(--color-ink-soft)] via-[color:var(--color-ink)] to-[color:var(--color-ink)] grain">
         <div className="px-6 pt-10 pb-4 flex items-center justify-between">
           <span className="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-[color:var(--color-bone-dim)]">
-            21:14 · Mayfair
+            21:14 · Portland
           </span>
           <span className="inline-flex h-2 w-2 rounded-full bg-[color:var(--color-champagne)]" />
         </div>
@@ -94,10 +94,10 @@ function PhoneMock() {
             Tonight · 22:00
           </p>
           <h4 className="font-display text-[1.45rem] leading-tight mt-2 text-[color:var(--color-bone)]">
-            Heathrow T5 → The Connaught
+            PDX arrivals to Lake Oswego
           </h4>
           <p className="mt-1 text-[0.78rem] text-[color:var(--color-bone-dim)]">
-            Flight BA286 · 21:48 ETA
+            Flight AS 342 · 21:48 ETA
           </p>
         </div>
 

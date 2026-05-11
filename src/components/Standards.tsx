@@ -13,7 +13,7 @@ const standards = [
     label: "Vehicle",
     title: "Younger than your watch.",
     body:
-      "No vehicle in the Pro Limo fleet is older than 36 months. Each is detailed weekly, audited monthly, and quietly retired before its third birthday.",
+      "No vehicle in the Professional Limousine Driver fleet is older than 36 months. Each is detailed weekly, audited monthly, and quietly retired before its third birthday.",
   },
   {
     no: "03",
@@ -44,7 +44,7 @@ export function Standards() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7 lg:pt-6">
             <p className="text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-              Four standards run the length of every Pro Limo journey, from the
+              Four standards run the length of every Professional Limousine Driver journey, from the
               quiet of the cabin to the kilowatt-hour of the engine that moved it.
             </p>
           </div>

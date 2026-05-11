@@ -1,20 +1,20 @@
 export const siteConfig = {
-  name: "Pro Limo",
-  legalName: "Pro Limo, a Corvus Inc. service",
-  url: "https://prolimo.com",
+  name: "Professional Limousine Driver",
+  legalName: "Professional Limousine Driver",
+  url: "https://prolimodriver.com",
   ogImage: "/api/og",
   description:
-    "Private chauffeur service in 500+ cities. Flat all-inclusive rates, professional drivers, and a flawless arrival every time.",
+    "Private chauffeur and airport car service centered on Portland, with service across the Portland metro, the coast, the valley, Puget Sound, and other regional routes.",
   shortDescription:
-    "Private chauffeur, worldwide.",
+    "Portland-centered private chauffeur service.",
   socials: {
-    instagram: "https://instagram.com/prolimo",
-    x: "https://x.com/prolimo",
-    linkedin: "https://www.linkedin.com/company/prolimo",
+    instagram: "https://instagram.com/prolimodriver",
+    x: "https://x.com/prolimodriver",
+    linkedin: "https://www.linkedin.com/company/prolimodriver",
   },
   contact: {
-    email: "concierge@prolimo.com",
-    phone: "+1-844-PROLIMO",
+    email: "concierge@prolimodriver.com",
+    phone: "+1-844-LIMO-DRV",
   },
   founded: "2026",
 } as const;

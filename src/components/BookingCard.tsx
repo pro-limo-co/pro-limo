@@ -10,8 +10,12 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
-export function BookingCard() {
-  const [tab, setTab] = useState<TabId>("oneway");
+type BookingCardProps = {
+  defaultTab?: TabId;
+};
+
+export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
+  const [tab, setTab] = useState<TabId>(defaultTab);
   const fromId = useId();
   const toId = useId();
   const dateId = useId();
@@ -20,6 +24,8 @@ export function BookingCard() {
   const flightId = useId();
   const durationId = useId();
   const luggageId = useId();
+  const airportDirectionId = useId();
+  const isAirport = tab === "airport";
 
   return (
     <div className="surface-raised rounded-2xl p-2 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
@@ -51,21 +57,39 @@ export function BookingCard() {
           e.preventDefault();
         }}
       >
-        <Field id={fromId} label="Pickup" placeholder="Address, airport, or hotel" icon="pin" />
+        <Field
+          id={fromId}
+          label={isAirport ? "Pickup location" : "Pickup"}
+          placeholder={isAirport ? "Airport, home, hotel, or office" : "Address, airport, or hotel"}
+          icon="pin"
+        />
         {tab === "hourly" ? (
           <Field id={durationId} label="Duration" placeholder="Choose hours" type="select" options={["2 hours", "3 hours", "4 hours", "6 hours", "Full day (8h)", "Full day (10h)"]} icon="clock" />
         ) : (
-          <Field id={toId} label="Drop-off" placeholder={tab === "airport" ? "Terminal or address" : "Final destination"} icon="flag" />
+          <Field
+            id={toId}
+            label={isAirport ? "Drop-off location" : "Drop-off"}
+            placeholder={isAirport ? "Airport terminal, home, hotel, or office" : "Final destination"}
+            icon="flag"
+          />
+        )}
+        {isAirport && (
+          <Field
+            id={airportDirectionId}
+            label="Airport trip"
+            placeholder="Choose pickup or drop-off"
+            type="select"
+            options={["Airport pickup", "Airport drop-off", "Round trip", "Private terminal"]}
+            icon="plane"
+          />
         )}
         <Field id={dateId} label="Date" placeholder="Pick a date" type="date" icon="cal" />
         <Field id={timeId} label="Pickup time" placeholder="HH:MM" type="time" icon="clock" />
-        {tab === "airport" && (
+        {isAirport && (
           <Field id={flightId} label="Flight number" placeholder="e.g. BA 286" icon="plane" />
         )}
         <Field id={paxId} label="Passengers" type="select" options={["1", "2", "3", "4", "5", "6", "7"]} icon="user" />
-        {tab !== "airport" && (
-          <Field id={luggageId} label="Luggage" type="select" options={["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"]} icon="bag" />
-        )}
+        <Field id={luggageId} label="Luggage" type="select" options={["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"]} icon="bag" />
       </form>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-3 px-2 sm:px-3">
@@ -82,7 +106,7 @@ export function BookingCard() {
 
       <div className="flex items-center gap-3 px-3 pt-4 pb-2 font-condensed text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
         <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[color:var(--color-champagne)]" />
-        Flat all-inclusive rates · Free 60-min wait at airports
+        Airport pickup and drop-off · Free 60-min wait on arrivals
       </div>
     </div>
   );

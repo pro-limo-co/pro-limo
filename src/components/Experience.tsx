@@ -37,7 +37,7 @@ export function Experience() {
           <div className="lg:col-span-6 lg:col-start-7 lg:pt-6">
             <p className="text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
               The drive is the rest, the prep, the breath between two important
-              moments. Three quiet promises hold every Pro Limo journey to that
+              moments. Three quiet promises hold every Professional Limousine Driver journey to that
               standard.
             </p>
           </div>

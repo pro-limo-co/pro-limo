@@ -6,10 +6,10 @@ const size = { width: 1200, height: 630 };
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get("title") ?? "Private chauffeur, worldwide";
-  const eyebrow = searchParams.get("eyebrow") ?? "Pro Limo";
+  const title = searchParams.get("title") ?? "Portland chauffeur service";
+  const eyebrow = searchParams.get("eyebrow") ?? "Professional Limousine Driver";
   const subtitle =
-    searchParams.get("subtitle") ?? "Flat rates · Professional drivers · 500+ cities";
+    searchParams.get("subtitle") ?? "Airport pickup · Airport drop-off · Regional rides";
 
   return new ImageResponse(
     (
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
               fontFamily: "sans-serif",
             }}
           >
-            prolimo.com
+            ProLimoDriver.com
           </div>
         </div>
 

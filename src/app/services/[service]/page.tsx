@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { service: slug } = await params;
   const s = getService(slug);
   if (!s) return {};
-  const title = `${s.name} — Pro Limo private chauffeur`;
+  const title = s.name;
   const description = s.intro.replace(/<[^>]+>|&[^;]+;/g, "");
   const url = `${siteConfig.url}/services/${s.slug}`;
   return {
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       url,
       images: [
         {
-          url: `/api/og?title=${encodeURIComponent(s.name)}&eyebrow=${encodeURIComponent("Pro Limo")}&subtitle=${encodeURIComponent(s.tagline)}`,
+          url: `/api/og?title=${encodeURIComponent(s.name)}&eyebrow=${encodeURIComponent("Professional Limousine Driver")}&subtitle=${encodeURIComponent(s.tagline)}`,
           width: 1200,
           height: 630,
         },
@@ -133,7 +133,7 @@ export default async function ServicePage({ params }: { params: Params }) {
                 <p className="px-4 pt-3 pb-1 font-mono text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
                   Reserve · {s.shortName}
                 </p>
-                <BookingCard />
+                <BookingCard defaultTab={s.slug === "airport-transfer" ? "airport" : "oneway"} />
               </div>
             </Reveal>
           </aside>

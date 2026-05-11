@@ -7,11 +7,11 @@ const cols = [
   },
   {
     label: "For business",
-    items: ["Pro Limo for Business", "Travel managers", "Duty of care", "API & integrations", "Concierge desk"],
+    items: ["Business travel", "Travel managers", "Duty of care", "Accounts", "Concierge desk"],
   },
   {
-    label: "Cities",
-    items: ["London", "New York", "Paris", "Tokyo", "Dubai", "All cities"],
+    label: "Locations",
+    items: ["Portland", "Seattle", "Eugene", "Cannon Beach", "Astoria", "All locations"],
   },
   {
     label: "Company",
@@ -27,8 +27,9 @@ export function Footer() {
           <div className="lg:col-span-4">
             <Logo />
             <p className="mt-6 max-w-sm text-[0.95rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-              Pro Limo is private chauffeur service for travelers and businesses
-              in 500+ cities. Crafted by chauffeurs, for the people they drive.
+              Professional Limousine Driver is private chauffeur service for
+              travelers and businesses around Portland and the current regional
+              service area. Crafted by chauffeurs, for the people they drive.
             </p>
 
             <form className="mt-10 max-w-sm">
@@ -78,7 +79,7 @@ export function Footer() {
 
         <div className="mt-16 lg:mt-24 pt-8 border-t border-[color:var(--color-divider-soft)] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6">
           <p className="text-[0.78rem] text-[color:var(--color-pewter)]">
-            © {new Date().getFullYear()} Pro Limo. A Corvus Inc. service. All rights reserved.
+            © {new Date().getFullYear()} Professional Limousine Driver. All rights reserved.
           </p>
           <ul className="flex flex-wrap items-center gap-6 text-[0.78rem] text-[color:var(--color-bone-dim)]">
             <li><a href="#legal" className="link-gold">Legal</a></li>

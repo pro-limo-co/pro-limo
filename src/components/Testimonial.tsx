@@ -30,7 +30,7 @@ export function Testimonial() {
             id="testimonial-heading"
             className="font-display font-light text-balance text-[clamp(1.65rem,3.4vw,2.85rem)] leading-[1.2] text-[color:var(--color-bone)] -mt-6"
           >
-            Of every vendor my team uses on the road, Pro Limo is the one I never
+            Of every vendor my team uses on the road, Professional Limousine Driver is the one I never
             have to think about. The car is there before I am — and somehow,
             so is exactly the silence I needed.
           </h2>

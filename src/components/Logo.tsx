@@ -5,8 +5,8 @@ type LogoProps = {
 export function Logo({ className }: LogoProps) {
   return (
     <span
-      className={`inline-flex items-baseline gap-[0.35rem] select-none ${className ?? ""}`}
-      aria-label="Pro Limo"
+      className={`inline-flex items-center gap-[0.45rem] select-none ${className ?? ""}`}
+      aria-label="Professional Limousine Driver"
     >
       <svg
         aria-hidden
@@ -27,8 +27,9 @@ export function Logo({ className }: LogoProps) {
           fill="currentColor"
         />
       </svg>
-      <span className="font-display text-[1.45rem] leading-none tracking-[-0.01em]">
-        Pro Limo
+      <span className="font-display text-[1.02rem] sm:text-[1.18rem] leading-[0.95] tracking-[0.01em]">
+        <span className="block">Professional</span>
+        <span className="block">Limousine Driver</span>
       </span>
     </span>
   );

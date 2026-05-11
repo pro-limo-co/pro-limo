@@ -4,8 +4,8 @@ const services = [
   {
     no: "01",
     title: "Airport transfers",
-    sub: "Smooth landings, every time.",
-    body: "Real-time flight tracking, 60 minutes of complimentary wait, and a chauffeur waiting in arrivals — by name.",
+    sub: "Arrivals and departures.",
+    body: "Airport pickup, airport drop-off, live flight tracking for arrivals, and terminal-aware departure timing.",
     href: "#airport",
     icon: PlaneIcon,
   },
@@ -21,7 +21,7 @@ const services = [
     no: "03",
     title: "City to city",
     sub: "Between cities, done better.",
-    body: "Cross borders without the airport. Scenic, silent, and on your own clock — across Europe and beyond.",
+    body: "Regional private transfers between Portland, Seattle, Eugene, the coast, the valley, and the Gorge.",
     href: "#intercity",
     icon: RouteIcon,
   },
@@ -50,7 +50,7 @@ export function Services() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7 lg:pt-6">
             <p className="text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-              Four ways to move with Pro Limo — each priced as a flat, all-inclusive
+              Four ways to move with Professional Limousine Driver - each priced as a flat, all-inclusive
               fare with no surge, no traffic surcharge, and no surprise on the receipt.
             </p>
           </div>

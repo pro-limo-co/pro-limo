@@ -17,8 +17,8 @@ export function Reveal({ children, delay = 0, className, as: Tag = "div" }: Reve
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
-      setShown(true);
-      return;
+      const frame = window.requestAnimationFrame(() => setShown(true));
+      return () => window.cancelAnimationFrame(frame);
     }
     const obs = new IntersectionObserver(
       (entries) => {

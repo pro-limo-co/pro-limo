@@ -9,15 +9,15 @@ import { cities } from "@/data/cities";
 import { siteConfig } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "All cities — Private chauffeur service in 500+ locations",
+  title: "Locations - Portland Chauffeur Service Area",
   description:
-    "Pro Limo private chauffeur service operates in 500+ cities worldwide. Browse local availability, airports served, and popular routes.",
+    "Browse Professional Limousine Driver location pages for Portland, Seattle, Eugene, Cannon Beach, Seaside, Astoria, and high-demand metro cities.",
   alternates: { canonical: "/cities" },
   openGraph: {
-    title: "All cities — Pro Limo private chauffeur service",
-    description: "Pro Limo private chauffeur service in 500+ cities worldwide.",
+    title: "Locations - Professional Limousine Driver",
+    description: "Private chauffeur and airport car service across the current Portland-centered service area.",
     url: `${siteConfig.url}/cities`,
-    images: [{ url: `/api/og?title=${encodeURIComponent("Cities · 500+ worldwide")}`, width: 1200, height: 630 }],
+    images: [{ url: `/api/og?title=${encodeURIComponent("Portland service area locations")}`, width: 1200, height: 630 }],
   },
 };
 
@@ -44,14 +44,14 @@ export default function CitiesIndex() {
       <Nav />
       <main>
         <PageHeader
-          eyebrow="Index — Cities"
+          eyebrow="Index - Locations"
           title={
             <>
-              Wherever you land,
-              <span className="block italic text-[color:var(--color-champagne-bright)]">we are local.</span>
+              Portland-centered,
+              <span className="block italic text-[color:var(--color-champagne-bright)]">route by route.</span>
             </>
           }
-          subtitle="Pro Limo operates in 500+ cities worldwide. The full index is below — every entry is staffed by chauffeurs who live in the city you’re visiting."
+          subtitle="Current location pages focus on cities within roughly 250 miles of Portland, including Seattle, Eugene, Cannon Beach, Seaside, Astoria, and high-demand communities around the metro."
         />
 
         <section className="mx-auto max-w-[1400px] px-6 lg:px-10 pb-24">
@@ -72,7 +72,7 @@ export default function CitiesIndex() {
                           {c.name}
                         </span>
                         <span className="font-mono text-[0.72rem] tracking-[0.2em] text-[color:var(--color-pewter)]">
-                          {c.airports[0]?.code}
+                          {c.stateCode} · {c.airports[0]?.code}
                         </span>
                       </Link>
                     </li>
@@ -83,8 +83,8 @@ export default function CitiesIndex() {
           ))}
 
           <p className="mt-16 text-[color:var(--color-bone-dim)] text-[0.95rem]">
-            Plus 488 more — if you don’t see your city, our concierge desk
-            can still arrange a chauffeur in 95% of inquiries.
+            Each location page links to airport transfer, hourly chauffeur,
+            city-to-city, business, and event service pages for the same market.
           </p>
         </section>
       </main>

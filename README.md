@@ -1,8 +1,8 @@
-# Pro Limo
+# Professional Limousine Driver
 
-Private chauffeur service for travelers and businesses — in 500+ cities, with flat rates, professional drivers, and a flawless arrival every time.
+Private chauffeur and airport car service for travelers and businesses around Portland and the current regional service area, with flat rates, professional drivers, and a polished arrival every time.
 
-A Corvus Inc. service. Built with Next.js 16, React 19, Tailwind CSS v4.
+Domain: [ProLimoDriver.com](https://prolimodriver.com). Built with Next.js 16, React 19, Tailwind CSS v4.
 
 ## Stack
 
@@ -11,13 +11,14 @@ A Corvus Inc. service. Built with Next.js 16, React 19, Tailwind CSS v4.
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com) (CSS-first config)
 - **Type**: Cormorant Garamond (display) + Geist (sans) + Geist Mono
 - **Images**: SVG illustrations + dynamic Open Graph via `next/og`
-- **SEO**: JSON-LD structured data, sitemap, robots, programmatic city × service pages
+- **SEO**: JSON-LD structured data, sitemap, robots, programmatic location x service pages
+- **Convex**: Production env wiring for `outstanding-crab-950`
 
 ## Getting started
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000).
@@ -25,31 +26,44 @@ Visit [http://localhost:3000](http://localhost:3000).
 ## Build
 
 ```bash
-npm run build
-npm start
+bun run build
+bun run start
 ```
 
-Output is fully static for the marketing surface (~85 prerendered pages: home, cities index, 12 city pages, services index, 5 service pages, 60 city × service combos, business, plus sitemap/robots).
+Output is static for the marketing surface: home, locations index, 28 location pages, services index, 5 service pages, 140 location x service combos, business, sitemap, robots, and a dynamic Open Graph route.
+
+## Production environment
+
+Vercel production is wired to the ProLimo Convex deployment:
+
+| Variable | Purpose |
+|---|---|
+| `CONVEX_DEPLOYMENT` | Convex production deployment name |
+| `CONVEX_DEPLOY_KEY` | Secret deploy key for Convex production deploys |
+| `NEXT_PUBLIC_CONVEX_URL` | Browser-safe Convex cloud URL |
+| `CONVEX_HTTP_ACTIONS_URL` | Server-side Convex HTTP Actions URL |
+
+Use `.env.example` as the non-secret template. Do not commit `.env.local` or the deploy key.
 
 ## Programmatic SEO routes
 
 | Path | Pages | Notes |
 |---|---|---|
 | `/` | 1 | Home (Hero, Services, Fleet, Experience, Cities, Standards, Testimonial, App, CTA) |
-| `/cities` | 1 | All-cities index with regional grouping |
-| `/cities/[city]` | 12 | One per city in `src/data/cities.ts` |
-| `/cities/[city]/[service]` | 60 | City × service combo (e.g. `/cities/london/airport-transfer`) |
+| `/cities` | 1 | All-locations index with regional grouping |
+| `/cities/[city]` | 28 | One per location in `src/data/cities.ts` |
+| `/cities/[city]/[service]` | 140 | Location x service combo (e.g. `/cities/portland/airport-transfer`) |
 | `/services` | 1 | All-services index |
 | `/services/[service]` | 5 | One per service in `src/data/services.ts` |
-| `/business` | 1 | Pro Limo for Business |
+| `/business` | 1 | Professional Limousine Driver for Business |
 | `/api/og` | dynamic | Edge-rendered Open Graph images, themed per page |
 | `/sitemap.xml` | 1 | Auto-generated from data |
 | `/robots.txt` | 1 | Auto-generated |
 
-## Adding a city
+## Adding a location
 
 1. Add an entry to `src/data/cities.ts`.
-2. The city is automatically added to the sitemap, the cities index, and all city × service combos.
+2. The location is automatically added to the sitemap, the locations index, and all location x service combos.
 
 ## Adding a service
 
@@ -65,4 +79,4 @@ Output is fully static for the marketing surface (~85 prerendered pages: home, c
 
 ## License
 
-© Corvus Inc. All rights reserved.
+© Professional Limousine Driver. All rights reserved.

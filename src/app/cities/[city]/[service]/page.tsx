@@ -23,8 +23,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const s = getService(serviceSlug);
   if (!c || !s) return {};
 
-  const title = `${s.name} in ${c.name} — Pro Limo private chauffeur`;
-  const description = `${s.intro.replace(/<[^>]+>|&[^;]+;/g, "")} Available in ${c.name}, ${c.country}.`;
+  const title = `${s.name} in ${c.name}, ${c.stateCode}`;
+  const description = `${s.intro.replace(/<[^>]+>|&[^;]+;/g, "")} Available in ${c.name}, ${c.state}.`;
   const url = `${siteConfig.url}/cities/${c.slug}/${s.slug}`;
 
   return {
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       url,
       images: [
         {
-          url: `/api/og?title=${encodeURIComponent(`${s.name} in ${c.name}`)}&eyebrow=${encodeURIComponent(`Pro Limo · ${c.country}`)}&subtitle=${encodeURIComponent(s.tagline)}`,
+          url: `/api/og?title=${encodeURIComponent(`${s.name} in ${c.name}`)}&eyebrow=${encodeURIComponent(`${c.stateCode} service area`)}&subtitle=${encodeURIComponent(s.tagline)}`,
           width: 1200,
           height: 630,
         },
@@ -68,7 +68,7 @@ export default async function CityServicePage({ params }: { params: Params }) {
     "@type": "Service",
     name: `${s.name} in ${c.name}`,
     serviceType: s.name,
-    areaServed: { "@type": "City", name: c.name, containedInPlace: { "@type": "Country", name: c.country } },
+    areaServed: { "@type": "City", name: c.name, containedInPlace: { "@type": "State", name: c.state } },
     provider: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
     description: s.intro.replace(/<[^>]+>|&[^;]+;/g, ""),
   };
@@ -168,7 +168,7 @@ export default async function CityServicePage({ params }: { params: Params }) {
                 <p className="px-4 pt-3 pb-1 font-mono text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
                   Reserve · {c.name} · {s.shortName}
                 </p>
-                <BookingCard />
+                <BookingCard defaultTab={s.slug === "airport-transfer" ? "airport" : "oneway"} />
               </div>
             </Reveal>
           </aside>

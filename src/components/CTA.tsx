@@ -19,8 +19,9 @@ export function CTA() {
         </Reveal>
         <Reveal delay={260}>
           <p className="mt-8 mx-auto max-w-xl text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-            Reserve a Pro Limo chauffeur in any of 500+ cities — flat rates,
-            real-time tracking, and a flawless arrival, every single time.
+            Reserve a Professional Limousine Driver chauffeur for Portland,
+            Seattle, Eugene, Cannon Beach, Seaside, Astoria, and the most
+            requested metro routes.
           </p>
         </Reveal>
         <Reveal delay={360}>

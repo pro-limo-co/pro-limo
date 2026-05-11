@@ -9,12 +9,12 @@ import { services } from "@/data/services";
 import { siteConfig } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Services — Private chauffeur, by the hour, airport, intercity",
+  title: "Services - Private Chauffeur, Airport, Hourly, Intercity",
   description:
-    "Pro Limo offers airport transfers, hourly chauffeurs, city-to-city rides, business travel, and event coordination — all at flat all-inclusive rates.",
+    "Professional Limousine Driver offers airport pickup and drop-off, hourly chauffeurs, city-to-city rides, business travel, and event coordination at flat all-inclusive rates.",
   alternates: { canonical: "/services" },
   openGraph: {
-    title: "Services — Pro Limo private chauffeur",
+    title: "Services - Professional Limousine Driver",
     description: "Five services. One standard.",
     url: `${siteConfig.url}/services`,
     images: [{ url: `/api/og?title=${encodeURIComponent("Five services. One standard.")}`, width: 1200, height: 630 }],
@@ -46,7 +46,7 @@ export default function ServicesIndex() {
               <span className="block italic text-[color:var(--color-champagne-bright)]">one standard.</span>
             </>
           }
-          subtitle="Whether you’re landing at midnight or chairing a board meeting at noon, Pro Limo runs five flat-fare services to take you there."
+          subtitle="Whether you are landing at midnight, departing before dawn, or chairing a board meeting at noon, Professional Limousine Driver runs five flat-fare services to take you there."
         />
 
         <section className="mx-auto max-w-[1400px] px-6 lg:px-10 pb-24">

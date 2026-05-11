@@ -24,7 +24,7 @@ export function Hero() {
           <div className="lg:col-span-7 xl:col-span-7">
             <p className="eyebrow rise rise-1">
               <span className="mr-2 text-[color:var(--color-champagne)]">·</span>
-              Chapter I — Pro Limo, since 2026
+              Chapter I - Professional Limousine Driver
             </p>
 
             <h1 id="hero-heading" className="display-xl mt-6 rise rise-2">
@@ -34,8 +34,9 @@ export function Hero() {
 
             <p className="mt-8 max-w-xl text-[1.05rem] leading-[1.65] text-[color:var(--color-bone-dim)] rise rise-3">
               A private chauffeur, a quiet vehicle, a flawless arrival.
-              In 500+ cities, Pro Limo is the most discreet way to move —
-              for travelers who measure a journey by what they didn’t have to think about.
+              Serving Portland and regional routes as far as Seattle, Eugene,
+              Astoria, Seaside, and Cannon Beach - for travelers who measure a
+              journey by what they did not have to think about.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 rise rise-4">
@@ -54,7 +55,7 @@ export function Hero() {
             </div>
 
             <dl className="mt-14 grid grid-cols-3 max-w-md rise rise-5 border-t hairline pt-6">
-              <Fact value="500+" label="Cities" />
+              <Fact value="250mi" label="Service radius" />
               <Fact value="60s" label="Pickup change window" />
               <Fact value="24/7" label="Concierge desk" />
             </dl>

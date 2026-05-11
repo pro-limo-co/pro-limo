@@ -19,8 +19,8 @@ export const organizationSchema: WithContext<Record<string, unknown>> = {
     contactType: "Concierge",
     email: siteConfig.contact.email,
     telephone: siteConfig.contact.phone,
-    availableLanguage: ["English", "French", "German", "Italian", "Spanish", "Japanese", "Mandarin", "Arabic"],
-    areaServed: "Worldwide",
+    availableLanguage: ["English"],
+    areaServed: ["Portland metro", "Oregon Coast", "Willamette Valley", "Puget Sound"],
   },
 };
 
@@ -44,7 +44,7 @@ export const homePageSchemas: WithContext<Record<string, unknown>>[] = [
     "@type": "Service",
     serviceType: "Private Chauffeur Service",
     provider: { "@id": siteConfig.url },
-    areaServed: "Worldwide",
+    areaServed: ["Portland metro", "Oregon Coast", "Willamette Valley", "Puget Sound"],
     description: siteConfig.description,
     offers: {
       "@type": "AggregateOffer",
@@ -66,12 +66,13 @@ export function citySchemas(city: City): WithContext<Record<string, unknown>>[] 
       name: `${siteConfig.name} ${city.name}`,
       url,
       image: `${siteConfig.url}/api/og?title=${encodeURIComponent(city.name)}`,
-      description: `Private chauffeur service in ${city.name}, ${city.country}. Flat rates, professional drivers, and a flawless arrival every time.`,
+      description: `Private chauffeur and airport car service in ${city.name}, ${city.state}. Flat rates, professional drivers, and a flawless arrival every time.`,
       telephone: siteConfig.contact.phone,
       priceRange: "$$$$",
       address: {
         "@type": "PostalAddress",
         addressLocality: city.name,
+        addressRegion: city.stateCode,
         addressCountry: city.countryCode,
       },
       geo: {
@@ -82,6 +83,10 @@ export function citySchemas(city: City): WithContext<Record<string, unknown>>[] 
       areaServed: {
         "@type": "City",
         name: city.name,
+        containedInPlace: {
+          "@type": "State",
+          name: city.state,
+        },
       },
       openingHoursSpecification: {
         "@type": "OpeningHoursSpecification",
@@ -114,7 +119,7 @@ export function serviceSchemas(service: Service): WithContext<Record<string, unk
       url,
       description: service.intro.replace(/<[^>]+>|&[^;]+;/g, ""),
       provider: { "@id": siteConfig.url },
-      areaServed: "Worldwide",
+      areaServed: ["Portland metro", "Oregon Coast", "Willamette Valley", "Puget Sound"],
     },
     {
       "@context": "https://schema.org",

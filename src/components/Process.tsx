@@ -6,7 +6,7 @@ const steps = [
     label: "Reserve",
     title: "Three taps, three minutes.",
     body:
-      "Pickup, drop-off, time. Pro Limo confirms a flat fare instantly and assigns a chauffeur within minutes — no auctions, no surge pricing.",
+      "Pickup, drop-off, time. Professional Limousine Driver confirms a flat fare and assigns a chauffeur - no auctions, no surge pricing.",
   },
   {
     no: "II",
@@ -51,7 +51,7 @@ export function Process() {
           </div>
           <div className="lg:col-span-6 lg:col-start-7 lg:pt-6">
             <p className="text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-              Most chauffeur services hide complexity. Pro Limo removes it. Every
+              Most chauffeur services hide complexity. Professional Limousine Driver removes it. Every
               step from booking to invoice runs as a single quiet protocol.
             </p>
           </div>
