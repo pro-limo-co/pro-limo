@@ -51,6 +51,10 @@ export default async function CityServicePage({ params }: { params: Params }) {
   const c = getCity(citySlug);
   const s = getService(serviceSlug);
   if (!c || !s) notFound();
+  const otherServices = services.reduce<(typeof services)[number][]>((acc, service) => {
+    if (service.slug !== s.slug) acc.push(service);
+    return acc;
+  }, []);
 
   const breadcrumbs = {
     "@context": "https://schema.org",
@@ -141,23 +145,21 @@ export default async function CityServicePage({ params }: { params: Params }) {
             <Reveal delay={240}>
               <h2 className="display-md mt-16">Other services in {c.name}</h2>
               <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {services
-                  .filter((o) => o.slug !== s.slug)
-                  .map((o) => (
-                    <li key={o.slug}>
-                      <Link
-                        href={`/cities/${c.slug}/${o.slug}`}
-                        className="group flex items-baseline justify-between border-b border-[color:var(--color-divider-soft)] py-3 hover:border-[color:var(--color-champagne)] transition-colors"
-                      >
-                        <span className="font-display text-[1.35rem] text-[color:var(--color-bone)] group-hover:text-[color:var(--color-champagne-bright)] transition-colors">
-                          {o.name}
-                        </span>
-                        <span className="font-mono text-[0.7rem] tracking-[0.18em] uppercase text-[color:var(--color-pewter)]">
-                          {c.name}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
+                {otherServices.map((o) => (
+                  <li key={o.slug}>
+                    <Link
+                      href={`/cities/${c.slug}/${o.slug}`}
+                      className="group flex items-baseline justify-between border-b border-[color:var(--color-divider-soft)] py-3 hover:border-[color:var(--color-champagne)] transition-colors"
+                    >
+                      <span className="font-display text-[1.35rem] text-[color:var(--color-bone)] group-hover:text-[color:var(--color-champagne-bright)] transition-colors">
+                        {o.name}
+                      </span>
+                      <span className="font-mono text-[0.7rem] tracking-[0.18em] uppercase text-[color:var(--color-pewter)]">
+                        {c.name}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </Reveal>
           </div>

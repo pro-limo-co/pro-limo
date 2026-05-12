@@ -4,12 +4,12 @@ const pillars = [
   {
     no: "I",
     title: "A welcome by name",
-    body: "Your chauffeur arrives in advance, in a freshly detailed vehicle, and greets you by name with a softly held door — never a hurried hand on the wheel.",
+    body: "Your chauffeur arrives in advance, in a freshly detailed vehicle, and greets you by name with a softly held door, never a hurried hand on the wheel.",
   },
   {
     no: "II",
     title: "You set the tone",
-    body: "Climate, music, conversation — or none. Save your preferences once and they travel with you across cities, fleets, and continents.",
+    body: "Climate, music, conversation, or none. Save your preferences once and they travel with you across cities, fleets, and continents.",
   },
   {
     no: "III",
@@ -28,7 +28,7 @@ export function Experience() {
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-16 lg:mb-24">
           <div className="lg:col-span-5">
-            <p className="eyebrow">Chapter IV — The Experience</p>
+            <p className="eyebrow">Chapter IV - The Experience</p>
             <h2 id="exp-heading" className="display-lg mt-5">
               Step in.
               <span className="block italic text-[color:var(--color-champagne-bright)]">Breathe out.</span>

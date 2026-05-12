@@ -4,7 +4,7 @@ import type { Service } from "@/data/services";
 
 type WithContext<T> = T & { "@context": "https://schema.org" };
 
-export const organizationSchema: WithContext<Record<string, unknown>> = {
+const organizationSchema: WithContext<Record<string, unknown>> = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: siteConfig.name,
@@ -24,7 +24,7 @@ export const organizationSchema: WithContext<Record<string, unknown>> = {
   },
 };
 
-export const websiteSchema: WithContext<Record<string, unknown>> = {
+const websiteSchema: WithContext<Record<string, unknown>> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: siteConfig.name,

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 const features = [
   {
     title: "Centralized billing",
-    body: "One invoice per cycle, one cost center, one reconciled spreadsheet — VAT-compliant in 30+ jurisdictions.",
+    body: "One invoice per cycle, one cost center, one reconciled spreadsheet, VAT-compliant in 30+ jurisdictions.",
   },
   {
     title: "Traveler profiles",
@@ -35,7 +35,7 @@ const features = [
   },
   {
     title: "Dedicated concierge",
-    body: "A real person, named, on a direct line — for every traveler, every booking, every contingency.",
+    body: "A real person, named, on a direct line, for every traveler, every booking, every contingency.",
   },
   {
     title: "GDS & travel platforms",
@@ -43,7 +43,7 @@ const features = [
   },
   {
     title: "Roadshow logistics",
-    body: "Multi-vehicle, multi-day, multi-city dispatch — with an on-site coordinator for the full duration.",
+    body: "Multi-vehicle, multi-day, multi-city dispatch with an on-site coordinator for the full duration.",
   },
 ];
 

@@ -18,5 +18,3 @@ export const siteConfig = {
   },
   founded: "2026",
 } as const;
-
-export type SiteConfig = typeof siteConfig;

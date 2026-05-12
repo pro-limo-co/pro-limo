@@ -1,6 +1,10 @@
 import { cities } from "@/data/cities";
 
 const marqueeCities = cities.map((city) => city.name);
+const marqueeItems = [
+  ...marqueeCities.map((name) => ({ name, loop: "primary" })),
+  ...marqueeCities.map((name) => ({ name, loop: "repeat" })),
+];
 
 export function Trust() {
   return (
@@ -14,13 +18,13 @@ export function Trust() {
         </p>
         <div className="relative flex-1 min-w-0 mask-fade">
           <div className="marquee-track flex items-center gap-12 whitespace-nowrap will-change-transform">
-            {[...marqueeCities, ...marqueeCities].map((c, i) => (
+            {marqueeItems.map((item) => (
               <span
-                key={`${c}-${i}`}
+                key={`${item.loop}-${item.name}`}
                 className="font-display text-[1.65rem] leading-none text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] transition-colors"
               >
-                {c}
-                <span className="inline-block mx-6 align-middle h-[6px] w-[6px] rounded-full bg-[color:var(--color-champagne)]/60" />
+                {item.name}
+                <span className="inline-block mx-6 align-middle size-[6px] rounded-full bg-[color:var(--color-champagne)]/60" />
               </span>
             ))}
           </div>

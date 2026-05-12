@@ -3,12 +3,8 @@ type JsonLdProps = {
 };
 
 export function JsonLd({ data }: JsonLdProps) {
-  const json = JSON.stringify(data);
+  const json = JSON.stringify(data).replace(/</g, "\\u003c");
   return (
-    <script
-      type="application/ld+json"
-      // Schema.org JSON-LD must be inlined raw
-      dangerouslySetInnerHTML={{ __html: json }}
-    />
+    <script type="application/ld+json">{json}</script>
   );
 }

@@ -9,7 +9,7 @@ export function CTA() {
     >
       <div className="relative z-10 mx-auto max-w-[1100px] px-6 lg:px-10 text-center">
         <Reveal>
-          <p className="eyebrow">— Réserver</p>
+          <p className="eyebrow">Réserver</p>
         </Reveal>
         <Reveal delay={120}>
           <h2 id="cta-heading" className="display-xl mt-6">

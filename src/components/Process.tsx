@@ -13,7 +13,7 @@ const steps = [
     label: "Track",
     title: "Watch the cabin arrive.",
     body:
-      "Live arrival map, chauffeur identity card, and vehicle plate — surfaced in your inbox the moment the car begins its run to you.",
+      "Live arrival map, chauffeur identity card, and vehicle plate, surfaced in your inbox the moment the car begins its run to you.",
   },
   {
     no: "III",
@@ -41,7 +41,7 @@ export function Process() {
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14 lg:mb-20">
           <div className="lg:col-span-5">
-            <p className="eyebrow">Chapter VI — How it runs</p>
+            <p className="eyebrow">Chapter VI - How it runs</p>
             <h2 id="process-heading" className="display-lg mt-5">
               Four steps,
               <span className="block italic text-[color:var(--color-champagne-bright)]">

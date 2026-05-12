@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "doctor:react": "react-doctor . --verbose --full --offline --project pro-limo",
+    "doctor:react:score": "react-doctor . --score --full --offline --project pro-limo"
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "convex": "^1.38.0",
     "motion": "^12.38.0",
     "next": "16.2.6",
     "react": "19.2.4",
@@ -25,6 +28,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "react-doctor": "^0.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -80,7 +80,7 @@ export function Nav() {
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="md:hidden ml-1 inline-flex items-center justify-center w-10 h-10 rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)]"
+            className="md:hidden ml-1 inline-flex size-10 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)]"
             aria-expanded={open}
             aria-label="Toggle menu"
           >

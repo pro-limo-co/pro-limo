@@ -20,14 +20,14 @@ const standards = [
     label: "Privacy",
     title: "What stays in the car.",
     body:
-      "Cabins are camera-free, conversations are confidential, and chauffeur agreements forbid disclosure — by name, by face, by route.",
+      "Cabins are camera-free, conversations are confidential, and chauffeur agreements forbid disclosure by name, by face, by route.",
   },
   {
     no: "04",
     label: "Sustainability",
     title: "Carbon-neutral, by design.",
     body:
-      "Every fare is offset by Gold Standard certified projects, with full electric available in 60+ cities — at the same flat fare.",
+      "Every fare is offset by Gold Standard certified projects, with full electric available in 60+ cities at the same flat fare.",
   },
 ];
 
@@ -37,7 +37,7 @@ export function Standards() {
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14 lg:mb-20">
           <div className="lg:col-span-5">
-            <p className="eyebrow">Chapter VI — Standards</p>
+            <p className="eyebrow">Chapter VI - Standards</p>
             <h2 className="display-lg mt-5">
               Expect <span className="italic text-[color:var(--color-champagne-bright)]">excellence.</span>
             </h2>

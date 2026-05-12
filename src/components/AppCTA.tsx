@@ -7,7 +7,7 @@ export function AppCTA() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div className="lg:col-span-7">
             <Reveal>
-              <p className="eyebrow">Chapter VIII — In your pocket</p>
+              <p className="eyebrow">Chapter VIII - In your pocket</p>
             </Reveal>
             <Reveal delay={120}>
               <h2 className="display-lg mt-5">
@@ -86,7 +86,7 @@ function PhoneMock() {
           <span className="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-[color:var(--color-bone-dim)]">
             21:14 · Portland
           </span>
-          <span className="inline-flex h-2 w-2 rounded-full bg-[color:var(--color-champagne)]" />
+          <span className="inline-flex size-2 rounded-full bg-[color:var(--color-champagne)]" />
         </div>
 
         <div className="px-6 mt-2">
@@ -137,7 +137,7 @@ function PhoneMock() {
         {/* Chauffeur card */}
         <div className="mx-4 mt-4 rounded-2xl border border-[color:var(--color-divider)] bg-[color:var(--color-ink-raised)] p-4">
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-10 w-10 rounded-full bg-[color:var(--color-champagne)]/15 items-center justify-center font-display text-[1rem] text-[color:var(--color-champagne-bright)]">
+            <span className="inline-flex size-10 rounded-full bg-[color:var(--color-champagne)]/15 items-center justify-center font-display text-[1rem] text-[color:var(--color-champagne-bright)]">
               MA
             </span>
             <div className="flex-1">

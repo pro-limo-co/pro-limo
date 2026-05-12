@@ -41,7 +41,7 @@ export function Services() {
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16 lg:mb-24">
           <div className="lg:col-span-5">
-            <p className="eyebrow">Chapter II — Services</p>
+            <p className="eyebrow">Chapter II - Services</p>
             <h2 className="display-lg mt-5">
               The way you travel,
               <br />
@@ -100,7 +100,7 @@ export function Services() {
 
 function IconBase({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--color-divider)] bg-[color:var(--color-ink-soft)] text-[color:var(--color-champagne-bright)] transition-colors group-hover:border-[color:var(--color-champagne)]">
+    <span className="inline-flex size-12 items-center justify-center rounded-full border border-[color:var(--color-divider)] bg-[color:var(--color-ink-soft)] text-[color:var(--color-champagne-bright)] transition-colors group-hover:border-[color:var(--color-champagne)]">
       {children}
     </span>
   );

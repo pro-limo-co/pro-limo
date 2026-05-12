@@ -6,7 +6,7 @@ const fleet = [
     examples: "Mercedes-Benz E-Class · BMW 5 Series",
     seats: "3 passengers · 2 large bags",
     blurb:
-      "An understated saloon for the working day — refined, brisk, and effortless to step in and out of.",
+      "An understated saloon for the working day, refined, brisk, and effortless to step in and out of.",
   },
   {
     tier: "First",
@@ -20,7 +20,7 @@ const fleet = [
     examples: "Mercedes-Benz V-Class · Sprinter Premium",
     seats: "Up to 7 passengers · 7 bags",
     blurb:
-      "Captain’s seats, lounge bench, and a working table — the boardroom that keeps moving.",
+      "Captain's seats, lounge bench, and a working table, the boardroom that keeps moving.",
   },
   {
     tier: "Electric",
@@ -37,14 +37,14 @@ export function Fleet() {
       <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16 lg:mb-20">
           <div>
-            <p className="eyebrow">Chapter III — The Fleet</p>
+            <p className="eyebrow">Chapter III - The Fleet</p>
             <h2 className="display-lg mt-5 max-w-[18ch]">
               Recent models, <span className="italic text-[color:var(--color-champagne-bright)]">never older than three years.</span>
             </h2>
           </div>
           <p className="max-w-md text-[1.025rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
             Every vehicle in our fleet is privately owned by the chauffeur driving it,
-            inspected weekly, and presented in pristine condition — interiors detailed
+            inspected weekly, and presented in pristine condition, interiors detailed
             between every fare.
           </p>
         </div>

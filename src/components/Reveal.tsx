@@ -43,7 +43,7 @@ export function Reveal({ children, delay = 0, className, as: Tag = "div" }: Reve
         transitionDelay: `${delay}ms`,
         opacity: shown ? 1 : 0,
         transform: shown ? "translateY(0)" : "translateY(28px)",
-        transition: "opacity 1100ms var(--ease-out-expo), transform 1100ms var(--ease-out-expo)",
+        transition: "opacity 900ms var(--ease-out-expo), transform 900ms var(--ease-out-expo)",
       }}
       className={className}
     >

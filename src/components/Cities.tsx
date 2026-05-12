@@ -2,9 +2,11 @@ import Link from "next/link";
 import { cities, featuredCitySlugs } from "@/data/cities";
 import { Reveal } from "./Reveal";
 
-const featured = featuredCitySlugs
-  .map((slug) => cities.find((city) => city.slug === slug))
-  .filter((city): city is NonNullable<typeof city> => Boolean(city));
+const featured = featuredCitySlugs.reduce<(typeof cities)[number][]>((acc, slug) => {
+  const city = cities.find((item) => item.slug === slug);
+  if (city) acc.push(city);
+  return acc;
+}, []);
 
 export function Cities() {
   return (

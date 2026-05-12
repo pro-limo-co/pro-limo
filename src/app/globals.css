@@ -15,7 +15,7 @@
   --color-pewter: #8A8884;
   --color-pewter-dim: #565552;
 
-  /* Sole accent — used sparingly */
+  /* Sole accent, used sparingly */
   --color-champagne: #C8A96A;
   --color-champagne-bright: #E5C98F;
   --color-champagne-dim: #8C7848;
@@ -26,7 +26,7 @@
   --font-mono: var(--font-mono), "Geist Mono", ui-monospace, monospace;
   --font-condensed: var(--font-condensed), "Oswald", "Bebas Neue", "Impact", sans-serif;
 
-  /* Easing — Open Design luxury spec: 150–250ms stable */
+  /* Easing, Open Design luxury spec: 150-250ms stable */
   --ease-stage: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -75,7 +75,7 @@ body {
 .font-mono { font-family: var(--font-mono); }
 .font-condensed { font-family: var(--font-condensed); }
 
-/* Eyebrow — Oswald, condensed, ALL CAPS, premium-mono feel (Bugatti-inspired) */
+/* Eyebrow, Oswald, condensed, ALL CAPS, premium-mono feel (Bugatti-inspired) */
 .eyebrow {
   font-family: var(--font-condensed);
   font-weight: 500;
@@ -95,7 +95,7 @@ body {
   color: var(--color-pewter);
 }
 
-/* Folio number — large, condensed, set on edge */
+/* Folio number, large, condensed, set on edge */
 .folio {
   font-family: var(--font-condensed);
   font-weight: 300;
@@ -107,7 +107,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Subtle grain — quieter than before per Bugatti monochrome austerity */
+/* Subtle grain, quieter than before per Bugatti monochrome austerity */
 .grain {
   position: relative;
   isolation: isolate;
@@ -123,7 +123,7 @@ html {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.42 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* Spotlight — restrained */
+/* Spotlight, restrained */
 .spotlight {
   background:
     radial-gradient(60% 40% at 50% 0%, color-mix(in oklab, var(--color-champagne) 6%, transparent), transparent 60%),
@@ -183,7 +183,7 @@ html {
   animation: halo 9s ease-in-out infinite;
 }
 
-/* Display sizes — Bugatti's monumental scale (ALL CAPS at extreme) */
+/* Display sizes, Bugatti's monumental scale (ALL CAPS at extreme) */
 .display-mega {
   font-family: var(--font-condensed);
   font-weight: 300;
@@ -246,7 +246,7 @@ html {
   color: var(--color-pewter-dim);
 }
 
-/* Button base — Bugatti-pill (9999px) with 1px hairline border */
+/* Button base, Bugatti-pill (9999px) with 1px hairline border */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -291,7 +291,7 @@ html {
   background: var(--color-champagne-bright);
 }
 
-/* Focus rings — explicit (luxury system: "Ensure hover, focus-visible, active, disabled, and loading states are explicit") */
+/* Focus rings, explicit (luxury system: "Ensure hover, focus-visible, active, disabled, and loading states are explicit") */
 :where(button, a, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-champagne);
   outline-offset: 3px;

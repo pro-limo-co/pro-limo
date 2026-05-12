@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { Trust } from "@/components/Trust";
@@ -15,6 +16,19 @@ import { MegaFolio } from "@/components/MegaFolio";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { homePageSchemas } from "@/lib/schema";
+import { siteConfig } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: siteConfig.name,
+  description: siteConfig.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    images: [{ url: siteConfig.ogImage, width: 1200, height: 630 }],
+  },
+};
 
 export default function Home() {
   return (

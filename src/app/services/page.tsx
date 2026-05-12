@@ -39,7 +39,7 @@ export default function ServicesIndex() {
       <Nav />
       <main>
         <PageHeader
-          eyebrow="Index — Services"
+          eyebrow="Index - Services"
           title={
             <>
               Five services,

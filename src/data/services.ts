@@ -48,17 +48,17 @@ export const services: Service[] = [
     shortName: "By the hour",
     tagline: "Your day, on retainer.",
     intro:
-      "Reserve Professional Limousine Driver for two hours or twelve. Your chauffeur stays with you for the entire booking — every stop, change of plan, and unscheduled detour included on a single flat fare.",
+      "Reserve Professional Limousine Driver for two hours or twelve. Your chauffeur stays with you for the entire booking, every stop, change of plan, and unscheduled detour included on a single flat fare.",
     bullets: [
       { title: "Unlimited stops", body: "Add or remove stops without changing the fare." },
       { title: "Unlimited mileage (within metro)", body: "We never count kilometers inside the city." },
-      { title: "Stays with you", body: "Same chauffeur, same vehicle — start to finish." },
+      { title: "Stays with you", body: "Same chauffeur, same vehicle, start to finish." },
       { title: "From two hours", body: "Two-hour minimum. Twelve-hour maximum per booking." },
     ],
     faqs: [
       {
         q: "Can I extend on the day?",
-        a: "Yes — your chauffeur can extend by the half-hour, billed at the published prorated rate.",
+        a: "Yes, your chauffeur can extend by the half-hour, billed at the published prorated rate.",
       },
       {
         q: "Can I leave bags in the vehicle?",
@@ -74,10 +74,10 @@ export const services: Service[] = [
     intro:
       "Move between regional cities without the airport. A Professional Limousine Driver intercity transfer moves you privately, on your own clock, in a quiet vehicle with a chauffeur briefed on your route.",
     bullets: [
-      { title: "Door-to-door", body: "From your address to theirs — no transfers, no terminals." },
+      { title: "Door-to-door", body: "From your address to theirs, no transfers, no terminals." },
       { title: "Scenic routing", body: "Choose the working route, or the one with a lake stop." },
       { title: "Regional corridors", body: "Portland-Seattle, Portland-Eugene, coast, Gorge, and valley routes on a single fare." },
-      { title: "Stops included", body: "Coffee, lunch, a view — all part of the fare." },
+      { title: "Stops included", body: "Coffee, lunch, a view, all part of the fare." },
     ],
     faqs: [
       {
@@ -122,7 +122,7 @@ export const services: Service[] = [
     intro:
       "Multi-vehicle, multi-day, multi-city. A Professional Limousine Driver events team plans the run-of-show with you and runs it on the day from a single dispatch desk.",
     bullets: [
-      { title: "Multi-vehicle dispatch", body: "Five cars, fifty cars — one quiet command desk." },
+      { title: "Multi-vehicle dispatch", body: "Five cars, fifty cars, one quiet command desk." },
       { title: "On-site coordinator", body: "An on-the-ground producer for the duration of your event." },
       { title: "Branded fleet (option)", body: "Subtle, removable livery for sponsorship moments." },
       { title: "Confidential", body: "NDAs and chauffeur briefings as standard." },

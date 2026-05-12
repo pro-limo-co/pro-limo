@@ -1,5 +1,7 @@
 import { Logo } from "./Logo";
 
+const copyrightYear = "2026";
+
 const cols = [
   {
     label: "Services",
@@ -33,11 +35,12 @@ export function Footer() {
             </p>
 
             <form className="mt-10 max-w-sm">
-              <label className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
-                The dispatch — quarterly
+              <label htmlFor="dispatch-email" className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
+                The dispatch, quarterly
               </label>
               <div className="mt-3 flex items-center gap-2 border-b border-[color:var(--color-divider)] focus-within:border-[color:var(--color-champagne)] transition-colors">
                 <input
+                  id="dispatch-email"
                   type="email"
                   placeholder="you@yourdomain.com"
                   className="field h-11 bg-transparent text-[0.95rem]"
@@ -49,7 +52,7 @@ export function Footer() {
                 </button>
               </div>
               <p className="mt-3 text-[0.72rem] text-[color:var(--color-pewter)]">
-                Travel essays and city guides — no marketing.
+                Travel essays and city guides, no marketing.
               </p>
             </form>
           </div>
@@ -79,7 +82,7 @@ export function Footer() {
 
         <div className="mt-16 lg:mt-24 pt-8 border-t border-[color:var(--color-divider-soft)] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6">
           <p className="text-[0.78rem] text-[color:var(--color-pewter)]">
-            © {new Date().getFullYear()} Professional Limousine Driver. All rights reserved.
+            © {copyrightYear} Professional Limousine Driver. All rights reserved.
           </p>
           <ul className="flex flex-wrap items-center gap-6 text-[0.78rem] text-[color:var(--color-bone-dim)]">
             <li><a href="#legal" className="link-gold">Legal</a></li>
@@ -125,7 +128,7 @@ function Social({
     <a
       href={href}
       aria-label={label}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] hover:border-[color:var(--color-champagne)] transition-colors"
+      className="inline-flex size-9 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] hover:border-[color:var(--color-champagne)] transition-colors"
     >
       {children}
     </a>

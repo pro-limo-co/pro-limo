@@ -15,7 +15,7 @@ type BookingCardProps = {
 };
 
 export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
-  const [tab, setTab] = useState<TabId>(defaultTab);
+  const [selectedTab, setSelectedTab] = useState<TabId | null>(null);
   const fromId = useId();
   const toId = useId();
   const dateId = useId();
@@ -25,6 +25,7 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
   const durationId = useId();
   const luggageId = useId();
   const airportDirectionId = useId();
+  const tab = selectedTab ?? defaultTab;
   const isAirport = tab === "airport";
 
   return (
@@ -37,7 +38,7 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
               key={t.id}
               role="tab"
               aria-selected={active}
-              onClick={() => setTab(t.id)}
+              onClick={() => setSelectedTab(t.id)}
               className={[
                 "flex-1 h-11 rounded-lg font-condensed text-[0.78rem] tracking-[0.16em] uppercase font-medium transition-colors",
                 active
@@ -51,11 +52,8 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
         })}
       </div>
 
-      <form
+      <div
         className="grid grid-cols-1 sm:grid-cols-2 gap-px mt-2 bg-[color:var(--color-divider-soft)] rounded-xl overflow-hidden"
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
       >
         <Field
           id={fromId}
@@ -90,10 +88,10 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
         )}
         <Field id={paxId} label="Passengers" type="select" options={["1", "2", "3", "4", "5", "6", "7"]} icon="user" />
         <Field id={luggageId} label="Luggage" type="select" options={["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"]} icon="bag" />
-      </form>
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-3 px-2 sm:px-3">
-        <button type="submit" className="btn btn-primary flex-1">
+        <button type="button" className="btn btn-primary flex-1">
           See prices & reserve
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -105,7 +103,7 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
       </div>
 
       <div className="flex items-center gap-3 px-3 pt-4 pb-2 font-condensed text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
-        <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[color:var(--color-champagne)]" />
+        <span className="inline-flex size-1.5 rounded-full bg-[color:var(--color-champagne)]" />
         Airport pickup and drop-off · Free 60-min wait on arrivals
       </div>
     </div>

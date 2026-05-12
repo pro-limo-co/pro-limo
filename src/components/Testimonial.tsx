@@ -18,7 +18,7 @@ export function Testimonial() {
 
       <div className="relative z-10 mx-auto max-w-[1100px] px-6 lg:px-10 text-center">
         <Reveal>
-          <p className="eyebrow mb-10">Chapter VII — In their words</p>
+          <p className="eyebrow mb-10">Chapter VII - In their words</p>
         </Reveal>
         <Reveal delay={120}>
           <span className="font-display italic text-[5rem] leading-none text-[color:var(--color-champagne)]">
@@ -31,7 +31,7 @@ export function Testimonial() {
             className="font-display font-light text-balance text-[clamp(1.65rem,3.4vw,2.85rem)] leading-[1.2] text-[color:var(--color-bone)] -mt-6"
           >
             Of every vendor my team uses on the road, Professional Limousine Driver is the one I never
-            have to think about. The car is there before I am — and somehow,
+            have to think about. The car is there before I am, and somehow,
             so is exactly the silence I needed.
           </h2>
         </Reveal>

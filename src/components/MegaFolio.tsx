@@ -6,7 +6,7 @@ export function MegaFolio() {
     >
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10 py-10 lg:py-16">
         <div className="flex items-end justify-between gap-6 mb-3">
-          <span className="metastrip">— A Corvus Inc. service · Est. 2026 ·</span>
+          <span className="metastrip">A Corvus Inc. service · Est. 2026 ·</span>
           <span className="metastrip">Filed: ProLimoDriver.com / fin.</span>
         </div>
         <h2

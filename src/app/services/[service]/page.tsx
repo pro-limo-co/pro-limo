@@ -48,6 +48,11 @@ export default async function ServicePage({ params }: { params: Params }) {
   const { service: slug } = await params;
   const s = getService(slug);
   if (!s) notFound();
+  const featuredCities = featuredCitySlugs.reduce<(typeof cities)[number][]>((acc, citySlug) => {
+    const city = cities.find((item) => item.slug === citySlug);
+    if (city) acc.push(city);
+    return acc;
+  }, []);
 
   return (
     <>
@@ -59,7 +64,7 @@ export default async function ServicePage({ params }: { params: Params }) {
           title={
             <>
               {s.name}
-              <span className="block italic text-[color:var(--color-champagne-bright)]">— {s.tagline}</span>
+              <span className="block italic text-[color:var(--color-champagne-bright)]">- {s.tagline}</span>
             </>
           }
           subtitle={s.intro}
@@ -105,24 +110,21 @@ export default async function ServicePage({ params }: { params: Params }) {
             <Reveal delay={220}>
               <h2 className="display-md mt-16">{s.shortName} in featured cities</h2>
               <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {featuredCitySlugs
-                  .map((slug) => cities.find((c) => c.slug === slug))
-                  .filter((c): c is NonNullable<typeof c> => Boolean(c))
-                  .map((c) => (
-                    <li key={c.slug}>
-                      <Link
-                        href={`/cities/${c.slug}/${s.slug}`}
-                        className="group flex items-baseline justify-between border-b border-[color:var(--color-divider-soft)] py-3 hover:border-[color:var(--color-champagne)] transition-colors"
-                      >
-                        <span className="font-display text-[1.4rem] text-[color:var(--color-bone)] group-hover:text-[color:var(--color-champagne-bright)] transition-colors">
-                          {c.name}
-                        </span>
-                        <span className="font-mono text-[0.72rem] tracking-[0.18em] text-[color:var(--color-pewter)]">
-                          {c.airports[0]?.code}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
+                {featuredCities.map((c) => (
+                  <li key={c.slug}>
+                    <Link
+                      href={`/cities/${c.slug}/${s.slug}`}
+                      className="group flex items-baseline justify-between border-b border-[color:var(--color-divider-soft)] py-3 hover:border-[color:var(--color-champagne)] transition-colors"
+                    >
+                      <span className="font-display text-[1.4rem] text-[color:var(--color-bone)] group-hover:text-[color:var(--color-champagne-bright)] transition-colors">
+                        {c.name}
+                      </span>
+                      <span className="font-mono text-[0.72rem] tracking-[0.18em] text-[color:var(--color-pewter)]">
+                        {c.airports[0]?.code}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </Reveal>
           </div>
