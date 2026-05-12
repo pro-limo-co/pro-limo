@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.2",
+    "@sentry/nextjs": "^10.53.1",
     "better-auth": "^1.6.10",
     "clsx": "^2.1.1",
     "convex": "^1.38.0",

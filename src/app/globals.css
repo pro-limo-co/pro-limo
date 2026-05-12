@@ -33,6 +33,19 @@
 
 :root {
   color-scheme: dark;
+  --background: var(--color-ink);
+  --foreground: var(--color-bone);
+  --primary: var(--color-champagne);
+  --primary-foreground: var(--color-ink);
+  --accent: var(--color-champagne-bright);
+  --accent-foreground: var(--color-ink);
+  --destructive: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --card: var(--color-ink-soft);
+  --card-foreground: var(--color-bone);
+  --border: var(--color-divider);
+  --ring: var(--color-champagne);
 }
 
 * {

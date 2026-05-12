@@ -14,6 +14,7 @@ Domain: [ProLimoDriver.com](https://prolimodriver.com). Built with Next.js 16, R
 - **SEO**: JSON-LD structured data, sitemap, robots, programmatic location x service pages
 - **Convex**: Booking persistence, dispatch workflow data, Better Auth-backed staff access
 - **Payments**: Stripe Checkout scaffold with webhook sync
+- **Observability**: Sentry runtime error reporting for client, server, and edge runtimes
 
 ## Getting started
 
@@ -50,6 +51,8 @@ Vercel production is wired to the ProLimo Convex deployment:
 | `STRIPE_SECRET_KEY` | Stripe secret key for Checkout |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
 | `STRIPE_WEBHOOK_SYNC_SECRET` | Shared secret used by the webhook route when syncing Convex |
+| `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN` | Sentry DSN for runtime error reporting |
+| `SENTRY_AUTH_TOKEN` | Secret token for source-map uploads in CI |
 
 Use `.env.example` as the non-secret template. Do not commit `.env.local` or the deploy key.
 
@@ -68,7 +71,10 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 | `/auth/sign-in` | dynamic | Better Auth staff sign-in |
 | `/booking/[reference]` | dynamic | Public booking status page |
 | `/api/auth/[...all]` | dynamic | Better Auth proxy route |
+| `/api/bookings` | dynamic | Booking submission API |
+| `/api/health` | dynamic | Runtime health check |
 | `/api/stripe/webhook` | dynamic | Stripe webhook sync route |
+| `/sentry-test?throw=server-component` | dynamic | Noindex server-component Sentry test route |
 | `/api/og` | dynamic | Edge-rendered Open Graph images, themed per page |
 | `/sitemap.xml` | 1 | Auto-generated from data |
 | `/robots.txt` | 1 | Auto-generated |
