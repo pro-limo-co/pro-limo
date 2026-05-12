@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function BookingReferencePage({ params }: { params: Params }) {
   const { reference } = await params;
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
   if (!convexUrl) notFound();
 
   const convex = new ConvexHttpClient(convexUrl);
@@ -61,4 +61,3 @@ function BookingFact({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-

@@ -4,7 +4,7 @@ import { api } from "@convex/_generated/api";
 const bookingModes = ["oneway", "hourly", "airport"] as const;
 
 export async function POST(request: Request) {
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
   if (!convexUrl) {
     return Response.json(
       {
@@ -72,7 +72,8 @@ export async function POST(request: Request) {
       message: "Request received. Dispatch will confirm pricing and availability.",
       publicReference: result.publicReference,
     });
-  } catch {
+  } catch (error) {
+    console.error("Booking submission failed", error);
     return Response.json(
       {
         status: "error",
