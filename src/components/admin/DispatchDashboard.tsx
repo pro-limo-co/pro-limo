@@ -54,10 +54,15 @@ export function DispatchDashboard({
   const [status, setStatus] = useState<Status | "all">("all");
   const viewer = useQuery(api.auth.getViewer);
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
-  const bookings = useQuery(api.bookings.listForDispatch, {
-    status: status === "all" ? undefined : status,
-    limit: 80,
-  });
+  const bookings = useQuery(
+    api.bookings.listForDispatch,
+    viewer?.staff
+      ? {
+          status: status === "all" ? undefined : status,
+          limit: 80,
+        }
+      : "skip",
+  );
   const session = authClient.useSession();
 
   if (viewer === undefined || session.isPending) {
