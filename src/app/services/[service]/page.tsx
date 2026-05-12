@@ -135,7 +135,12 @@ export default async function ServicePage({ params }: { params: Params }) {
                 <p className="px-4 pt-3 pb-1 font-mono text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
                   Reserve · {s.shortName}
                 </p>
-                <BookingCard defaultTab={s.slug === "airport-transfer" ? "airport" : "oneway"} />
+                <BookingCard
+                  defaultTab={s.slug === "airport-transfer" ? "airport" : "oneway"}
+                  serviceSlug={s.slug}
+                  sourceLabel={`Service · ${s.shortName}`}
+                  sourcePath={`/services/${s.slug}`}
+                />
               </div>
             </Reveal>
           </aside>

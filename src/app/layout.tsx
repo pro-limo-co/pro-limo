@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono, Oswald } from "next/font/google";
+import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -74,7 +75,9 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${geist.variable} ${geistMono.variable} ${oswald.variable}`}
     >
-      <body className="page-frame">{children}</body>
+      <body className="page-frame">
+        <ConvexClientProvider>{children}</ConvexClientProvider>
+      </body>
     </html>
   );
 }

@@ -65,12 +65,12 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#signin"
+          <Link
+            href="/auth/sign-in?next=/admin/dispatch"
             className="hidden sm:inline-flex font-condensed text-[0.78rem] tracking-[0.16em] uppercase text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors px-3 py-2"
           >
             Sign in
-          </a>
+          </Link>
           <Link href="/#book" className="btn btn-primary !h-10 !px-5 !text-[0.7rem]">
             Reserve
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -110,13 +110,13 @@ export function Nav() {
               </li>
             ))}
             <li>
-              <a
-                href="#signin"
+              <Link
+                href="/auth/sign-in?next=/admin/dispatch"
                 onClick={() => setOpen(false)}
                 className="block py-3 font-condensed tracking-[0.14em] uppercase text-[0.85rem] text-[color:var(--color-bone-dim)]"
               >
                 Sign in
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

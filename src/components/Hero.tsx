@@ -62,7 +62,7 @@ export function Hero() {
           </div>
 
           <div className="lg:col-span-5 xl:col-span-5 lg:pt-12 rise rise-6" id="book">
-            <BookingCard />
+            <BookingCard sourceLabel="Homepage" sourcePath="/" />
           </div>
         </div>
 

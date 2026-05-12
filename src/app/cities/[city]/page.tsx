@@ -121,7 +121,11 @@ export default async function CityPage({ params }: { params: Params }) {
                 <p className="px-4 pt-3 pb-1 font-mono text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
                   Reserve in {c.name}
                 </p>
-                <BookingCard />
+                <BookingCard
+                  citySlug={c.slug}
+                  sourceLabel={`Location · ${c.name}`}
+                  sourcePath={`/cities/${c.slug}`}
+                />
               </div>
             </Reveal>
           </aside>

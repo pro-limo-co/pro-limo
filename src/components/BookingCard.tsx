@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { FormEvent, useId, useState } from "react";
 
 const tabs = [
   { id: "oneway", label: "One-way" },
@@ -12,9 +12,32 @@ type TabId = (typeof tabs)[number]["id"];
 
 type BookingCardProps = {
   defaultTab?: TabId;
+  citySlug?: string;
+  serviceSlug?: string;
+  sourceLabel?: string;
+  sourcePath?: string;
 };
 
-export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
+const initialState: BookingSubmissionState = {
+  status: "idle",
+  message: "",
+};
+
+type BookingSubmissionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  publicReference?: string;
+};
+
+export function BookingCard({
+  defaultTab = "oneway",
+  citySlug,
+  serviceSlug,
+  sourceLabel = "Website",
+  sourcePath = "/",
+}: BookingCardProps) {
+  const [state, setState] = useState<BookingSubmissionState>(initialState);
+  const [submitting, setSubmitting] = useState(false);
   const [selectedTab, setSelectedTab] = useState<TabId | null>(null);
   const fromId = useId();
   const toId = useId();
@@ -25,17 +48,29 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
   const durationId = useId();
   const luggageId = useId();
   const airportDirectionId = useId();
+  const nameId = useId();
+  const emailId = useId();
+  const phoneId = useId();
+  const notesId = useId();
   const tab = selectedTab ?? defaultTab;
   const isAirport = tab === "airport";
+  const isHourly = tab === "hourly";
 
   return (
-    <div className="surface-raised rounded-2xl p-2 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
+    <form onSubmit={handleSubmit} className="surface-raised rounded-2xl p-2 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
+      <input type="hidden" name="bookingMode" value={tab} />
+      <input type="hidden" name="sourceLabel" value={sourceLabel} />
+      <input type="hidden" name="sourcePath" value={sourcePath} />
+      {citySlug && <input type="hidden" name="citySlug" value={citySlug} />}
+      {serviceSlug && <input type="hidden" name="serviceSlug" value={serviceSlug} />}
+
       <div role="tablist" aria-label="Booking type" className="flex gap-1 p-1 bg-[color:var(--color-ink)]/40 rounded-xl">
         {tabs.map((t) => {
           const active = tab === t.id;
           return (
             <button
               key={t.id}
+              type="button"
               role="tab"
               aria-selected={active}
               onClick={() => setSelectedTab(t.id)}
@@ -52,47 +87,64 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
         })}
       </div>
 
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 gap-px mt-2 bg-[color:var(--color-divider-soft)] rounded-xl overflow-hidden"
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px mt-2 bg-[color:var(--color-divider-soft)] rounded-xl overflow-hidden">
         <Field
           id={fromId}
+          name="pickupLocation"
           label={isAirport ? "Pickup location" : "Pickup"}
           placeholder={isAirport ? "Airport, home, hotel, or office" : "Address, airport, or hotel"}
           icon="pin"
+          required
         />
-        {tab === "hourly" ? (
-          <Field id={durationId} label="Duration" placeholder="Choose hours" type="select" options={["2 hours", "3 hours", "4 hours", "6 hours", "Full day (8h)", "Full day (10h)"]} icon="clock" />
+        {isHourly ? (
+          <Field
+            id={durationId}
+            name="duration"
+            label="Duration"
+            placeholder="Choose hours"
+            type="select"
+            options={["2 hours", "3 hours", "4 hours", "6 hours", "Full day (8h)", "Full day (10h)"]}
+            icon="clock"
+            required
+          />
         ) : (
           <Field
             id={toId}
+            name="dropoffLocation"
             label={isAirport ? "Drop-off location" : "Drop-off"}
             placeholder={isAirport ? "Airport terminal, home, hotel, or office" : "Final destination"}
             icon="flag"
+            required
           />
         )}
         {isAirport && (
           <Field
             id={airportDirectionId}
+            name="airportTrip"
             label="Airport trip"
             placeholder="Choose pickup or drop-off"
             type="select"
             options={["Airport pickup", "Airport drop-off", "Round trip", "Private terminal"]}
             icon="plane"
+            required
           />
         )}
-        <Field id={dateId} label="Date" placeholder="Pick a date" type="date" icon="cal" />
-        <Field id={timeId} label="Pickup time" placeholder="HH:MM" type="time" icon="clock" />
+        <Field id={dateId} name="pickupDate" label="Date" placeholder="Pick a date" type="date" icon="cal" required />
+        <Field id={timeId} name="pickupTime" label="Pickup time" placeholder="HH:MM" type="time" icon="clock" required />
         {isAirport && (
-          <Field id={flightId} label="Flight number" placeholder="e.g. BA 286" icon="plane" />
+          <Field id={flightId} name="flightNumber" label="Flight number" placeholder="e.g. BA 286" icon="plane" />
         )}
-        <Field id={paxId} label="Passengers" type="select" options={["1", "2", "3", "4", "5", "6", "7"]} icon="user" />
-        <Field id={luggageId} label="Luggage" type="select" options={["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"]} icon="bag" />
+        <Field id={paxId} name="passengerCount" label="Passengers" type="select" options={["1", "2", "3", "4", "5", "6", "7"]} icon="user" required />
+        <Field id={luggageId} name="luggage" label="Luggage" type="select" options={["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"]} icon="bag" required />
+        <Field id={nameId} name="customerName" label="Name" placeholder="Passenger name" icon="user" required />
+        <Field id={emailId} name="customerEmail" label="Email" placeholder="you@example.com" type="email" icon="mail" required />
+        <Field id={phoneId} name="customerPhone" label="Phone" placeholder="+1 503 555 0100" type="tel" icon="phone" required />
+        <Field id={notesId} name="notes" label="Notes" placeholder="Arrival details or preferences" type="textarea" icon="note" />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-3 px-2 sm:px-3">
-        <button type="button" className="btn btn-primary flex-1">
-          See prices & reserve
+        <button type="submit" disabled={submitting} className="btn btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-60">
+          {submitting ? "Submitting" : "See prices & reserve"}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -102,24 +154,58 @@ export function BookingCard({ defaultTab = "oneway" }: BookingCardProps) {
         </a>
       </div>
 
+      {state.status !== "idle" && (
+        <div
+          className={[
+            "mx-3 mt-4 rounded-lg border px-4 py-3 text-[0.86rem] leading-[1.55]",
+            state.status === "success"
+              ? "border-[color:var(--color-champagne-dim)] bg-[color:color-mix(in_oklab,var(--color-champagne)_12%,transparent)] text-[color:var(--color-bone)]"
+              : "border-red-400/40 bg-red-950/20 text-red-100",
+          ].join(" ")}
+          aria-live="polite"
+        >
+          {state.message}
+          {state.publicReference && (
+            <span className="ml-2 font-mono text-[color:var(--color-champagne-bright)]">
+              {state.publicReference}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center gap-3 px-3 pt-4 pb-2 font-condensed text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
         <span className="inline-flex size-1.5 rounded-full bg-[color:var(--color-champagne)]" />
         Airport pickup and drop-off · Free 60-min wait on arrivals
       </div>
-    </div>
+    </form>
   );
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setState(initialState);
+    const response = await fetch("/api/bookings", {
+      method: "POST",
+      body: new FormData(event.currentTarget),
+    });
+    const result = (await response.json()) as BookingSubmissionState;
+    setSubmitting(false);
+    setState(result);
+  }
 }
 
 type FieldProps = {
   id: string;
+  name: string;
   label: string;
   placeholder?: string;
-  type?: "text" | "date" | "time" | "select";
+  type?: "text" | "email" | "tel" | "date" | "time" | "select" | "textarea";
   options?: string[];
-  icon?: "pin" | "flag" | "cal" | "clock" | "plane" | "user" | "bag";
+  icon?: "pin" | "flag" | "cal" | "clock" | "plane" | "user" | "bag" | "mail" | "phone" | "note";
+  required?: boolean;
 };
 
-function Field({ id, label, placeholder, type = "text", options, icon }: FieldProps) {
+function Field({ id, name, label, placeholder, type = "text", options, icon, required }: FieldProps) {
   return (
     <label
       htmlFor={id}
@@ -134,8 +220,10 @@ function Field({ id, label, placeholder, type = "text", options, icon }: FieldPr
           {type === "select" ? (
             <select
               id={id}
+              name={name}
               className="field mt-1 text-[0.95rem] bg-transparent appearance-none pr-6 cursor-pointer"
               defaultValue=""
+              required={required}
             >
               <option value="" disabled className="text-[color:var(--color-pewter-dim)]">
                 {placeholder ?? "Select"}
@@ -146,12 +234,22 @@ function Field({ id, label, placeholder, type = "text", options, icon }: FieldPr
                 </option>
               ))}
             </select>
+          ) : type === "textarea" ? (
+            <textarea
+              id={id}
+              name={name}
+              placeholder={placeholder}
+              className="field mt-1 min-h-12 resize-none text-[0.95rem]"
+              required={required}
+            />
           ) : (
             <input
               id={id}
+              name={name}
               type={type}
               placeholder={placeholder}
               className="field mt-1 text-[0.95rem]"
+              required={required}
             />
           )}
         </div>
@@ -231,6 +329,26 @@ function Icon({ name }: { name?: FieldProps["icon"] }) {
         <svg {...common}>
           <rect x="4" y="7" width="16" height="14" rx="2" />
           <path d="M9 7V5a3 3 0 016 0v2M4 12h16" />
+        </svg>
+      );
+    case "mail":
+      return (
+        <svg {...common}>
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="M4 7l8 6 8-6" />
+        </svg>
+      );
+    case "phone":
+      return (
+        <svg {...common}>
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.11 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.12.9.33 1.77.62 2.61a2 2 0 01-.45 2.11L8 9.72a16 16 0 006.28 6.28l1.28-1.28a2 2 0 012.11-.45c.84.29 1.71.5 2.61.62A2 2 0 0122 16.92z" />
+        </svg>
+      );
+    case "note":
+      return (
+        <svg {...common}>
+          <path d="M4 4h16v16H4z" />
+          <path d="M8 8h8M8 12h8M8 16h5" />
         </svg>
       );
     default:

@@ -12,7 +12,8 @@ Domain: [ProLimoDriver.com](https://prolimodriver.com). Built with Next.js 16, R
 - **Type**: Cormorant Garamond (display) + Geist (sans) + Geist Mono
 - **Images**: SVG illustrations + dynamic Open Graph via `next/og`
 - **SEO**: JSON-LD structured data, sitemap, robots, programmatic location x service pages
-- **Convex**: Production env wiring for `outstanding-crab-950`
+- **Convex**: Booking persistence, dispatch workflow data, Better Auth-backed staff access
+- **Payments**: Stripe Checkout scaffold with webhook sync
 
 ## Getting started
 
@@ -42,6 +43,13 @@ Vercel production is wired to the ProLimo Convex deployment:
 | `CONVEX_DEPLOY_KEY` | Secret deploy key for Convex production deploys |
 | `NEXT_PUBLIC_CONVEX_URL` | Browser-safe Convex cloud URL |
 | `CONVEX_HTTP_ACTIONS_URL` | Server-side Convex HTTP Actions URL |
+| `NEXT_PUBLIC_CONVEX_SITE_URL` | Convex HTTP Actions URL for Better Auth |
+| `SITE_URL` / `NEXT_PUBLIC_SITE_URL` | Canonical app URL for auth and checkout redirects |
+| `BETTER_AUTH_SECRET` | Better Auth secret |
+| `DISPATCH_ADMIN_EMAILS` | Comma-separated staff emails allowed to claim admin access |
+| `STRIPE_SECRET_KEY` | Stripe secret key for Checkout |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `STRIPE_WEBHOOK_SYNC_SECRET` | Shared secret used by the webhook route when syncing Convex |
 
 Use `.env.example` as the non-secret template. Do not commit `.env.local` or the deploy key.
 
@@ -56,6 +64,11 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 | `/services` | 1 | All-services index |
 | `/services/[service]` | 5 | One per service in `src/data/services.ts` |
 | `/business` | 1 | Professional Limousine Driver for Business |
+| `/admin/dispatch` | dynamic | Staff-only dispatch workflow |
+| `/auth/sign-in` | dynamic | Better Auth staff sign-in |
+| `/booking/[reference]` | dynamic | Public booking status page |
+| `/api/auth/[...all]` | dynamic | Better Auth proxy route |
+| `/api/stripe/webhook` | dynamic | Stripe webhook sync route |
 | `/api/og` | dynamic | Edge-rendered Open Graph images, themed per page |
 | `/sitemap.xml` | 1 | Auto-generated from data |
 | `/robots.txt` | 1 | Auto-generated |
@@ -72,8 +85,8 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 
 ## Architecture notes
 
-- All marketing pages are React Server Components. Only interactive widgets (Nav, BookingCard, Reveal) are `"use client"`.
-- The hero booking form is intentionally inert — the dispatch backend is out of scope for this repo.
+- All marketing pages are React Server Components. Interactive widgets (Nav, BookingCard, Reveal, auth, dispatch) are `"use client"`.
+- Booking submissions persist to Convex through `api.bookings.create`, then staff manage quote, assignment, notes, and payment links in `/admin/dispatch`.
 - The Reveal component uses IntersectionObserver to fade-in sections as they scroll into view.
 - The "rise" CSS animation (in `globals.css`) handles the on-load hero stagger without JS.
 

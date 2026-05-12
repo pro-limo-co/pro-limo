@@ -1,0 +1,103 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+const bookingStatus = v.union(
+  v.literal("new"),
+  v.literal("quoted"),
+  v.literal("assigned"),
+  v.literal("driver_en_route"),
+  v.literal("in_progress"),
+  v.literal("completed"),
+  v.literal("canceled"),
+);
+
+const paymentStatus = v.union(
+  v.literal("not_started"),
+  v.literal("quote_required"),
+  v.literal("pending"),
+  v.literal("requires_action"),
+  v.literal("paid"),
+  v.literal("refunded"),
+  v.literal("failed"),
+  v.literal("unavailable"),
+);
+
+export default defineSchema({
+  bookings: defineTable({
+    publicReference: v.string(),
+    bookingMode: v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport")),
+    status: bookingStatus,
+    paymentStatus,
+    sourcePath: v.optional(v.string()),
+    sourceLabel: v.optional(v.string()),
+    citySlug: v.optional(v.string()),
+    serviceSlug: v.optional(v.string()),
+    pickupLocation: v.string(),
+    dropoffLocation: v.optional(v.string()),
+    airportTrip: v.optional(v.string()),
+    pickupDate: v.string(),
+    pickupTime: v.string(),
+    duration: v.optional(v.string()),
+    flightNumber: v.optional(v.string()),
+    passengerCount: v.number(),
+    luggage: v.string(),
+    customerName: v.string(),
+    customerEmail: v.string(),
+    customerPhone: v.string(),
+    notes: v.optional(v.string()),
+    quotedAmountCents: v.optional(v.number()),
+    currency: v.optional(v.string()),
+    assignedChauffeurName: v.optional(v.string()),
+    vehicleLabel: v.optional(v.string()),
+    dispatchNotes: v.optional(v.string()),
+    stripeCheckoutSessionId: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_publicReference", ["publicReference"])
+    .index("by_status_and_createdAt", ["status", "createdAt"])
+    .index("by_paymentStatus_and_createdAt", ["paymentStatus", "createdAt"])
+    .index("by_pickupDate_and_pickupTime", ["pickupDate", "pickupTime"]),
+
+  bookingEvents: defineTable({
+    bookingId: v.id("bookings"),
+    kind: v.union(
+      v.literal("submitted"),
+      v.literal("status_changed"),
+      v.literal("assignment_updated"),
+      v.literal("note_added"),
+      v.literal("payment_updated"),
+    ),
+    message: v.string(),
+    actorTokenIdentifier: v.optional(v.string()),
+    actorName: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_bookingId_and_createdAt", ["bookingId", "createdAt"]),
+
+  staffProfiles: defineTable({
+    tokenIdentifier: v.string(),
+    email: v.string(),
+    name: v.optional(v.string()),
+    role: v.union(v.literal("admin"), v.literal("dispatcher"), v.literal("viewer")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_tokenIdentifier", ["tokenIdentifier"])
+    .index("by_email", ["email"])
+    .index("by_role", ["role"]),
+
+  paymentIntents: defineTable({
+    bookingId: v.id("bookings"),
+    provider: v.literal("stripe"),
+    providerSessionId: v.optional(v.string()),
+    status: paymentStatus,
+    amountCents: v.number(),
+    currency: v.string(),
+    checkoutUrl: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_bookingId_and_createdAt", ["bookingId", "createdAt"])
+    .index("by_providerSessionId", ["providerSessionId"])
+    .index("by_status_and_createdAt", ["status", "createdAt"]),
+});
