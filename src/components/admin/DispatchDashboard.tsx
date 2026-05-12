@@ -31,9 +31,27 @@ type DispatchDraftAction =
   | { type: "status"; value: Status }
   | { type: "quote" | "driver" | "vehicle" | "notes" | "staffNote"; value: string }
   | { type: "clearStaffNote" };
+type HandoffChannel = "email" | "sms" | "copy";
+type HandoffDraft = {
+  recipientName: string;
+  recipientEmail: string;
+  recipientPhone: string;
+  channel: HandoffChannel;
+  message: string;
+};
+type HandoffResult = {
+  rideUrl: string;
+  message: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+};
 
-export function DispatchDashboard() {
-  const [status, setStatus] = useState<Status | "all">("new");
+export function DispatchDashboard({
+  title = "Dispatch",
+}: {
+  title?: string;
+}) {
+  const [status, setStatus] = useState<Status | "all">("all");
   const viewer = useQuery(api.auth.getViewer);
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
   const bookings = useQuery(api.bookings.listForDispatch, {
@@ -73,7 +91,7 @@ export function DispatchDashboard() {
   }
 
   return (
-    <DispatchShell title="Dispatch" showSignOut>
+    <DispatchShell title={title} showSignOut>
       <div className="mt-8 flex flex-wrap items-center gap-2">
         <FilterButton label="All" active={status === "all"} onClick={() => setStatus("all")} />
         {statuses.map((item) => (
@@ -112,8 +130,11 @@ export function DispatchDashboard() {
 function DispatchBookingRow({ booking }: { booking: Booking }) {
   const updateDispatch = useMutation(api.bookings.updateDispatch);
   const addNote = useMutation(api.bookings.addNote);
+  const createHandoff = useMutation(api.handoffs.create);
   const createCheckoutSession = useAction(api.payments.createCheckoutSession);
   const [draft, dispatchDraft] = useReducer(dispatchDraftReducer, booking, createDispatchDraft);
+  const [handoffDraft, setHandoffDraft] = useState<HandoffDraft>(() => createHandoffDraft());
+  const [handoffResult, setHandoffResult] = useState<HandoffResult | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -163,6 +184,34 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
       return;
     }
     setMessage(result.status === "quote_required" ? "Add a quote first" : "Stripe is not configured");
+  }
+
+  async function prepareHandoff() {
+    setPending(true);
+    setMessage("");
+    setHandoffResult(null);
+    try {
+      const result = await createHandoff({
+        bookingId: booking._id,
+        recipientName: handoffDraft.recipientName,
+        recipientEmail: emptyToUndefined(handoffDraft.recipientEmail),
+        recipientPhone: emptyToUndefined(handoffDraft.recipientPhone),
+        channel: handoffDraft.channel,
+        message: emptyToUndefined(handoffDraft.message),
+      });
+      const rideUrl = new URL(result.routePath, window.location.origin).toString();
+      setHandoffResult({
+        rideUrl,
+        message: buildHandoffMessage(booking, rideUrl, handoffDraft.message),
+        recipientEmail: emptyToUndefined(handoffDraft.recipientEmail),
+        recipientPhone: emptyToUndefined(handoffDraft.recipientPhone),
+      });
+      setMessage("Ride link ready");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not create ride link");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -230,6 +279,85 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
           <button type="button" className="font-condensed text-[0.68rem] tracking-[0.16em] uppercase text-[color:var(--color-champagne-bright)]" onClick={() => void saveNote()}>
             Add
           </button>
+        </div>
+        <div className="mt-5 border-t border-[color:var(--color-divider-soft)] pt-4">
+          <p className="font-condensed text-[0.68rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
+            Send ride
+          </p>
+          <div className="mt-3 grid gap-2">
+            <input
+              value={handoffDraft.recipientName}
+              onChange={(event) => setHandoffDraft((current) => ({ ...current, recipientName: event.target.value }))}
+              placeholder="Recipient name"
+              className="field h-10 border-b border-[color:var(--color-divider)] text-[0.86rem]"
+            />
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_0.8fr]">
+              <input
+                value={handoffDraft.recipientEmail}
+                onChange={(event) => setHandoffDraft((current) => ({ ...current, recipientEmail: event.target.value }))}
+                placeholder="Email"
+                type="email"
+                className="field h-10 border-b border-[color:var(--color-divider)] text-[0.86rem]"
+              />
+              <input
+                value={handoffDraft.recipientPhone}
+                onChange={(event) => setHandoffDraft((current) => ({ ...current, recipientPhone: event.target.value }))}
+                placeholder="Phone"
+                type="tel"
+                className="field h-10 border-b border-[color:var(--color-divider)] text-[0.86rem]"
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[0.8fr_1fr]">
+              <select
+                value={handoffDraft.channel}
+                onChange={(event) => setHandoffDraft((current) => ({ ...current, channel: event.target.value as HandoffChannel }))}
+                className="field h-10 border-b border-[color:var(--color-divider)] bg-transparent text-[0.86rem]"
+              >
+                <option value="email" className="bg-[color:var(--color-ink)]">Email</option>
+                <option value="sms" className="bg-[color:var(--color-ink)]">Text</option>
+                <option value="copy" className="bg-[color:var(--color-ink)]">Copy</option>
+              </select>
+              <button type="button" disabled={pending} className="btn btn-ghost !h-10 !px-4 !text-[0.68rem] disabled:opacity-60" onClick={() => void prepareHandoff()}>
+                Prepare link
+              </button>
+            </div>
+            <textarea
+              value={handoffDraft.message}
+              onChange={(event) => setHandoffDraft((current) => ({ ...current, message: event.target.value }))}
+              placeholder="Optional note"
+              className="field min-h-14 border-b border-[color:var(--color-divider)] text-[0.86rem]"
+            />
+          </div>
+          {handoffResult && (
+            <div className="mt-4 grid gap-2">
+              <a href={handoffResult.rideUrl} className="truncate font-mono text-[0.72rem] text-[color:var(--color-champagne-bright)]">
+                {handoffResult.rideUrl}
+              </a>
+              <div className="grid grid-cols-3 gap-2">
+                <a
+                  href={handoffResult.recipientEmail ? buildMailto(handoffResult.recipientEmail, booking, handoffResult.message) : undefined}
+                  aria-disabled={!handoffResult.recipientEmail}
+                  className="btn btn-ghost !h-9 !px-2 !text-[0.62rem] aria-disabled:pointer-events-none aria-disabled:opacity-40"
+                >
+                  Email
+                </a>
+                <a
+                  href={handoffResult.recipientPhone ? buildSms(handoffResult.recipientPhone, handoffResult.message) : undefined}
+                  aria-disabled={!handoffResult.recipientPhone}
+                  className="btn btn-ghost !h-9 !px-2 !text-[0.62rem] aria-disabled:pointer-events-none aria-disabled:opacity-40"
+                >
+                  Text
+                </a>
+                <button
+                  type="button"
+                  className="btn btn-ghost !h-9 !px-2 !text-[0.62rem]"
+                  onClick={() => void navigator.clipboard.writeText(handoffResult.rideUrl)}
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         {message && <p className="mt-3 text-[0.78rem] text-[color:var(--color-champagne-bright)]">{message}</p>}
       </section>
@@ -363,6 +491,16 @@ function createDispatchDraft(booking: Booking): DispatchDraft {
   };
 }
 
+function createHandoffDraft(): HandoffDraft {
+  return {
+    recipientName: "",
+    recipientEmail: "",
+    recipientPhone: "",
+    channel: "email",
+    message: "",
+  };
+}
+
 function dispatchDraftReducer(state: DispatchDraft, action: DispatchDraftAction): DispatchDraft {
   if (action.type === "clearStaffNote") {
     return { ...state, staffNote: "" };
@@ -371,4 +509,28 @@ function dispatchDraftReducer(state: DispatchDraft, action: DispatchDraftAction)
     ...state,
     [action.type]: action.value,
   };
+}
+
+function buildHandoffMessage(booking: Booking, rideUrl: string, note: string) {
+  const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
+    .filter(Boolean)
+    .join(" to ");
+  return [
+    `Professional Limousine Driver ride ${booking.publicReference}`,
+    `${booking.pickupDate} at ${booking.pickupTime}`,
+    route,
+    note.trim(),
+    `Open ride: ${rideUrl}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function buildMailto(email: string, booking: Booking, body: string) {
+  const subject = `Ride ${booking.publicReference}`;
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function buildSms(phone: string, body: string) {
+  return `sms:${encodeURIComponent(phone)}?&body=${encodeURIComponent(body)}`;
 }

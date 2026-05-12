@@ -22,6 +22,15 @@ const paymentStatus = v.union(
   v.literal("unavailable"),
 );
 
+const handoffStatus = v.union(
+  v.literal("sent"),
+  v.literal("accepted"),
+  v.literal("declined"),
+  v.literal("completed"),
+);
+
+const handoffChannel = v.union(v.literal("email"), v.literal("sms"), v.literal("copy"));
+
 export default defineSchema({
   bookings: defineTable({
     publicReference: v.string(),
@@ -67,6 +76,10 @@ export default defineSchema({
       v.literal("assignment_updated"),
       v.literal("note_added"),
       v.literal("payment_updated"),
+      v.literal("handoff_sent"),
+      v.literal("handoff_accepted"),
+      v.literal("handoff_declined"),
+      v.literal("driver_status_updated"),
     ),
     message: v.string(),
     actorTokenIdentifier: v.optional(v.string()),
@@ -99,5 +112,26 @@ export default defineSchema({
   })
     .index("by_bookingId_and_createdAt", ["bookingId", "createdAt"])
     .index("by_providerSessionId", ["providerSessionId"])
+    .index("by_status_and_createdAt", ["status", "createdAt"]),
+
+  rideHandoffs: defineTable({
+    bookingId: v.id("bookings"),
+    token: v.string(),
+    recipientName: v.string(),
+    recipientEmail: v.optional(v.string()),
+    recipientPhone: v.optional(v.string()),
+    channel: handoffChannel,
+    status: handoffStatus,
+    message: v.optional(v.string()),
+    createdByTokenIdentifier: v.optional(v.string()),
+    createdByName: v.optional(v.string()),
+    acceptedAt: v.optional(v.number()),
+    declinedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_bookingId_and_createdAt", ["bookingId", "createdAt"])
     .index("by_status_and_createdAt", ["status", "createdAt"]),
 });

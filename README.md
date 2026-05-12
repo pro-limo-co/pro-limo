@@ -68,8 +68,10 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 | `/services/[service]` | 5 | One per service in `src/data/services.ts` |
 | `/business` | 1 | Professional Limousine Driver for Business |
 | `/admin/dispatch` | dynamic | Staff-only dispatch workflow |
+| `/admin/rides` | dynamic | Staff ride ledger and handoff workflow |
 | `/auth/sign-in` | dynamic | Better Auth staff sign-in |
 | `/booking/[reference]` | dynamic | Public booking status page |
+| `/rides/[token]` | dynamic | Tokenized driver or partner ride handoff page |
 | `/api/auth/[...all]` | dynamic | Better Auth proxy route |
 | `/api/bookings` | dynamic | Booking submission API |
 | `/api/health` | dynamic | Runtime health check |
@@ -92,7 +94,7 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 ## Architecture notes
 
 - All marketing pages are React Server Components. Interactive widgets (Nav, BookingCard, Reveal, auth, dispatch) are `"use client"`.
-- Booking submissions persist to Convex through `api.bookings.create`, then staff manage quote, assignment, notes, and payment links in `/admin/dispatch`.
+- Booking submissions persist to Convex through `api.bookings.create`, then staff manage quote, assignment, ride handoff links, notes, and payment links in `/admin/dispatch` or `/admin/rides`.
 - The Reveal component uses IntersectionObserver to fade-in sections as they scroll into view.
 - The "rise" CSS animation (in `globals.css`) handles the on-load hero stagger without JS.
 
