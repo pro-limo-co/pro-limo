@@ -137,6 +137,7 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
   const addNote = useMutation(api.bookings.addNote);
   const createHandoff = useMutation(api.handoffs.create);
   const createCheckoutSession = useAction(api.payments.createCheckoutSession);
+  const handoffs = useQuery(api.handoffs.listForBooking, { bookingId: booking._id });
   const [draft, dispatchDraft] = useReducer(dispatchDraftReducer, booking, createDispatchDraft);
   const [handoffDraft, setHandoffDraft] = useState<HandoffDraft>(() => createHandoffDraft());
   const [handoffResult, setHandoffResult] = useState<HandoffResult | null>(null);
@@ -363,6 +364,49 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
               </div>
             </div>
           )}
+          {handoffs && handoffs.length > 0 && (
+            <div className="mt-4 grid gap-2 border-t border-[color:var(--color-divider-soft)] pt-4">
+              {handoffs.slice(0, 2).map((handoff) => {
+                const rideUrl = getRideUrl(`/rides/${handoff.token}`);
+                const handoffMessage = buildHandoffMessage(booking, rideUrl, handoff.message ?? "");
+                return (
+                  <div key={handoff._id} className="grid gap-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <a href={rideUrl} className="truncate font-mono text-[0.72rem] text-[color:var(--color-champagne-bright)]">
+                        {rideUrl}
+                      </a>
+                      <span className="font-condensed text-[0.62rem] tracking-[0.16em] uppercase text-[color:var(--color-pewter)]">
+                        {formatStatus(handoff.status)}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <a
+                        href={handoff.recipientEmail ? buildMailto(handoff.recipientEmail, booking, handoffMessage) : undefined}
+                        aria-disabled={!handoff.recipientEmail}
+                        className="btn btn-ghost !h-9 !px-2 !text-[0.62rem] aria-disabled:pointer-events-none aria-disabled:opacity-40"
+                      >
+                        Email
+                      </a>
+                      <a
+                        href={handoff.recipientPhone ? buildSms(handoff.recipientPhone, handoffMessage) : undefined}
+                        aria-disabled={!handoff.recipientPhone}
+                        className="btn btn-ghost !h-9 !px-2 !text-[0.62rem] aria-disabled:pointer-events-none aria-disabled:opacity-40"
+                      >
+                        Text
+                      </a>
+                      <button
+                        type="button"
+                        className="btn btn-ghost !h-9 !px-2 !text-[0.62rem]"
+                        onClick={() => void navigator.clipboard.writeText(rideUrl)}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
         {message && <p className="mt-3 text-[0.78rem] text-[color:var(--color-champagne-bright)]">{message}</p>}
       </section>
@@ -538,4 +582,9 @@ function buildMailto(email: string, booking: Booking, body: string) {
 
 function buildSms(phone: string, body: string) {
   return `sms:${encodeURIComponent(phone)}?&body=${encodeURIComponent(body)}`;
+}
+
+function getRideUrl(routePath: string) {
+  if (typeof window === "undefined") return routePath;
+  return new URL(routePath, window.location.origin).toString();
 }
