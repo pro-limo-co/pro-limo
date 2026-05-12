@@ -427,7 +427,7 @@ function DispatchShell({
     <section className="mx-auto max-w-[1500px] px-6 pt-32 pb-20 lg:px-10">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="eyebrow">Professional Limousine Driver</p>
+          <p className="eyebrow">ProLimo OS</p>
           <h1 className="display-md mt-5">{title}</h1>
         </div>
         {showSignOut && (

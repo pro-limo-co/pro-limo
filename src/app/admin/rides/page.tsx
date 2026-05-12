@@ -4,7 +4,7 @@ import { Nav } from "@/components/Nav";
 import { DispatchDashboard } from "@/components/admin/DispatchDashboard";
 
 export const metadata: Metadata = {
-  title: "Rides",
+  title: "ProLimo OS - Rides",
   robots: { index: false, follow: false },
 };
 

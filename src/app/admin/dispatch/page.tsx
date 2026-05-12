@@ -4,7 +4,7 @@ import { Nav } from "@/components/Nav";
 import { DispatchDashboard } from "@/components/admin/DispatchDashboard";
 
 export const metadata: Metadata = {
-  title: "Dispatch",
+  title: "ProLimo OS - Dispatch",
   robots: { index: false, follow: false },
 };
 
@@ -19,4 +19,3 @@ export default function DispatchPage() {
     </>
   );
 }
-
