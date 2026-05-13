@@ -337,7 +337,7 @@ function DispatchBookingHeader({ booking }: { booking: Booking }) {
         </div>
         <div className="rounded-md border bg-background px-4 py-3 text-sm">
           <p className="font-medium text-foreground">{booking.pickupDate} at {booking.pickupTime}</p>
-          <p className="mt-1 text-muted-foreground">{booking.passengerCount} passengers / {booking.luggage}</p>
+          <p className="mt-1 text-muted-foreground">{formatPassengerCount(booking.passengerCount)} / {booking.luggage}</p>
         </div>
       </div>
     </CardHeader>
@@ -850,6 +850,10 @@ function RideLinkActions({
 
 function formatStatus(status: string) {
   return status.replaceAll("_", " ");
+}
+
+function formatPassengerCount(count: number) {
+  return `${count} ${count === 1 ? "passenger" : "passengers"}`;
 }
 
 function emptyToUndefined(value: string) {

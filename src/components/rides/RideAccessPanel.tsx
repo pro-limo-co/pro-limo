@@ -97,7 +97,7 @@ export function RideAccessPanel({ token }: { token: string }) {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <RideFact icon={<UserRound className="size-4" />} label="Passengers" value={`${booking.passengerCount} passengers`} />
+              <RideFact icon={<UserRound className="size-4" />} label="Passengers" value={formatPassengerCount(booking.passengerCount)} />
               <RideFact label="Luggage" value={booking.luggage} />
               {booking.vehicleLabel && <RideFact label="Vehicle" value={booking.vehicleLabel} />}
               {booking.flightNumber && <RideFact label="Flight" value={booking.flightNumber} />}
@@ -211,4 +211,8 @@ function RideFact({
 
 function formatStatus(status: string) {
   return status.replaceAll("_", " ");
+}
+
+function formatPassengerCount(count: number) {
+  return `${count} ${count === 1 ? "passenger" : "passengers"}`;
 }
