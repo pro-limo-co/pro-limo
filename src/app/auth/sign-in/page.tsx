@@ -17,10 +17,10 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
 
   return (
     <>
-      <Nav />
-      <main className="min-h-[100svh] px-6 pt-32 pb-20 lg:px-10">
+      <Nav tone="light" />
+      <main className="pld-ui min-h-[100svh] bg-background px-6 pt-32 pb-20 text-foreground lg:px-10">
         <div className="mx-auto max-w-xl">
-          <Suspense fallback={<div className="surface-raised rounded-2xl p-8">Loading</div>}>
+          <Suspense fallback={<div className="rounded-lg border bg-card p-8 text-card-foreground">Loading</div>}>
             <AuthPanel next={next} />
           </Suspense>
         </div>

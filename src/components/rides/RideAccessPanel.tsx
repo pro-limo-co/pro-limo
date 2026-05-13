@@ -1,9 +1,13 @@
 "use client";
 
+import { CheckCircle2, Mail, MapPin, Navigation, Phone, UserRound, XCircle } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { api } from "@convex/_generated/api";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const rideStatuses = [
   { value: "driver_en_route", label: "On the way" },
@@ -27,9 +31,11 @@ export function RideAccessPanel({ token }: { token: string }) {
   if (!ride) {
     return (
       <RideShell title="Ride link unavailable">
-        <p className="mt-4 text-[0.95rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-          This ride link is expired or was entered incorrectly.
-        </p>
+        <Card>
+          <CardContent className="pt-6">
+            This ride link is expired or was entered incorrectly.
+          </CardContent>
+        </Card>
       </RideShell>
     );
   }
@@ -37,7 +43,8 @@ export function RideAccessPanel({ token }: { token: string }) {
   const { booking, handoff } = ride;
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
-    .join(" → ");
+    .join(" -> ");
+  const accepted = handoff.status === "accepted" || handoff.status === "completed";
 
   async function answer(response: "accepted" | "declined") {
     setPending(response);
@@ -67,71 +74,101 @@ export function RideAccessPanel({ token }: { token: string }) {
 
   return (
     <RideShell title={booking.publicReference}>
-      <div className="mt-8 flex flex-wrap items-center gap-3">
-        <StatusPill label={formatStatus(handoff.status)} />
-        <StatusPill label={formatStatus(booking.status)} muted />
+      <div className="grid gap-4 lg:grid-cols-[1fr_18rem]">
+        <Card>
+          <CardHeader>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge>{formatStatus(booking.status)}</Badge>
+              <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
+            </div>
+            <CardTitle className="pt-2">{booking.customerName}</CardTitle>
+            <CardDescription>{booking.pickupDate} at {booking.pickupTime}</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-5">
+            <div className="rounded-lg border bg-muted/40 p-4">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">Route</p>
+                  <p className="mt-1 text-base font-medium">{route}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <RideFact icon={<UserRound className="size-4" />} label="Passengers" value={`${booking.passengerCount} passengers`} />
+              <RideFact label="Luggage" value={booking.luggage} />
+              {booking.vehicleLabel && <RideFact label="Vehicle" value={booking.vehicleLabel} />}
+              {booking.flightNumber && <RideFact label="Flight" value={booking.flightNumber} />}
+            </div>
+
+            {(booking.notes || booking.dispatchNotes || handoff.message) && (
+              <div className="rounded-lg border bg-background p-4 text-sm leading-6 text-muted-foreground">
+                {[booking.notes, booking.dispatchNotes, handoff.message].filter(Boolean).join(" ")}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Driver actions</CardTitle>
+            <CardDescription>Update dispatch from this ride link.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            <Button
+              type="button"
+              disabled={Boolean(pending) || accepted}
+              onClick={() => void answer("accepted")}
+            >
+              <CheckCircle2 className="size-4" aria-hidden />
+              {pending === "accepted" ? "Accepting" : "Accept ride"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={Boolean(pending) || handoff.status === "declined" || handoff.status === "completed"}
+              onClick={() => void answer("declined")}
+            >
+              <XCircle className="size-4" aria-hidden />
+              {pending === "declined" ? "Declining" : "Decline"}
+            </Button>
+            <div className="my-2 h-px bg-border" />
+            {rideStatuses.map((status) => (
+              <Button
+                key={status.value}
+                type="button"
+                variant={booking.status === status.value ? "secondary" : "outline"}
+                disabled={Boolean(pending) || handoff.status === "declined"}
+                onClick={() => void updateStatus(status.value)}
+              >
+                <Navigation className="size-4" aria-hidden />
+                {pending === status.value ? "Saving" : status.label}
+              </Button>
+            ))}
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-[color:var(--color-divider-soft)] bg-[color:var(--color-divider-soft)] md:grid-cols-2">
-        <RideFact label="Pickup" value={`${booking.pickupDate} · ${booking.pickupTime}`} />
-        <RideFact label="Passenger" value={booking.customerName} />
-        <RideFact label="Phone" value={booking.customerPhone} href={`tel:${booking.customerPhone}`} />
-        <RideFact label="Email" value={booking.customerEmail} href={`mailto:${booking.customerEmail}`} />
-      </div>
-
-      <section className="mt-8 border-y border-[color:var(--color-divider-soft)] py-6">
-        <p className="font-condensed text-[0.68rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
-          Route
-        </p>
-        <p className="mt-3 text-[1rem] leading-[1.7] text-[color:var(--color-bone)]">{route}</p>
-        <div className="mt-5 grid gap-3 text-[0.9rem] text-[color:var(--color-bone-dim)] sm:grid-cols-2">
-          <p>{booking.passengerCount} passengers</p>
-          <p>{booking.luggage}</p>
-          {booking.flightNumber && <p>Flight {booking.flightNumber}</p>}
-          {booking.vehicleLabel && <p>{booking.vehicleLabel}</p>}
-        </div>
-        {(booking.notes || booking.dispatchNotes || handoff.message) && (
-          <p className="mt-5 text-[0.92rem] leading-[1.65] text-[color:var(--color-bone-dim)]">
-            {[booking.notes, booking.dispatchNotes, handoff.message].filter(Boolean).join(" ")}
-          </p>
-        )}
-      </section>
-
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <button
-          type="button"
-          disabled={Boolean(pending) || handoff.status === "accepted" || handoff.status === "completed"}
-          className="btn btn-primary disabled:cursor-not-allowed disabled:opacity-60"
-          onClick={() => void answer("accepted")}
-        >
-          {pending === "accepted" ? "Accepting" : "Accept ride"}
-        </button>
-        <button
-          type="button"
-          disabled={Boolean(pending) || handoff.status === "declined" || handoff.status === "completed"}
-          className="btn btn-ghost disabled:cursor-not-allowed disabled:opacity-60"
-          onClick={() => void answer("declined")}
-        >
-          {pending === "declined" ? "Declining" : "Decline"}
-        </button>
-      </div>
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        {rideStatuses.map((status) => (
-          <button
-            key={status.value}
-            type="button"
-            disabled={Boolean(pending) || handoff.status === "declined"}
-            className="h-12 border border-[color:var(--color-divider)] px-4 font-condensed text-[0.7rem] tracking-[0.16em] uppercase text-[color:var(--color-bone-dim)] transition-colors hover:text-[color:var(--color-bone)] disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={() => void updateStatus(status.value)}
-          >
-            {pending === status.value ? "Saving" : status.label}
-          </button>
-        ))}
-      </div>
+      <Card className="mt-4">
+        <CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
+          <Button asChild variant="outline">
+            <a href={`tel:${booking.customerPhone}`}>
+              <Phone className="size-4" aria-hidden />
+              {booking.customerPhone}
+            </a>
+          </Button>
+          <Button asChild variant="outline">
+            <a href={`mailto:${booking.customerEmail}`}>
+              <Mail className="size-4" aria-hidden />
+              {booking.customerEmail}
+            </a>
+          </Button>
+        </CardContent>
+      </Card>
 
       {message && (
-        <p className="mt-5 text-[0.86rem] text-[color:var(--color-champagne-bright)]" aria-live="polite">
+        <p className="mt-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" aria-live="polite">
           {message}
         </p>
       )}
@@ -141,10 +178,12 @@ export function RideAccessPanel({ token }: { token: string }) {
 
 function RideShell({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <section className="mx-auto max-w-4xl px-6 pt-32 pb-20 lg:px-10">
-      <p className="eyebrow">Ride access</p>
-      <h1 className="display-md mt-5">{title}</h1>
-      {children}
+    <section className="pld-ui min-h-[100svh] bg-background px-6 pt-32 pb-20 text-foreground lg:px-10">
+      <div className="mx-auto max-w-5xl">
+        <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">Ride access</p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-normal">{title}</h1>
+        <div className="mt-6">{children}</div>
+      </div>
     </section>
   );
 }
@@ -152,44 +191,20 @@ function RideShell({ title, children }: { title: string; children?: ReactNode })
 function RideFact({
   label,
   value,
-  href,
+  icon,
 }: {
   label: string;
   value: string;
-  href?: string;
+  icon?: ReactNode;
 }) {
-  const content = (
-    <p className="mt-2 text-[1rem] text-[color:var(--color-bone)]">{value}</p>
-  );
-
   return (
-    <div className="bg-[color:var(--color-ink)] p-6">
-      <p className="font-condensed text-[0.68rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
+    <div className="rounded-lg border bg-background p-4">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+        {icon}
         {label}
-      </p>
-      {href ? (
-        <a href={href} className="block transition-colors hover:text-[color:var(--color-champagne-bright)]">
-          {content}
-        </a>
-      ) : (
-        content
-      )}
+      </div>
+      <p className="mt-2 text-sm font-medium">{value}</p>
     </div>
-  );
-}
-
-function StatusPill({ label, muted = false }: { label: string; muted?: boolean }) {
-  return (
-    <span
-      className={[
-        "rounded-full border px-3 py-1 font-condensed text-[0.65rem] tracking-[0.16em] uppercase",
-        muted
-          ? "border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)]"
-          : "border-[color:var(--color-champagne-dim)] text-[color:var(--color-champagne-bright)]",
-      ].join(" ")}
-    >
-      {label}
-    </span>
   );
 }
 

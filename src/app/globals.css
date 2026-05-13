@@ -20,6 +20,26 @@
   --color-champagne-bright: #E5C98F;
   --color-champagne-dim: #8C7848;
 
+  /* ShadCN semantic primitives */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   /* Type */
   --font-display: var(--font-display), "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: var(--font-sans), "Geist", -apple-system, "Segoe UI", system-ui, sans-serif;
@@ -35,8 +55,14 @@
   color-scheme: dark;
   --background: var(--color-ink);
   --foreground: var(--color-bone);
+  --popover: var(--color-ink-raised);
+  --popover-foreground: var(--color-bone);
   --primary: var(--color-champagne);
   --primary-foreground: var(--color-ink);
+  --secondary: var(--color-ink-raised);
+  --secondary-foreground: var(--color-bone);
+  --muted: var(--color-ink-raised);
+  --muted-foreground: var(--color-bone-dim);
   --accent: var(--color-champagne-bright);
   --accent-foreground: var(--color-ink);
   --destructive: #ef4444;
@@ -45,7 +71,63 @@
   --card: var(--color-ink-soft);
   --card-foreground: var(--color-bone);
   --border: var(--color-divider);
+  --input: var(--color-divider);
   --ring: var(--color-champagne);
+}
+
+.pld-ui {
+  color-scheme: light;
+  --color-ink: #f8fafc;
+  --color-ink-soft: #ffffff;
+  --color-ink-raised: #ffffff;
+  --color-ink-elevated: #f1f5f9;
+  --color-divider: #d7dee8;
+  --color-divider-soft: #e7edf5;
+  --color-bone: #0f172a;
+  --color-bone-dim: #475569;
+  --color-pewter: #64748b;
+  --color-pewter-dim: #94a3b8;
+  --color-champagne: #1d4ed8;
+  --color-champagne-bright: #2563eb;
+  --color-champagne-dim: #93c5fd;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --secondary: #e2e8f0;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e0f2fe;
+  --accent-foreground: #075985;
+  --destructive: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+  --border: #d7dee8;
+  --input: #cbd5e1;
+  --ring: #2563eb;
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f172a;
+  --color-primary: #1d4ed8;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #e2e8f0;
+  --color-secondary-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-accent: #e0f2fe;
+  --color-accent-foreground: #075985;
+  --color-destructive: #dc2626;
+  --color-border: #d7dee8;
+  --color-input: #cbd5e1;
+  --color-ring: #2563eb;
 }
 
 * {

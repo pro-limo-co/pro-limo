@@ -1,8 +1,14 @@
 "use client";
 
+import { ArrowRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useReducer, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient } from "@/lib/auth-client";
 
 type Mode = "sign-in" | "sign-up";
@@ -63,94 +69,94 @@ export function AuthPanel({ next }: { next: string }) {
 
   if (session.data?.session) {
     return (
-      <div className="surface-raised rounded-2xl p-8">
-        <p className="eyebrow">Signed in</p>
-        <h1 className="display-md mt-5">Dispatch access</h1>
-        <p className="mt-4 text-[0.95rem] leading-[1.7] text-[color:var(--color-bone-dim)]">
-          {session.data.user.email}
-        </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Link href={next} className="btn btn-primary">
-            Continue
-          </Link>
-          <button
+      <Card>
+        <CardHeader>
+          <CardDescription>Signed in</CardDescription>
+          <CardTitle>Dispatch access</CardTitle>
+          <CardDescription>{session.data.user.email}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row">
+          <Button asChild>
+            <Link href={next}>
+              Continue
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </Button>
+          <Button
             type="button"
-            className="btn btn-ghost"
+            variant="outline"
             onClick={async () => {
               await authClient.signOut();
               refresh();
             }}
           >
+            <LogOut className="size-4" aria-hidden />
             Sign out
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="surface-raised rounded-2xl p-8">
-      <p className="eyebrow">Staff access</p>
-      <h1 className="display-md mt-5">Dispatch sign in</h1>
+    <Card>
+      <CardHeader>
+        <CardDescription>Staff access</CardDescription>
+        <CardTitle>Dispatch sign in</CardTitle>
+        <CardDescription>Use the staff account to view bookings and send driver links.</CardDescription>
+      </CardHeader>
 
-      <div className="mt-8 grid grid-cols-2 gap-1 rounded-xl bg-[color:var(--color-ink)]/50 p-1">
-        <button
-          type="button"
-          onClick={() => setMode("sign-in")}
-          className={tabClass(mode === "sign-in")}
-        >
-          Sign in
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("sign-up")}
-          className={tabClass(mode === "sign-up")}
-        >
-          Create
-        </button>
-      </div>
+      <CardContent>
+        <Tabs value={mode} onValueChange={(value) => setMode(value as Mode)}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="sign-in">Sign in</TabsTrigger>
+            <TabsTrigger value="sign-up">Create</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      <form onSubmit={onSubmit} className="mt-6 grid gap-4">
-        {mode === "sign-up" && (
+        <form onSubmit={onSubmit} className="mt-6 grid gap-4">
+          {mode === "sign-up" && (
+            <AuthField
+              label="Name"
+              name="name"
+              value={formState.name}
+              onChange={(value) => dispatch({ type: "name", value })}
+              autoComplete="name"
+              required
+            />
+          )}
           <AuthField
-            label="Name"
-            name="name"
-            value={formState.name}
-            onChange={(value) => dispatch({ type: "name", value })}
-            autoComplete="name"
+            label="Email"
+            name="email"
+            type="email"
+            value={formState.email}
+            onChange={(value) => dispatch({ type: "email", value })}
+            autoComplete="email"
             required
           />
-        )}
-        <AuthField
-          label="Email"
-          name="email"
-          type="email"
-          value={formState.email}
-          onChange={(value) => dispatch({ type: "email", value })}
-          autoComplete="email"
-          required
-        />
-        <AuthField
-          label="Password"
-          name="password"
-          type="password"
-          value={formState.password}
-          onChange={(value) => dispatch({ type: "password", value })}
-          autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-          required
-        />
+          <AuthField
+            label="Password"
+            name="password"
+            type="password"
+            value={formState.password}
+            onChange={(value) => dispatch({ type: "password", value })}
+            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+            required
+          />
 
-        {error && (
-          <p className="rounded-lg border border-red-400/40 bg-red-950/20 px-4 py-3 text-[0.86rem] text-red-100">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+              {error}
+            </p>
+          )}
 
-        <button type="submit" disabled={pending} className="btn btn-primary mt-2 disabled:cursor-not-allowed disabled:opacity-60">
-          {pending ? "Working" : mode === "sign-in" ? "Sign in" : "Create account"}
-        </button>
-      </form>
-    </div>
+          <Button type="submit" disabled={pending} className="mt-2 w-full">
+            {pending ? "Working" : mode === "sign-in" ? "Sign in" : "Create account"}
+            <ArrowRight className="size-4" aria-hidden />
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -172,30 +178,19 @@ function AuthField({
   required?: boolean;
 }) {
   return (
-    <label className="block bg-[color:var(--color-ink-soft)] px-5 py-4">
-      <span className="block font-condensed text-[0.68rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
-        {label}
-      </span>
-      <input
+    <div className="grid gap-2">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
+        id={name}
         name={name}
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         autoComplete={autoComplete}
         required={required}
-        className="field mt-1 text-[0.95rem]"
       />
-    </label>
+    </div>
   );
-}
-
-function tabClass(active: boolean) {
-  return [
-    "h-11 rounded-lg font-condensed text-[0.78rem] tracking-[0.16em] uppercase transition-colors",
-    active
-      ? "bg-[color:var(--color-bone)] text-[color:var(--color-ink)]"
-      : "text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)]",
-  ].join(" ");
 }
 
 function formReducer(state: FormState, action: FormAction): FormState {

@@ -91,7 +91,7 @@ export function Footer() {
                 </h4>
                 <ul className="mt-5 space-y-3">
                   {c.items.map((it) => (
-                    <li key={it.href}>
+                    <li key={`${c.label}-${it.label}`}>
                       <Link
                         href={it.href}
                         className="text-[0.9rem] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors link-gold"

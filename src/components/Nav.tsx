@@ -11,9 +11,10 @@ const links = [
   { label: "Business", href: "/business" },
 ];
 
-export function Nav() {
+export function Nav({ tone = "dark" }: { tone?: "dark" | "light" }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const light = tone === "light";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -26,13 +27,15 @@ export function Nav() {
     <header
       className={[
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        scrolled
-          ? "backdrop-blur-md bg-[color:color-mix(in_oklab,var(--color-ink)_82%,transparent)] border-b border-[color:var(--color-divider-soft)]"
-          : "bg-transparent border-b border-transparent",
+        light
+          ? "pld-ui border-b border-border bg-background/95 text-foreground shadow-sm backdrop-blur-md"
+          : scrolled
+            ? "backdrop-blur-md bg-[color:color-mix(in_oklab,var(--color-ink)_82%,transparent)] border-b border-[color:var(--color-divider-soft)]"
+            : "bg-transparent border-b border-transparent",
       ].join(" ")}
     >
       {/* Monocle-style metadata strip */}
-      <div className="hidden md:block border-b border-[color:var(--color-divider-soft)]/80">
+      <div className={["hidden md:block border-b", light ? "border-border" : "border-[color:var(--color-divider-soft)]/80"].join(" ")}>
         <div className="mx-auto max-w-[1400px] px-6 lg:px-10 h-7 flex items-center justify-between text-[10px] tracking-[0.28em] uppercase text-[color:var(--color-pewter-dim)] font-condensed">
           <div className="flex items-center gap-5">
             <span className="text-[color:var(--color-champagne)]">★</span>
