@@ -387,6 +387,7 @@ function DispatchBookingHeader({
             type="button"
             variant="outline"
             className="justify-center"
+            aria-label={`${expanded ? "Hide" : "Open"} ${booking.publicReference}`}
             aria-expanded={expanded}
             onClick={onToggle}
           >
