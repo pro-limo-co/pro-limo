@@ -252,6 +252,14 @@ function DispatchBookingRow({
   }
 
   async function openCheckout() {
+    if (isTerminalBooking(booking.status)) {
+      dispatchRowUi({
+        type: "setMessage",
+        message: `Payment links are closed for ${formatStatus(booking.status)} rides.`,
+      });
+      return;
+    }
+
     dispatchRowUi({ type: "setPending", pending: true });
     dispatchRowUi({ type: "setMessage", message: "" });
     try {
@@ -267,7 +275,12 @@ function DispatchBookingRow({
       }
       dispatchRowUi({
         type: "setMessage",
-        message: result.status === "quote_required" ? "Add a quote first." : "Stripe is not configured.",
+        message:
+          result.status === "quote_required"
+            ? "Add a quote first."
+            : result.status === "closed"
+              ? `Payment links are closed for ${formatStatus(booking.status)} rides.`
+              : "Stripe is not configured.",
       });
     } catch (error) {
       dispatchRowUi({ type: "setMessage", message: error instanceof Error ? error.message : "Could not create payment link." });
@@ -462,9 +475,19 @@ function DispatchEditorSection({
   onSaveNote: () => Promise<void>;
   pending: boolean;
 }) {
+  const terminalBooking = isTerminalBooking(booking.status);
+
   return (
     <section className="grid content-start gap-4">
-      <SectionHeading title="Dispatch" description="Set quote, driver, vehicle, and status." />
+      <SectionHeading
+        title="Dispatch"
+        description={
+          terminalBooking
+            ? "Review the closed ride or correct dispatch details."
+            : "Set quote, driver, vehicle, and status."
+        }
+      />
+      <InfoRow label="Payment" value={booking.paymentStatus} />
       <StatusSelect
         id={`status-${booking._id}`}
         value={draft.status}
@@ -508,11 +531,21 @@ function DispatchEditorSection({
           <Save className="size-4" aria-hidden />
           Save
         </Button>
-        <Button type="button" variant="outline" disabled={pending} onClick={() => void onOpenCheckout()}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={pending || terminalBooking}
+          onClick={() => void onOpenCheckout()}
+        >
           <CreditCard className="size-4" aria-hidden />
-          Payment link
+          {terminalBooking ? "Payment closed" : "Payment link"}
         </Button>
       </div>
+      {terminalBooking && (
+        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          Payment links are closed for {formatStatus(booking.status)} rides.
+        </p>
+      )}
       <div className="grid gap-2">
         <Label htmlFor={`staff-note-${booking._id}`}>Internal note</Label>
         <div className="grid gap-2 sm:grid-cols-[1fr_auto]">

@@ -16,6 +16,12 @@ export const createCheckoutSession = action({
       bookingId: args.bookingId,
     });
     if (!booking) throw new Error("Booking not found");
+    if (booking.status === "completed" || booking.status === "canceled") {
+      return {
+        status: "closed" as const,
+        checkoutUrl: null,
+      };
+    }
 
     if (!booking.quotedAmountCents || booking.quotedAmountCents <= 0) {
       return {
