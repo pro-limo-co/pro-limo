@@ -45,7 +45,7 @@ export function RideAccessPanel({ token }: { token: string }) {
   const { booking, handoff } = ride;
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
-    .join(" -> ");
+    .join(" to ");
   const closed = handoff.status === "declined" || handoff.status === "completed" || booking.status === "completed";
   const nextRideStatus = getNextRideStatus(booking.status, handoff.status);
   const actionHint = getActionHint(booking.status, handoff.status, nextRideStatus);
@@ -86,7 +86,9 @@ export function RideAccessPanel({ token }: { token: string }) {
               <Badge>{formatStatus(booking.status)}</Badge>
               <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
             </div>
-            <CardTitle className="pt-2">{booking.customerName}</CardTitle>
+            <CardTitle className="break-words pt-2 [overflow-wrap:anywhere]">
+              {booking.customerName}
+            </CardTitle>
             <CardDescription>{booking.pickupDate} at {booking.pickupTime}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-5">
@@ -95,7 +97,9 @@ export function RideAccessPanel({ token }: { token: string }) {
                 <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">Route</p>
-                  <p className="mt-1 text-base font-medium">{route}</p>
+                  <p className="mt-1 break-words text-base font-medium [overflow-wrap:anywhere]">
+                    {route}
+                  </p>
                 </div>
               </div>
             </div>
@@ -108,7 +112,7 @@ export function RideAccessPanel({ token }: { token: string }) {
             </div>
 
             {(booking.notes || booking.dispatchNotes || handoff.message) && (
-              <div className="rounded-lg border bg-background p-4 text-sm leading-6 text-muted-foreground">
+              <div className="break-words rounded-lg border bg-background p-4 text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">
                 {[booking.notes, booking.dispatchNotes, handoff.message].filter(Boolean).join(" ")}
               </div>
             )}
@@ -184,16 +188,16 @@ export function RideAccessPanel({ token }: { token: string }) {
 
       <Card className="mt-4">
         <CardContent className="grid gap-3 pt-6 sm:grid-cols-2">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="min-w-0 justify-start whitespace-normal text-left">
             <a href={`tel:${booking.customerPhone}`}>
-              <Phone className="size-4" aria-hidden />
-              {booking.customerPhone}
+              <Phone className="size-4 shrink-0" aria-hidden />
+              <span className="min-w-0 break-words [overflow-wrap:anywhere]">{booking.customerPhone}</span>
             </a>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="min-w-0 justify-start whitespace-normal text-left">
             <a href={`mailto:${booking.customerEmail}`}>
-              <Mail className="size-4" aria-hidden />
-              {booking.customerEmail}
+              <Mail className="size-4 shrink-0" aria-hidden />
+              <span className="min-w-0 break-words [overflow-wrap:anywhere]">{booking.customerEmail}</span>
             </a>
           </Button>
         </CardContent>
@@ -235,7 +239,7 @@ function RideFact({
         {icon}
         {label}
       </div>
-      <p className="mt-2 text-sm font-medium">{value}</p>
+      <p className="mt-2 break-words text-sm font-medium [overflow-wrap:anywhere]">{value}</p>
     </div>
   );
 }
