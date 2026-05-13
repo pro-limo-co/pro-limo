@@ -21,6 +21,25 @@ const statusSteps = [
   { value: "completed", label: "Ride completed" },
 ] as const;
 
+const statusLabels: Record<string, string> = {
+  accepted: "Accepted",
+  arrived: "Arrived",
+  assigned: "Assigned",
+  canceled: "Canceled",
+  completed: "Completed",
+  driver_en_route: "Driver on the way",
+  failed: "Failed",
+  in_progress: "In progress",
+  new: "New",
+  not_started: "Not started",
+  paid: "Paid",
+  pending: "Pending",
+  quote_required: "Quote required",
+  quoted: "Quoted",
+  refunded: "Refunded",
+  unavailable: "Unavailable",
+};
+
 type Booking = NonNullable<FunctionReturnType<typeof api.bookings.getByReference>>;
 type BookingStatus = Booking["status"];
 
@@ -55,7 +74,7 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
 
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
-    .join(" -> ");
+    .join(" to ");
 
   return (
     <StatusShell reference={booking.publicReference}>
@@ -73,19 +92,7 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
           <CardContent>
             <ol className="grid gap-2">
               {statusSteps.map((step) => (
-                <li
-                  key={step.value}
-                  className={cn(
-                    "flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm",
-                    getStepState(booking.status, step.value) === "current" && "border-primary bg-primary/5 text-foreground",
-                    getStepState(booking.status, step.value) === "done" && "bg-muted/40 text-muted-foreground",
-                  )}
-                >
-                  <span className="font-medium">{step.label}</span>
-                  <Badge variant={getStepState(booking.status, step.value) === "current" ? "default" : "outline"}>
-                    {getStepState(booking.status, step.value)}
-                  </Badge>
-                </li>
+                <StatusStep key={step.value} bookingStatus={booking.status} step={step} />
               ))}
             </ol>
           </CardContent>
@@ -130,6 +137,31 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
   );
 }
 
+function StatusStep({
+  bookingStatus,
+  step,
+}: {
+  bookingStatus: BookingStatus;
+  step: (typeof statusSteps)[number];
+}) {
+  const state = getStepState(bookingStatus, step.value);
+
+  return (
+    <li
+      className={cn(
+        "flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm",
+        state === "current" && "border-primary bg-primary/5 text-foreground",
+        state === "done" && "bg-muted/40 text-muted-foreground",
+      )}
+    >
+      <span className="font-medium">{step.label}</span>
+      <Badge variant={state === "current" ? "default" : "outline"}>
+        {formatStatus(state)}
+      </Badge>
+    </li>
+  );
+}
+
 function StatusShell({
   children,
   reference,
@@ -169,7 +201,7 @@ function StatusFact({
           {icon}
           {label}
         </div>
-        <p className="mt-2 break-words text-base font-medium capitalize text-foreground [overflow-wrap:anywhere]">
+        <p className="mt-2 break-words text-base font-medium text-foreground [overflow-wrap:anywhere]">
           {value}
         </p>
       </CardContent>
@@ -203,7 +235,11 @@ function getStepState(current: BookingStatus, step: (typeof statusSteps)[number]
 }
 
 function formatStatus(status: string) {
-  return status.replaceAll("_", " ");
+  return statusLabels[status] ?? sentenceCase(status.replaceAll("_", " "));
+}
+
+function sentenceCase(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatPassengerCount(count: number) {
