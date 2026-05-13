@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 const statusSteps = [
   { value: "new", label: "Request received" },
-  { value: "quoted", label: "Quote ready" },
+  { value: "quoted", label: "Dispatch reviewed" },
   { value: "assigned", label: "Chauffeur assigned" },
   { value: "driver_en_route", label: "Driver on the way" },
   { value: "arrived", label: "Driver arrived" },
@@ -62,7 +62,7 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
     <StatusShell reference={booking.publicReference}>
       <div className="flex flex-wrap items-center gap-2">
         <Badge>{formatStatus(booking.status)}</Badge>
-        <Badge variant="outline">{formatStatus(booking.paymentStatus)}</Badge>
+        <Badge variant="outline">{formatPaymentStatus(booking.paymentStatus)}</Badge>
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
@@ -88,7 +88,7 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
           />
           <StatusFact icon={<UserRound className="size-4" />} label="Passenger" value={booking.customerName} />
           <StatusFact icon={<CarFront className="size-4" />} label="Chauffeur" value={booking.assignedChauffeurName ?? "Dispatch assigning"} />
-          <StatusFact icon={<CreditCard className="size-4" />} label="Payment" value={formatStatus(booking.paymentStatus)} />
+          <StatusFact icon={<CreditCard className="size-4" />} label="Payment" value={formatPaymentStatus(booking.paymentStatus)} />
         </div>
       </div>
 
@@ -193,12 +193,13 @@ function StatusFact({
 
 function getStatusTitle(status: BookingStatus) {
   if (status === "canceled") return "Ride canceled";
+  if (status === "quoted") return "Quote ready";
   return statusSteps.find((step) => step.value === status)?.label ?? formatStatus(status);
 }
 
 function getStatusDescription(booking: Booking) {
   if (booking.status === "new") return "Dispatch has the request and is confirming availability.";
-  if (booking.status === "quoted") return "Dispatch has prepared pricing for this ride.";
+  if (booking.status === "quoted") return "Dispatch has reviewed the ride and is preparing final confirmation.";
   if (booking.status === "assigned") return "A chauffeur has been assigned to this ride.";
   if (booking.status === "driver_en_route") return "The chauffeur is on the way to pickup.";
   if (booking.status === "arrived") return "The chauffeur has arrived at pickup.";
@@ -214,6 +215,12 @@ function getStepState(current: BookingStatus, step: (typeof statusSteps)[number]
   if (stepIndex < currentIndex) return "done";
   if (stepIndex === currentIndex) return "current";
   return "pending";
+}
+
+function formatPaymentStatus(status: Booking["paymentStatus"]) {
+  if (status === "not_started") return "Payment pending";
+  if (status === "quote_required") return "Quote pending";
+  return formatStatus(status);
 }
 
 function formatPassengerCount(count: number) {
