@@ -266,7 +266,7 @@ function DispatchBookingRow({
     if (isTerminalBooking(booking.status)) {
       dispatchRowUi({
         type: "setMessage",
-        message: `Payment links are closed for ${formatStatus(booking.status)} rides.`,
+        message: `Payment links are closed for ${formatStatusInSentence(booking.status)} rides.`,
       });
       return;
     }
@@ -288,9 +288,9 @@ function DispatchBookingRow({
         type: "setMessage",
         message:
           result.status === "quote_required"
-            ? "Add a quote first."
+              ? "Add a quote first."
             : result.status === "closed"
-              ? `Payment links are closed for ${formatStatus(booking.status)} rides.`
+              ? `Payment links are closed for ${formatStatusInSentence(booking.status)} rides.`
               : "Stripe is not configured.",
       });
     } catch (error) {
@@ -555,7 +555,7 @@ function DispatchEditorSection({
       </div>
       {terminalBooking && (
         <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          Payment links are closed for {formatStatus(booking.status)} rides.
+          Payment links are closed for {formatStatusInSentence(booking.status)} rides.
         </p>
       )}
       <div className="grid gap-2">
@@ -611,7 +611,7 @@ function DriverLinkSection({
       {terminalBooking ? (
         <>
           <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-            New driver links are closed for {formatStatus(booking.status)} rides.
+            New driver links are closed for {formatStatusInSentence(booking.status)} rides.
           </p>
           <RecentHandoffs booking={booking} handoffs={handoffs} />
         </>
@@ -1055,6 +1055,10 @@ function getEventBadgeVariant(kind: BookingEvent["kind"]) {
 
 function isTerminalBooking(status: string) {
   return status === "completed" || status === "canceled";
+}
+
+function formatStatusInSentence(status: string) {
+  return formatStatus(status).toLowerCase();
 }
 
 function formatPassengerCount(count: number) {

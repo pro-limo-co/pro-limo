@@ -234,7 +234,7 @@ export const updateRideStatus = mutation({
       ctx.db.insert("bookingEvents", {
         bookingId: handoff.bookingId,
         kind: "driver_status_updated",
-        message: `${handoff.recipientName} updated ${booking.publicReference} to ${args.status}.`,
+        message: `${handoff.recipientName} updated ${booking.publicReference} to ${formatStatus(args.status)}.`,
         createdAt: now,
       }),
     ]);
@@ -247,5 +247,11 @@ function normalizeOptional(value: string | undefined) {
 }
 
 function formatStatus(status: string) {
-  return status.replaceAll("_", " ");
+  const labels: Record<string, string> = {
+    arrived: "Arrived",
+    completed: "Completed",
+    driver_en_route: "Driver on the way",
+    in_progress: "In progress",
+  };
+  return labels[status] ?? status.replaceAll("_", " ");
 }

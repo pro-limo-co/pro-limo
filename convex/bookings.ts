@@ -184,7 +184,7 @@ export const updateDispatch = mutation({
       ctx.db.insert("bookingEvents", {
         bookingId: args.bookingId,
         kind: args.status === booking.status ? "assignment_updated" : "status_changed",
-        message: `Dispatch updated ${booking.publicReference} to ${args.status}.`,
+        message: `Dispatch updated ${booking.publicReference} to ${formatStatus(args.status)}.`,
         actorTokenIdentifier: identity.tokenIdentifier,
         actorName: staff.name ?? staff.email,
         createdAt: now,
@@ -192,6 +192,20 @@ export const updateDispatch = mutation({
     ]);
   },
 });
+
+function formatStatus(status: string) {
+  const labels: Record<string, string> = {
+    arrived: "Arrived",
+    assigned: "Assigned",
+    canceled: "Canceled",
+    completed: "Completed",
+    driver_en_route: "Driver on the way",
+    in_progress: "In progress",
+    new: "New",
+    quoted: "Quoted",
+  };
+  return labels[status] ?? status.replaceAll("_", " ");
+}
 
 export const addNote = mutation({
   args: {
