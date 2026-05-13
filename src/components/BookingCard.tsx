@@ -151,12 +151,12 @@ export function BookingCard({
               )}
               aria-live="polite"
             >
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 {state.status === "success" && <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />}
-                <span>
+                <span className="min-w-0">
                   {state.message}
                   {state.publicReference && (
-                    <strong className="ml-2 font-mono text-emerald-700">{state.publicReference}</strong>
+                    <strong className="mt-1 block font-mono text-emerald-700">{state.publicReference}</strong>
                   )}
                 </span>
               </div>
@@ -244,11 +244,11 @@ function SelectField({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className="pld-ui">
-        {options.map((option) => (
-          <SelectItem key={option} value={option}>
-            {option}
-          </SelectItem>
-        ))}
+          {options.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

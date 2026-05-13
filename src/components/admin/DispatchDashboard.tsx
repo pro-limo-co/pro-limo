@@ -346,7 +346,7 @@ function BookingDetailsSection({
   routeSummary: string;
 }) {
   return (
-    <section className="grid gap-4">
+    <section className="grid content-start gap-4">
       <SectionHeading title="Booking" description={routeSummary} />
       <InfoRow label="Mode" value={booking.bookingMode} />
       {booking.flightNumber && <InfoRow label="Flight" value={booking.flightNumber} />}
@@ -373,7 +373,7 @@ function DispatchEditorSection({
   pending: boolean;
 }) {
   return (
-    <section className="grid gap-4">
+    <section className="grid content-start gap-4">
       <SectionHeading title="Dispatch" description="Set quote, driver, vehicle, and status." />
       <StatusSelect
         id={`status-${booking._id}`}
@@ -462,7 +462,7 @@ function DriverLinkSection({
   setHandoffDraft: Dispatch<SetStateAction<HandoffDraft>>;
 }) {
   return (
-    <section className="grid gap-4">
+    <section className="grid content-start gap-4">
       <SectionHeading title="Driver link" description="Create the link the driver opens for ride status updates." />
       <TextField
         id={`handoff-recipient-${booking._id}`}
@@ -554,7 +554,7 @@ function DriverLinkControls({
           rideUrl={handoffResult.rideUrl}
         />
       )}
-      <RecentHandoffs booking={booking} handoffs={handoffs} />
+      <RecentHandoffs booking={booking} excludedRideUrl={handoffResult?.rideUrl} handoffs={handoffs} />
       {message && (
         <p className="rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground" aria-live="polite">
           {message}
@@ -564,15 +564,24 @@ function DriverLinkControls({
   );
 }
 
-function RecentHandoffs({ booking, handoffs }: { booking: Booking; handoffs: Handoff[] }) {
-  if (handoffs.length === 0) return null;
+function RecentHandoffs({
+  booking,
+  excludedRideUrl,
+  handoffs,
+}: {
+  booking: Booking;
+  excludedRideUrl?: string;
+  handoffs: Handoff[];
+}) {
+  const visibleHandoffs = handoffs.filter((handoff) => getRideUrl(`/rides/${handoff.token}`) !== excludedRideUrl);
+  if (visibleHandoffs.length === 0) return null;
 
   return (
     <div className="grid gap-3 rounded-md border bg-muted/30 p-3">
       <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
         Recent links
       </p>
-      {handoffs.map((handoff) => {
+      {visibleHandoffs.map((handoff) => {
         const rideUrl = getRideUrl(`/rides/${handoff.token}`);
         const handoffMessage = buildHandoffMessage(booking, rideUrl, handoff.message ?? "");
         return (

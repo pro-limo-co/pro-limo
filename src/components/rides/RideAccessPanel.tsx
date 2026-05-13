@@ -45,6 +45,7 @@ export function RideAccessPanel({ token }: { token: string }) {
     .filter(Boolean)
     .join(" -> ");
   const accepted = handoff.status === "accepted" || handoff.status === "completed";
+  const closed = handoff.status === "declined" || handoff.status === "completed" || booking.status === "completed";
 
   async function answer(response: "accepted" | "declined") {
     setPending(response);
@@ -127,7 +128,7 @@ export function RideAccessPanel({ token }: { token: string }) {
             <Button
               type="button"
               variant="outline"
-              disabled={Boolean(pending) || handoff.status === "declined" || handoff.status === "completed"}
+              disabled={Boolean(pending) || accepted || closed}
               onClick={() => void answer("declined")}
             >
               <XCircle className="size-4" aria-hidden />
@@ -138,8 +139,8 @@ export function RideAccessPanel({ token }: { token: string }) {
               <Button
                 key={status.value}
                 type="button"
-                variant={booking.status === status.value ? "secondary" : "outline"}
-                disabled={Boolean(pending) || handoff.status === "declined"}
+                variant={booking.status === status.value ? "default" : "outline"}
+                disabled={Boolean(pending) || closed || booking.status === status.value}
                 onClick={() => void updateStatus(status.value)}
               >
                 <Navigation className="size-4" aria-hidden />

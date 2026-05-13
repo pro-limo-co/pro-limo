@@ -8,24 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient } from "@/lib/auth-client";
 
-type Mode = "sign-in" | "sign-up";
-
 type FormState = {
-  name: string;
   email: string;
   password: string;
 };
 
 type FormAction =
-  | { type: "name"; value: string }
   | { type: "email"; value: string }
   | { type: "password"; value: string };
 
 const initialFormState: FormState = {
-  name: "",
   email: "",
   password: "",
 };
@@ -33,7 +27,6 @@ const initialFormState: FormState = {
 export function AuthPanel({ next }: { next: string }) {
   const { push, refresh } = useRouter();
   const session = authClient.useSession();
-  const [mode, setMode] = useState<Mode>("sign-in");
   const [formState, dispatch] = useReducer(formReducer, initialFormState);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -43,19 +36,11 @@ export function AuthPanel({ next }: { next: string }) {
     setPending(true);
     setError("");
 
-    const result =
-      mode === "sign-in"
-        ? await authClient.signIn.email({
-            email: formState.email,
-            password: formState.password,
-            callbackURL: next,
-          })
-        : await authClient.signUp.email({
-            name: formState.name,
-            email: formState.email,
-            password: formState.password,
-            callbackURL: next,
-          });
+    const result = await authClient.signIn.email({
+      email: formState.email,
+      password: formState.password,
+      callbackURL: next,
+    });
 
     setPending(false);
     if (result.error) {
@@ -107,24 +92,7 @@ export function AuthPanel({ next }: { next: string }) {
       </CardHeader>
 
       <CardContent>
-        <Tabs value={mode} onValueChange={(value) => setMode(value as Mode)}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in">Sign in</TabsTrigger>
-            <TabsTrigger value="sign-up">Create</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <form onSubmit={onSubmit} className="mt-6 grid gap-4">
-          {mode === "sign-up" && (
-            <AuthField
-              label="Name"
-              name="name"
-              value={formState.name}
-              onChange={(value) => dispatch({ type: "name", value })}
-              autoComplete="name"
-              required
-            />
-          )}
+        <form onSubmit={onSubmit} className="grid gap-4">
           <AuthField
             label="Email"
             name="email"
@@ -140,7 +108,7 @@ export function AuthPanel({ next }: { next: string }) {
             type="password"
             value={formState.password}
             onChange={(value) => dispatch({ type: "password", value })}
-            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+            autoComplete="current-password"
             required
           />
 
@@ -151,7 +119,7 @@ export function AuthPanel({ next }: { next: string }) {
           )}
 
           <Button type="submit" disabled={pending} className="mt-2 w-full">
-            {pending ? "Working" : mode === "sign-in" ? "Sign in" : "Create account"}
+            {pending ? "Signing in" : "Sign in"}
             <ArrowRight className="size-4" aria-hidden />
           </Button>
         </form>
