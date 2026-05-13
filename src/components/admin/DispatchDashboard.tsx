@@ -344,7 +344,7 @@ function DispatchBookingRow({
       />
 
       {expanded && (
-        <CardContent className="grid gap-6 p-5 lg:grid-cols-[1fr_1fr_1.1fr]">
+        <CardContent className="grid min-w-0 gap-6 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)]">
           <BookingDetailsSection booking={booking} routeSummary={routeSummary} />
           <DispatchEditorSection
             booking={booking}
@@ -461,7 +461,7 @@ function BookingDetailsSection({
   routeSummary: string;
 }) {
   return (
-    <section className="grid content-start gap-4">
+    <section className="grid min-w-0 content-start gap-4">
       <SectionHeading title="Booking" description={routeSummary} />
       <InfoRow label="Mode" value={booking.bookingMode} />
       {booking.flightNumber && <InfoRow label="Flight" value={booking.flightNumber} />}
@@ -490,7 +490,7 @@ function DispatchEditorSection({
   const terminalBooking = isTerminalBooking(booking.status);
 
   return (
-    <section className="grid content-start gap-4">
+    <section className="grid min-w-0 content-start gap-4">
       <SectionHeading
         title="Dispatch"
         description={
@@ -505,7 +505,7 @@ function DispatchEditorSection({
         value={draft.status}
         onChange={(value) => dispatchDraft({ type: "status", value })}
       />
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
         <TextField
           id={`quote-${booking._id}`}
           label="Quote USD"
@@ -538,7 +538,7 @@ function DispatchEditorSection({
           className="mt-2 min-h-24"
         />
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
         <Button type="button" disabled={pending} onClick={() => void onSaveDispatch()}>
           <Save className="size-4" aria-hidden />
           Save
@@ -558,9 +558,9 @@ function DispatchEditorSection({
           Payment links are closed for {formatStatusInSentence(booking.status)} rides.
         </p>
       )}
-      <div className="grid gap-2">
+      <div className="grid min-w-0 gap-2">
         <Label htmlFor={`staff-note-${booking._id}`}>Internal note</Label>
-        <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+        <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
           <Input
             id={`staff-note-${booking._id}`}
             value={draft.staffNote}
@@ -599,7 +599,7 @@ function DriverLinkSection({
   const terminalBooking = isTerminalBooking(booking.status);
 
   return (
-    <section className="grid content-start gap-4">
+    <section className="grid min-w-0 content-start gap-4">
       <SectionHeading
         title="Driver link"
         description={
@@ -624,7 +624,7 @@ function DriverLinkSection({
             onChange={(value) => onHandoffDraftChange({ recipientName: value })}
             placeholder="Driver name"
           />
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-3 sm:grid-cols-2">
             <TextField
               id={`handoff-email-${booking._id}`}
               label="Email"
@@ -666,7 +666,7 @@ function OperationsLogSection({
   loading: boolean;
 }) {
   return (
-    <section className="grid content-start gap-4 lg:col-span-3">
+    <section className="grid min-w-0 content-start gap-4 lg:col-span-3">
       <SectionHeading
         title="Operations log"
         description="Live dispatch, payment, handoff, driver-status, and staff-note updates."
@@ -680,9 +680,9 @@ function OperationsLogSection({
           No updates recorded yet.
         </p>
       ) : (
-        <ol className="grid gap-2">
+        <ol className="grid min-w-0 gap-2">
           {events.slice(0, 8).map((event) => (
-            <li key={event._id} className="rounded-md border bg-background p-3">
+            <li key={event._id} className="min-w-0 rounded-md border bg-background p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={getEventBadgeVariant(event.kind)}>
                   {formatStatus(event.kind)}
@@ -728,7 +728,7 @@ function DriverLinkControls({
 }) {
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-[0.9fr_1fr]">
+      <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]">
         <ChannelSelect
           id={`handoff-channel-${booking._id}`}
           value={handoffDraft.channel}
@@ -781,7 +781,7 @@ function RecentHandoffs({
   if (visibleHandoffs.length === 0) return null;
 
   return (
-    <div className="grid gap-3 rounded-md border bg-muted/30 p-3">
+    <div className="grid min-w-0 gap-3 rounded-md border bg-muted/30 p-3">
       <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
         Recent links
       </p>
@@ -789,9 +789,9 @@ function RecentHandoffs({
         const rideUrl = getRideUrl(`/rides/${handoff.token}`);
         const handoffMessage = buildHandoffMessage(booking, rideUrl, handoff.message ?? "");
         return (
-          <div key={handoff._id} className="grid gap-2 rounded-md bg-background p-3">
-            <div className="flex items-center justify-between gap-3">
-              <a href={rideUrl} className="truncate font-mono text-xs text-primary">
+          <div key={handoff._id} className="grid min-w-0 gap-2 rounded-md bg-background p-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <a href={rideUrl} className="min-w-0 truncate font-mono text-xs text-primary">
                 {rideUrl}
               </a>
               <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
@@ -999,14 +999,14 @@ function RideLinkActions({
   rideUrl: string;
 }) {
   return (
-    <div className="grid gap-2">
+    <div className="grid min-w-0 gap-2">
       {!compact && (
-        <a href={rideUrl} className="truncate rounded-md border bg-background px-3 py-2 font-mono text-xs text-primary">
+        <a href={rideUrl} className="min-w-0 truncate rounded-md border bg-background px-3 py-2 font-mono text-xs text-primary">
           {rideUrl}
         </a>
       )}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Button asChild variant="outline" size="sm">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-4">
+        <Button asChild variant="outline" size="sm" className="w-full">
           <a href={rideUrl} target="_blank" rel="noreferrer">
             <ExternalLink className="size-4" aria-hidden />
             Open
@@ -1016,7 +1016,7 @@ function RideLinkActions({
           asChild
           variant="outline"
           size="sm"
-          className={cn(!email && "pointer-events-none opacity-50")}
+          className={cn("w-full", !email && "pointer-events-none opacity-50")}
         >
           <a href={email ? buildMailto(email, booking, message) : undefined} aria-disabled={!email}>
             <Mail className="size-4" aria-hidden />
@@ -1027,14 +1027,14 @@ function RideLinkActions({
           asChild
           variant="outline"
           size="sm"
-          className={cn(!phone && "pointer-events-none opacity-50")}
+          className={cn("w-full", !phone && "pointer-events-none opacity-50")}
         >
           <a href={phone ? buildSms(phone, message) : undefined} aria-disabled={!phone}>
             <Phone className="size-4" aria-hidden />
             Text
           </a>
         </Button>
-        <Button type="button" variant="outline" size="sm" onClick={() => void navigator.clipboard.writeText(rideUrl)}>
+        <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => void navigator.clipboard.writeText(rideUrl)}>
           <Copy className="size-4" aria-hidden />
           Copy
         </Button>
