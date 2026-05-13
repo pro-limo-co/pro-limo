@@ -200,7 +200,7 @@ function formatStatus(status: string) {
     canceled: "Canceled",
     completed: "Completed",
     driver_en_route: "Driver on the way",
-    in_progress: "In progress",
+    in_progress: "Passenger onboard",
     new: "New",
     quoted: "Quoted",
   };

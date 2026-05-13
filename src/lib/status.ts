@@ -15,7 +15,7 @@ const statusLabels: Record<string, string> = {
   handoff_declined: "Handoff declined",
   handoff_sent: "Handoff sent",
   hourly: "Hourly",
-  in_progress: "In progress",
+  in_progress: "Passenger onboard",
   new: "New",
   not_started: "Not started",
   note_added: "Note added",

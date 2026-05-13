@@ -251,7 +251,7 @@ function formatStatus(status: string) {
     arrived: "Arrived",
     completed: "Completed",
     driver_en_route: "Driver on the way",
-    in_progress: "In progress",
+    in_progress: "Passenger onboard",
   };
   return labels[status] ?? status.replaceAll("_", " ");
 }
