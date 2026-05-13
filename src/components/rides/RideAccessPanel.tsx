@@ -8,6 +8,7 @@ import { api } from "@convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatStatus } from "@/lib/status";
 
 const rideStatuses = [
   { value: "driver_en_route", label: "On the way" },
@@ -237,10 +238,6 @@ function RideFact({
       <p className="mt-2 text-sm font-medium">{value}</p>
     </div>
   );
-}
-
-function formatStatus(status: string) {
-  return status.replaceAll("_", " ");
 }
 
 function getNextRideStatus(

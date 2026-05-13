@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
+import { formatStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
 const statuses = [
@@ -1040,10 +1041,6 @@ function RideLinkActions({
       </div>
     </div>
   );
-}
-
-function formatStatus(status: string) {
-  return status.replaceAll("_", " ");
 }
 
 function formatTimestamp(timestamp: number) {

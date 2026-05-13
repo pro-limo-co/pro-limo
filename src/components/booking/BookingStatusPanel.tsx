@@ -9,6 +9,7 @@ import { api } from "@convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
 const statusSteps = [
@@ -20,25 +21,6 @@ const statusSteps = [
   { value: "in_progress", label: "Passenger onboard" },
   { value: "completed", label: "Ride completed" },
 ] as const;
-
-const statusLabels: Record<string, string> = {
-  accepted: "Accepted",
-  arrived: "Arrived",
-  assigned: "Assigned",
-  canceled: "Canceled",
-  completed: "Completed",
-  driver_en_route: "Driver on the way",
-  failed: "Failed",
-  in_progress: "In progress",
-  new: "New",
-  not_started: "Not started",
-  paid: "Paid",
-  pending: "Pending",
-  quote_required: "Quote required",
-  quoted: "Quoted",
-  refunded: "Refunded",
-  unavailable: "Unavailable",
-};
 
 type Booking = NonNullable<FunctionReturnType<typeof api.bookings.getByReference>>;
 type BookingStatus = Booking["status"];
@@ -232,14 +214,6 @@ function getStepState(current: BookingStatus, step: (typeof statusSteps)[number]
   if (stepIndex < currentIndex) return "done";
   if (stepIndex === currentIndex) return "current";
   return "pending";
-}
-
-function formatStatus(status: string) {
-  return statusLabels[status] ?? sentenceCase(status.replaceAll("_", " "));
-}
-
-function sentenceCase(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatPassengerCount(count: number) {
