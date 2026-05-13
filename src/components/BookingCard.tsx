@@ -47,9 +47,11 @@ export function BookingCard({
 }: BookingCardProps) {
   const [state, setState] = useState<BookingSubmissionState>(initialState);
   const [submitting, setSubmitting] = useState(false);
+  const [formKey, setFormKey] = useState(0);
   const [tab, setTab] = useReducer((_current: TabId, next: TabId) => next, defaultTab);
   const isAirport = tab === "airport";
   const isHourly = tab === "hourly";
+  const isSubmitted = state.status === "success" && Boolean(state.publicReference);
 
   return (
     <Card className="pld-ui border-border bg-card text-card-foreground shadow-2xl shadow-black/20">
@@ -67,7 +69,7 @@ export function BookingCard({
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="grid gap-5">
+        <form key={formKey} onSubmit={handleSubmit} className="grid gap-5">
           <input type="hidden" name="bookingMode" value={tab} />
           <input type="hidden" name="sourceLabel" value={sourceLabel} />
           <input type="hidden" name="sourcePath" value={sourcePath} />
@@ -153,37 +155,58 @@ export function BookingCard({
             >
               <div className="flex gap-3">
                 {state.status === "success" && <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />}
-                <span className="min-w-0">
-                  {state.message}
+                <div className="min-w-0">
+                  <p>{state.message}</p>
                   {state.publicReference && (
                     <>
-                      <strong className="mt-1 block font-mono text-emerald-700">{state.publicReference}</strong>
-                      <Button asChild variant="outline" size="sm" className="mt-3 border-emerald-300 bg-white text-emerald-900 hover:bg-emerald-100">
-                        <a href={`/booking/${encodeURIComponent(state.publicReference)}`}>View request</a>
-                      </Button>
+                      <strong className="mt-1 block font-mono text-emerald-700">
+                        {state.publicReference}
+                      </strong>
+                      <p className="mt-1 text-emerald-800">
+                        Dispatch can see it now in ProLimo OS.
+                      </p>
                     </>
                   )}
-                </span>
+                </div>
               </div>
             </div>
           )}
 
-          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-            <Button type="submit" disabled={submitting} size="lg" className="w-full">
-              {submitting ? "Submitting" : "Submit booking"}
-              <ArrowRight className="size-4" aria-hidden />
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <a href="#concierge">
-                <Headphones className="size-4" aria-hidden />
-                Concierge
-              </a>
-            </Button>
-          </div>
+          {isSubmitted && state.publicReference ? (
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <Button asChild size="lg" className="w-full">
+                <a href={`/booking/${encodeURIComponent(state.publicReference)}`}>
+                  View request
+                  <ArrowRight className="size-4" aria-hidden />
+                </a>
+              </Button>
+              <Button type="button" variant="outline" size="lg" onClick={handleStartAnother}>
+                New request
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <Button type="submit" disabled={submitting} size="lg" className="w-full">
+                {submitting ? "Submitting" : "Submit booking"}
+                <ArrowRight className="size-4" aria-hidden />
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <a href="#concierge">
+                  <Headphones className="size-4" aria-hidden />
+                  Concierge
+                </a>
+              </Button>
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>
   );
+
+  function handleStartAnother() {
+    setState(initialState);
+    setFormKey((key) => key + 1);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
