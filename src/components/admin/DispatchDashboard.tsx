@@ -377,6 +377,7 @@ function DispatchBookingHeader({
           <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
             {routeSummary}
           </p>
+          <DriverSummary booking={booking} />
         </div>
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] lg:min-w-[26rem]">
           <div className="rounded-md border bg-background px-4 py-3 text-sm">
@@ -397,6 +398,33 @@ function DispatchBookingHeader({
         </div>
       </div>
     </CardHeader>
+  );
+}
+
+function DriverSummary({ booking }: { booking: Booking }) {
+  const driverName = booking.assignedChauffeurName ?? booking.latestHandoff?.recipientName;
+
+  if (!driverName && !booking.latestHandoff) {
+    return (
+      <p className="mt-3 text-sm font-medium text-muted-foreground">
+        Driver link not created
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+      {driverName && (
+        <span className="rounded-md border bg-background px-2.5 py-1 font-medium text-foreground">
+          Driver: {driverName}
+        </span>
+      )}
+      {booking.latestHandoff && (
+        <Badge variant={booking.latestHandoff.status === "declined" ? "destructive" : "outline"}>
+          Link {formatStatus(booking.latestHandoff.status)}
+        </Badge>
+      )}
+    </div>
   );
 }
 

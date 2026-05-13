@@ -95,15 +95,38 @@ export const listForDispatch = query({
     const limit = Math.min(args.limit ?? 80, 120);
 
     const status = args.status;
+    let bookings;
     if (status) {
-      return await ctx.db
+      bookings = await ctx.db
         .query("bookings")
         .withIndex("by_status_and_createdAt", (q) => q.eq("status", status))
         .order("desc")
         .take(limit);
+    } else {
+      bookings = await ctx.db.query("bookings").order("desc").take(limit);
     }
 
-    return await ctx.db.query("bookings").order("desc").take(limit);
+    return await Promise.all(
+      bookings.map(async (booking) => {
+        const latestHandoff = await ctx.db
+          .query("rideHandoffs")
+          .withIndex("by_bookingId_and_createdAt", (q) => q.eq("bookingId", booking._id))
+          .order("desc")
+          .first();
+
+        return {
+          ...booking,
+          latestHandoff: latestHandoff
+            ? {
+                recipientName: latestHandoff.recipientName,
+                status: latestHandoff.status,
+                token: latestHandoff.token,
+                updatedAt: latestHandoff.updatedAt,
+              }
+            : null,
+        };
+      }),
+    );
   },
 });
 
