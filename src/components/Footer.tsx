@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Logo } from "./Logo";
 
 const copyrightYear = "2026";
@@ -71,10 +72,12 @@ export function Footer() {
                   placeholder="you@yourdomain.com"
                   className="field h-11 bg-transparent text-[0.95rem]"
                 />
-                <button type="submit" className="text-[color:var(--color-champagne-bright)] hover:text-[color:var(--color-champagne)] transition-colors p-2">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M5 12h14M13 5l7 7-7 7" />
-                  </svg>
+                <button
+                  type="button"
+                  aria-label="Subscribe to The Dispatch"
+                  className="text-[color:var(--color-champagne-bright)] transition-colors hover:text-[color:var(--color-champagne)] p-2"
+                >
+                  <ArrowRight className="size-[18px]" aria-hidden />
                 </button>
               </div>
               <p className="mt-3 text-[0.72rem] text-[color:var(--color-pewter)]">

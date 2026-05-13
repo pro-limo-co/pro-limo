@@ -678,7 +678,7 @@ function SectionHeading({ title, description }: { title: string; description: st
   return (
     <div>
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
-      <p className="mt-1 break-words text-sm leading-6 text-muted-foreground">{description}</p>
+      <p className="mt-1 break-words text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">{description}</p>
     </div>
   );
 }

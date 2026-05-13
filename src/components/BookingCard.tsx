@@ -156,7 +156,12 @@ export function BookingCard({
                 <span className="min-w-0">
                   {state.message}
                   {state.publicReference && (
-                    <strong className="mt-1 block font-mono text-emerald-700">{state.publicReference}</strong>
+                    <>
+                      <strong className="mt-1 block font-mono text-emerald-700">{state.publicReference}</strong>
+                      <Button asChild variant="outline" size="sm" className="mt-3 border-emerald-300 bg-white text-emerald-900 hover:bg-emerald-100">
+                        <a href={`/booking/${encodeURIComponent(state.publicReference)}`}>View request</a>
+                      </Button>
+                    </>
                   )}
                 </span>
               </div>
