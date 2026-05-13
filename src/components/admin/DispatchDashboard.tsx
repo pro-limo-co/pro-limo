@@ -3,6 +3,7 @@
 import type { FunctionReturnType } from "convex/server";
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
+  ChevronDown,
   Copy,
   CreditCard,
   ExternalLink,
@@ -14,7 +15,7 @@ import {
   Send,
 } from "lucide-react";
 import Link from "next/link";
-import { type Dispatch, type ReactNode, type SetStateAction, useMemo, useReducer, useState } from "react";
+import { type ReactNode, useMemo, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,21 @@ type HandoffResult = {
   recipientEmail?: string;
   recipientPhone?: string;
 };
+type RowUiState = {
+  expanded: boolean;
+  handoffDraft: HandoffDraft;
+  handoffResult: HandoffResult | null;
+  message: string;
+  pending: boolean;
+};
+type RowUiAction =
+  | { type: "toggleExpanded" }
+  | { type: "handoffDraft"; value: Partial<HandoffDraft> }
+  | { type: "setMessage"; message: string }
+  | { type: "setPending"; pending: boolean }
+  | { type: "startHandoff" }
+  | { type: "handoffSuccess"; result: HandoffResult }
+  | { type: "handoffError"; message: string };
 
 export function DispatchDashboard({
   title = "Dispatch",
@@ -165,24 +181,30 @@ export function DispatchDashboard({
             </CardContent>
           </Card>
         ) : (
-          bookings.map((booking) => <DispatchBookingRow key={booking._id} booking={booking} />)
+          bookings.map((booking, index) => (
+            <DispatchBookingRow key={booking._id} booking={booking} initialOpen={index === 0} />
+          ))
         )}
       </div>
     </DispatchShell>
   );
 }
 
-function DispatchBookingRow({ booking }: { booking: Booking }) {
+function DispatchBookingRow({
+  booking,
+  initialOpen,
+}: {
+  booking: Booking;
+  initialOpen: boolean;
+}) {
   const updateDispatch = useMutation(api.bookings.updateDispatch);
   const addNote = useMutation(api.bookings.addNote);
   const createHandoff = useMutation(api.handoffs.create);
   const createCheckoutSession = useAction(api.payments.createCheckoutSession);
-  const handoffs = useQuery(api.handoffs.listForBooking, { bookingId: booking._id });
+  const [rowUi, dispatchRowUi] = useReducer(rowUiReducer, { booking, initialOpen }, createRowUiState);
+  const { expanded, handoffDraft, handoffResult, message, pending } = rowUi;
+  const handoffs = useQuery(api.handoffs.listForBooking, expanded ? { bookingId: booking._id } : "skip");
   const [draft, dispatchDraft] = useReducer(dispatchDraftReducer, booking, createDispatchDraft);
-  const [handoffDraft, setHandoffDraft] = useState<HandoffDraft>(() => createHandoffDraft(booking));
-  const [handoffResult, setHandoffResult] = useState<HandoffResult | null>(null);
-  const [pending, setPending] = useState(false);
-  const [message, setMessage] = useState("");
 
   const routeSummary = useMemo(() => {
     const parts = [booking.pickupLocation];
@@ -192,8 +214,8 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
   }, [booking.dropoffLocation, booking.duration, booking.pickupLocation]);
 
   async function saveDispatch() {
-    setPending(true);
-    setMessage("");
+    dispatchRowUi({ type: "setPending", pending: true });
+    dispatchRowUi({ type: "setMessage", message: "" });
     try {
       const quotedAmountCents = draft.quote ? Math.round(Number.parseFloat(draft.quote) * 100) : undefined;
       const validQuote =
@@ -208,30 +230,30 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
         vehicleLabel: emptyToUndefined(draft.vehicle),
         dispatchNotes: emptyToUndefined(draft.notes),
       });
-      setMessage("Dispatch saved.");
+      dispatchRowUi({ type: "setMessage", message: "Dispatch saved." });
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not save dispatch.");
+      dispatchRowUi({ type: "setMessage", message: error instanceof Error ? error.message : "Could not save dispatch." });
     } finally {
-      setPending(false);
+      dispatchRowUi({ type: "setPending", pending: false });
     }
   }
 
   async function saveNote() {
     const note = draft.staffNote.trim();
     if (!note) return;
-    setMessage("");
+    dispatchRowUi({ type: "setMessage", message: "" });
     try {
       await addNote({ bookingId: booking._id, note });
       dispatchDraft({ type: "clearStaffNote" });
-      setMessage("Note added.");
+      dispatchRowUi({ type: "setMessage", message: "Note added." });
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not add note.");
+      dispatchRowUi({ type: "setMessage", message: error instanceof Error ? error.message : "Could not add note." });
     }
   }
 
   async function openCheckout() {
-    setPending(true);
-    setMessage("");
+    dispatchRowUi({ type: "setPending", pending: true });
+    dispatchRowUi({ type: "setMessage", message: "" });
     try {
       const result = await createCheckoutSession({
         bookingId: booking._id,
@@ -240,27 +262,28 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
       });
       if (result.checkoutUrl) {
         window.open(result.checkoutUrl, "_blank", "noopener,noreferrer");
-        setMessage("Checkout opened.");
+        dispatchRowUi({ type: "setMessage", message: "Checkout opened." });
         return;
       }
-      setMessage(result.status === "quote_required" ? "Add a quote first." : "Stripe is not configured.");
+      dispatchRowUi({
+        type: "setMessage",
+        message: result.status === "quote_required" ? "Add a quote first." : "Stripe is not configured.",
+      });
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not create payment link.");
+      dispatchRowUi({ type: "setMessage", message: error instanceof Error ? error.message : "Could not create payment link." });
     } finally {
-      setPending(false);
+      dispatchRowUi({ type: "setPending", pending: false });
     }
   }
 
   async function prepareHandoff() {
     const validationMessage = getHandoffValidationMessage(handoffDraft);
     if (validationMessage) {
-      setMessage(validationMessage);
+      dispatchRowUi({ type: "setMessage", message: validationMessage });
       return;
     }
 
-    setPending(true);
-    setMessage("");
-    setHandoffResult(null);
+    dispatchRowUi({ type: "startHandoff" });
     try {
       const result = await createHandoff({
         bookingId: booking._id,
@@ -271,17 +294,17 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
         message: emptyToUndefined(handoffDraft.message),
       });
       const rideUrl = new URL(result.routePath, window.location.origin).toString();
-      setHandoffResult({
-        rideUrl,
-        message: buildHandoffMessage(booking, rideUrl, handoffDraft.message),
-        recipientEmail: emptyToUndefined(handoffDraft.recipientEmail),
-        recipientPhone: emptyToUndefined(handoffDraft.recipientPhone),
+      dispatchRowUi({
+        type: "handoffSuccess",
+        result: {
+          rideUrl,
+          message: buildHandoffMessage(booking, rideUrl, handoffDraft.message),
+          recipientEmail: emptyToUndefined(handoffDraft.recipientEmail),
+          recipientPhone: emptyToUndefined(handoffDraft.recipientPhone),
+        },
       });
-      setMessage("Driver ride link ready.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not create ride link.");
-    } finally {
-      setPending(false);
+      dispatchRowUi({ type: "handoffError", message: error instanceof Error ? error.message : "Could not create ride link." });
     }
   }
 
@@ -289,39 +312,56 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
 
   return (
     <Card className="overflow-hidden">
-      <DispatchBookingHeader booking={booking} />
+      <DispatchBookingHeader
+        booking={booking}
+        expanded={expanded}
+        onToggle={() => dispatchRowUi({ type: "toggleExpanded" })}
+        routeSummary={routeSummary}
+      />
 
-      <CardContent className="grid gap-6 p-5 lg:grid-cols-[1fr_1fr_1.1fr]">
-        <BookingDetailsSection booking={booking} routeSummary={routeSummary} />
-        <DispatchEditorSection
-          booking={booking}
-          dispatchDraft={dispatchDraft}
-          draft={draft}
-          onOpenCheckout={openCheckout}
-          onSaveDispatch={saveDispatch}
-          onSaveNote={saveNote}
-          pending={pending}
-        />
-        <DriverLinkSection
-          booking={booking}
-          handoffDraft={handoffDraft}
-          handoffResult={handoffResult}
-          handoffs={latestHandoffs}
-          message={message}
-          onPrepareHandoff={prepareHandoff}
-          pending={pending}
-          setHandoffDraft={setHandoffDraft}
-        />
-      </CardContent>
+      {expanded && (
+        <CardContent className="grid gap-6 p-5 lg:grid-cols-[1fr_1fr_1.1fr]">
+          <BookingDetailsSection booking={booking} routeSummary={routeSummary} />
+          <DispatchEditorSection
+            booking={booking}
+            dispatchDraft={dispatchDraft}
+            draft={draft}
+            onOpenCheckout={openCheckout}
+            onSaveDispatch={saveDispatch}
+            onSaveNote={saveNote}
+            pending={pending}
+          />
+          <DriverLinkSection
+            booking={booking}
+            handoffDraft={handoffDraft}
+            handoffResult={handoffResult}
+            handoffs={latestHandoffs}
+            message={message}
+            onHandoffDraftChange={(value) => dispatchRowUi({ type: "handoffDraft", value })}
+            onPrepareHandoff={prepareHandoff}
+            pending={pending}
+          />
+        </CardContent>
+      )}
     </Card>
   );
 }
 
-function DispatchBookingHeader({ booking }: { booking: Booking }) {
+function DispatchBookingHeader({
+  booking,
+  expanded,
+  onToggle,
+  routeSummary,
+}: {
+  booking: Booking;
+  expanded: boolean;
+  onToggle: () => void;
+  routeSummary: string;
+}) {
   return (
-    <CardHeader className="border-b bg-muted/30">
+    <CardHeader className={cn("bg-muted/30", expanded && "border-b")}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={booking.status === "canceled" ? "destructive" : "secondary"}>
               {formatStatus(booking.status)}
@@ -331,13 +371,28 @@ function DispatchBookingHeader({ booking }: { booking: Booking }) {
             </span>
           </div>
           <CardTitle className="mt-3 text-2xl">{booking.customerName}</CardTitle>
-          <CardDescription className="mt-2 break-words">
+          <CardDescription className="mt-2 break-words [overflow-wrap:anywhere]">
             {booking.customerEmail} / {booking.customerPhone}
           </CardDescription>
+          <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+            {routeSummary}
+          </p>
         </div>
-        <div className="rounded-md border bg-background px-4 py-3 text-sm">
-          <p className="font-medium text-foreground">{booking.pickupDate} at {booking.pickupTime}</p>
-          <p className="mt-1 text-muted-foreground">{formatPassengerCount(booking.passengerCount)} / {booking.luggage}</p>
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto] lg:min-w-[26rem]">
+          <div className="rounded-md border bg-background px-4 py-3 text-sm">
+            <p className="font-medium text-foreground">{booking.pickupDate} at {booking.pickupTime}</p>
+            <p className="mt-1 text-muted-foreground">{formatPassengerCount(booking.passengerCount)} / {booking.luggage}</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="justify-center"
+            aria-expanded={expanded}
+            onClick={onToggle}
+          >
+            {expanded ? "Hide" : "Open"}
+            <ChevronDown className={cn("size-4 transition-transform", expanded && "rotate-180")} aria-hidden />
+          </Button>
         </div>
       </div>
     </CardHeader>
@@ -454,18 +509,18 @@ function DriverLinkSection({
   handoffResult,
   handoffs,
   message,
+  onHandoffDraftChange,
   onPrepareHandoff,
   pending,
-  setHandoffDraft,
 }: {
   booking: Booking;
   handoffDraft: HandoffDraft;
   handoffResult: HandoffResult | null;
   handoffs: Handoff[];
   message: string;
+  onHandoffDraftChange: (value: Partial<HandoffDraft>) => void;
   onPrepareHandoff: () => Promise<void>;
   pending: boolean;
-  setHandoffDraft: Dispatch<SetStateAction<HandoffDraft>>;
 }) {
   return (
     <section className="grid content-start gap-4">
@@ -477,7 +532,7 @@ function DriverLinkSection({
         id={`handoff-recipient-${booking._id}`}
         label="Recipient"
         value={handoffDraft.recipientName}
-        onChange={(value) => setHandoffDraft((current) => ({ ...current, recipientName: value }))}
+        onChange={(value) => onHandoffDraftChange({ recipientName: value })}
         placeholder="Driver name"
       />
       <div className="grid gap-3 sm:grid-cols-2">
@@ -486,7 +541,7 @@ function DriverLinkSection({
           label="Email"
           type="email"
           value={handoffDraft.recipientEmail}
-          onChange={(value) => setHandoffDraft((current) => ({ ...current, recipientEmail: value }))}
+          onChange={(value) => onHandoffDraftChange({ recipientEmail: value })}
           placeholder="driver@example.com"
         />
         <TextField
@@ -494,7 +549,7 @@ function DriverLinkSection({
           label="Phone"
           type="tel"
           value={handoffDraft.recipientPhone}
-          onChange={(value) => setHandoffDraft((current) => ({ ...current, recipientPhone: value }))}
+          onChange={(value) => onHandoffDraftChange({ recipientPhone: value })}
           placeholder="+1 503 555 0100"
         />
       </div>
@@ -504,9 +559,9 @@ function DriverLinkSection({
         handoffResult={handoffResult}
         handoffs={handoffs}
         message={message}
+        onHandoffDraftChange={onHandoffDraftChange}
         onPrepareHandoff={onPrepareHandoff}
         pending={pending}
-        setHandoffDraft={setHandoffDraft}
       />
     </section>
   );
@@ -518,18 +573,18 @@ function DriverLinkControls({
   handoffResult,
   handoffs,
   message,
+  onHandoffDraftChange,
   onPrepareHandoff,
   pending,
-  setHandoffDraft,
 }: {
   booking: Booking;
   handoffDraft: HandoffDraft;
   handoffResult: HandoffResult | null;
   handoffs: Handoff[];
   message: string;
+  onHandoffDraftChange: (value: Partial<HandoffDraft>) => void;
   onPrepareHandoff: () => Promise<void>;
   pending: boolean;
-  setHandoffDraft: Dispatch<SetStateAction<HandoffDraft>>;
 }) {
   return (
     <>
@@ -537,7 +592,7 @@ function DriverLinkControls({
         <ChannelSelect
           id={`handoff-channel-${booking._id}`}
           value={handoffDraft.channel}
-          onChange={(value) => setHandoffDraft((current) => ({ ...current, channel: value }))}
+          onChange={(value) => onHandoffDraftChange({ channel: value })}
         />
         <Button type="button" disabled={pending} onClick={() => void onPrepareHandoff()}>
           <Send className="size-4" aria-hidden />
@@ -549,7 +604,7 @@ function DriverLinkControls({
         <Textarea
           id={`handoff-message-${booking._id}`}
           value={handoffDraft.message}
-          onChange={(event) => setHandoffDraft((current) => ({ ...current, message: event.target.value }))}
+          onChange={(event) => onHandoffDraftChange({ message: event.target.value })}
           placeholder="Optional pickup instructions"
           className="mt-2 min-h-20"
         />
@@ -880,6 +935,49 @@ function createHandoffDraft(booking: Booking): HandoffDraft {
     channel: "copy",
     message: "",
   };
+}
+
+function createRowUiState({
+  booking,
+  initialOpen,
+}: {
+  booking: Booking;
+  initialOpen: boolean;
+}): RowUiState {
+  return {
+    expanded: initialOpen,
+    handoffDraft: createHandoffDraft(booking),
+    handoffResult: null,
+    message: "",
+    pending: false,
+  };
+}
+
+function rowUiReducer(state: RowUiState, action: RowUiAction): RowUiState {
+  switch (action.type) {
+    case "toggleExpanded":
+      return { ...state, expanded: !state.expanded };
+    case "handoffDraft":
+      return {
+        ...state,
+        handoffDraft: { ...state.handoffDraft, ...action.value },
+      };
+    case "setMessage":
+      return { ...state, message: action.message };
+    case "setPending":
+      return { ...state, pending: action.pending };
+    case "startHandoff":
+      return { ...state, handoffResult: null, message: "", pending: true };
+    case "handoffSuccess":
+      return {
+        ...state,
+        handoffResult: action.result,
+        message: "Driver ride link ready.",
+        pending: false,
+      };
+    case "handoffError":
+      return { ...state, message: action.message, pending: false };
+  }
 }
 
 function getHandoffValidationMessage(draft: HandoffDraft) {
