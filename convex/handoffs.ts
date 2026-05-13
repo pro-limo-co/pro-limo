@@ -32,6 +32,8 @@ export const create = mutation({
       ctx.db.get(args.bookingId),
     ]);
     if (!booking) throw new Error("Booking not found");
+    if (booking.status === "completed") throw new Error("Ride is already completed");
+    if (booking.status === "canceled") throw new Error("Ride was canceled");
 
     const recipientName = args.recipientName.trim();
     if (!recipientName) throw new Error("Recipient name is required");

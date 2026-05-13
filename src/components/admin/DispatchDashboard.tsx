@@ -551,47 +551,64 @@ function DriverLinkSection({
   onPrepareHandoff: () => Promise<void>;
   pending: boolean;
 }) {
+  const terminalBooking = isTerminalBooking(booking.status);
+
   return (
     <section className="grid content-start gap-4">
       <SectionHeading
         title="Driver link"
-        description="Create the ride link. Email and text actions unlock when contact info is present."
+        description={
+          terminalBooking
+            ? "This ride is closed. Existing links stay available for review."
+            : "Create the ride link. Email and text actions unlock when contact info is present."
+        }
       />
-      <TextField
-        id={`handoff-recipient-${booking._id}`}
-        label="Recipient"
-        value={handoffDraft.recipientName}
-        onChange={(value) => onHandoffDraftChange({ recipientName: value })}
-        placeholder="Driver name"
-      />
-      <div className="grid gap-3 sm:grid-cols-2">
-        <TextField
-          id={`handoff-email-${booking._id}`}
-          label="Email"
-          type="email"
-          value={handoffDraft.recipientEmail}
-          onChange={(value) => onHandoffDraftChange({ recipientEmail: value })}
-          placeholder="driver@example.com"
-        />
-        <TextField
-          id={`handoff-phone-${booking._id}`}
-          label="Phone"
-          type="tel"
-          value={handoffDraft.recipientPhone}
-          onChange={(value) => onHandoffDraftChange({ recipientPhone: value })}
-          placeholder="+1 503 555 0100"
-        />
-      </div>
-      <DriverLinkControls
-        booking={booking}
-        handoffDraft={handoffDraft}
-        handoffResult={handoffResult}
-        handoffs={handoffs}
-        message={message}
-        onHandoffDraftChange={onHandoffDraftChange}
-        onPrepareHandoff={onPrepareHandoff}
-        pending={pending}
-      />
+      {terminalBooking ? (
+        <>
+          <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+            New driver links are closed for {formatStatus(booking.status)} rides.
+          </p>
+          <RecentHandoffs booking={booking} handoffs={handoffs} />
+        </>
+      ) : (
+        <>
+          <TextField
+            id={`handoff-recipient-${booking._id}`}
+            label="Recipient"
+            value={handoffDraft.recipientName}
+            onChange={(value) => onHandoffDraftChange({ recipientName: value })}
+            placeholder="Driver name"
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <TextField
+              id={`handoff-email-${booking._id}`}
+              label="Email"
+              type="email"
+              value={handoffDraft.recipientEmail}
+              onChange={(value) => onHandoffDraftChange({ recipientEmail: value })}
+              placeholder="driver@example.com"
+            />
+            <TextField
+              id={`handoff-phone-${booking._id}`}
+              label="Phone"
+              type="tel"
+              value={handoffDraft.recipientPhone}
+              onChange={(value) => onHandoffDraftChange({ recipientPhone: value })}
+              placeholder="+1 503 555 0100"
+            />
+          </div>
+          <DriverLinkControls
+            booking={booking}
+            handoffDraft={handoffDraft}
+            handoffResult={handoffResult}
+            handoffs={handoffs}
+            message={message}
+            onHandoffDraftChange={onHandoffDraftChange}
+            onPrepareHandoff={onPrepareHandoff}
+            pending={pending}
+          />
+        </>
+      )}
     </section>
   );
 }
@@ -934,6 +951,10 @@ function RideLinkActions({
 
 function formatStatus(status: string) {
   return status.replaceAll("_", " ");
+}
+
+function isTerminalBooking(status: string) {
+  return status === "completed" || status === "canceled";
 }
 
 function formatPassengerCount(count: number) {
