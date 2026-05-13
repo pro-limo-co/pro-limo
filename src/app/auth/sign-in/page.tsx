@@ -16,7 +16,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
 
   return (
     <>
-      <Nav tone="light" />
+      <Nav minimal tone="light" />
       <main className="pld-ui min-h-[100svh] bg-background px-6 pt-32 pb-20 text-foreground lg:px-10">
         <div className="mx-auto max-w-xl">
           <Suspense fallback={<div className="rounded-lg border bg-card p-8 text-card-foreground">Loading</div>}>

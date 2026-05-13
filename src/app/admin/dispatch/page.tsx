@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function DispatchPage() {
   return (
     <>
-      <Nav tone="light" />
+      <Nav minimal tone="light" />
       <main className="min-h-[100svh]">
         <DispatchDashboard />
       </main>

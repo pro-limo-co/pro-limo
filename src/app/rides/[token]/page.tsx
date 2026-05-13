@@ -16,7 +16,7 @@ export default async function RidePage({ params }: { params: Params }) {
 
   return (
     <>
-      <Nav tone="light" />
+      <Nav minimal tone="light" />
       <main className="min-h-[100svh]">
         <RideAccessPanel token={token} />
       </main>

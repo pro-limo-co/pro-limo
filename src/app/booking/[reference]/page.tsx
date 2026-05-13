@@ -27,7 +27,7 @@ export default async function BookingReferencePage({ params }: { params: Params 
 
   return (
     <>
-      <Nav tone="light" />
+      <Nav minimal tone="light" />
       <main className="pld-ui min-h-[100svh] bg-background px-6 pt-32 pb-20 text-foreground lg:px-10">
         <section className="mx-auto max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
