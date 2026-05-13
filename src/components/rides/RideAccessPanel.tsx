@@ -44,10 +44,10 @@ export function RideAccessPanel({ token }: { token: string }) {
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
     .join(" -> ");
-  const accepted = handoff.status === "accepted";
   const closed = handoff.status === "declined" || handoff.status === "completed" || booking.status === "completed";
   const nextRideStatus = getNextRideStatus(booking.status, handoff.status);
   const actionHint = getActionHint(booking.status, handoff.status, nextRideStatus);
+  const terminalAction = getTerminalActionLabel(booking.status, handoff.status);
 
   async function answer(response: "accepted" | "declined") {
     setPending(response);
@@ -122,36 +122,60 @@ export function RideAccessPanel({ token }: { token: string }) {
             <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
               {actionHint}
             </p>
-            <Button
-              type="button"
-              disabled={Boolean(pending) || handoff.status !== "sent" || closed}
-              onClick={() => void answer("accepted")}
-            >
-              <CheckCircle2 className="size-4" aria-hidden />
-              {pending === "accepted" ? "Accepting" : accepted ? "Ride accepted" : "Accept ride"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={Boolean(pending) || handoff.status !== "sent" || closed}
-              onClick={() => void answer("declined")}
-            >
-              <XCircle className="size-4" aria-hidden />
-              {pending === "declined" ? "Declining" : "Decline"}
-            </Button>
-            <div className="my-2 h-px bg-border" />
-            {rideStatuses.map((status) => (
+            {handoff.status === "sent" && (
+              <div className="grid gap-3">
+                <Button
+                  type="button"
+                  disabled={Boolean(pending) || closed}
+                  onClick={() => void answer("accepted")}
+                >
+                  <CheckCircle2 className="size-4" aria-hidden />
+                  {pending === "accepted" ? "Accepting" : "Accept ride"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={Boolean(pending) || closed}
+                  onClick={() => void answer("declined")}
+                >
+                  <XCircle className="size-4" aria-hidden />
+                  {pending === "declined" ? "Declining" : "Decline"}
+                </Button>
+              </div>
+            )}
+            {nextRideStatus && (
               <Button
-                key={status.value}
                 type="button"
-                variant={booking.status === status.value || nextRideStatus === status.value ? "default" : "outline"}
-                disabled={Boolean(pending) || closed || nextRideStatus !== status.value}
-                onClick={() => void updateStatus(status.value)}
+                disabled={Boolean(pending) || closed}
+                onClick={() => void updateStatus(nextRideStatus)}
               >
                 <Navigation className="size-4" aria-hidden />
-                {pending === status.value ? "Saving" : status.label}
+                {pending === nextRideStatus ? "Saving" : getRideStatusLabel(nextRideStatus)}
               </Button>
-            ))}
+            )}
+            {terminalAction && (
+              <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm font-medium text-foreground">
+                {handoff.status === "declined" ? (
+                  <XCircle className="size-4 text-destructive" aria-hidden />
+                ) : (
+                  <CheckCircle2 className="size-4 text-primary" aria-hidden />
+                )}
+                {terminalAction}
+              </div>
+            )}
+            <div className="grid gap-2 border-t pt-3">
+              {rideStatuses.map((status) => (
+                <div
+                  key={status.value}
+                  className="flex items-center justify-between gap-3 text-sm text-muted-foreground"
+                >
+                  <span>{status.label}</span>
+                  <Badge variant={isRideStepReached(booking.status, status.value) ? "default" : "outline"}>
+                    {isRideStepReached(booking.status, status.value) ? "done" : "pending"}
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -242,6 +266,25 @@ function getActionHint(
   if (!nextRideStatus) return "Dispatch controls are current. No driver update is available.";
 
   return `Next: ${formatStatus(nextRideStatus)}.`;
+}
+
+function getTerminalActionLabel(bookingStatus: string, handoffStatus: string) {
+  if (handoffStatus === "declined") return "Ride declined";
+  if (handoffStatus === "completed" || bookingStatus === "completed") return "Ride completed";
+  if (handoffStatus === "accepted" && !getNextRideStatus(bookingStatus, handoffStatus)) {
+    return "Ride accepted";
+  }
+  return null;
+}
+
+function getRideStatusLabel(status: RideStatus) {
+  return rideStatuses.find((item) => item.value === status)?.label ?? formatStatus(status);
+}
+
+function isRideStepReached(bookingStatus: string, status: RideStatus) {
+  const currentIndex = rideStatuses.findIndex((item) => item.value === bookingStatus);
+  const stepIndex = rideStatuses.findIndex((item) => item.value === status);
+  return currentIndex >= stepIndex && stepIndex >= 0;
 }
 
 function formatPassengerCount(count: number) {
