@@ -252,6 +252,12 @@ function DispatchBookingRow({ booking }: { booking: Booking }) {
   }
 
   async function prepareHandoff() {
+    const validationMessage = getHandoffValidationMessage(handoffDraft);
+    if (validationMessage) {
+      setMessage(validationMessage);
+      return;
+    }
+
     setPending(true);
     setMessage("");
     setHandoffResult(null);
@@ -463,7 +469,10 @@ function DriverLinkSection({
 }) {
   return (
     <section className="grid content-start gap-4">
-      <SectionHeading title="Driver link" description="Create the link the driver opens for ride status updates." />
+      <SectionHeading
+        title="Driver link"
+        description="Create the ride link. Email and text actions unlock when contact info is present."
+      />
       <TextField
         id={`handoff-recipient-${booking._id}`}
         label="Recipient"
@@ -532,7 +541,7 @@ function DriverLinkControls({
         />
         <Button type="button" disabled={pending} onClick={() => void onPrepareHandoff()}>
           <Send className="size-4" aria-hidden />
-          Prepare link
+          Create link
         </Button>
       </div>
       <div>
@@ -764,15 +773,15 @@ function ChannelSelect({
 }) {
   return (
     <div>
-      <Label htmlFor={id}>Send by</Label>
+      <Label htmlFor={id}>Share mode</Label>
       <Select value={value} onValueChange={(next) => onChange(next as HandoffChannel)}>
         <SelectTrigger id={id} className="mt-2">
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="pld-ui">
+          <SelectItem value="copy">Copy link</SelectItem>
           <SelectItem value="email">Email</SelectItem>
           <SelectItem value="sms">Text</SelectItem>
-          <SelectItem value="copy">Copy</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -864,9 +873,20 @@ function createHandoffDraft(booking: Booking): HandoffDraft {
     recipientName: booking.assignedChauffeurName ?? "",
     recipientEmail: "",
     recipientPhone: "",
-    channel: "email",
+    channel: "copy",
     message: "",
   };
+}
+
+function getHandoffValidationMessage(draft: HandoffDraft) {
+  if (!draft.recipientName.trim()) return "Add the driver name before creating a ride link.";
+  if (draft.channel === "email" && !draft.recipientEmail.trim()) {
+    return "Add a driver email or switch Share mode to Copy link.";
+  }
+  if (draft.channel === "sms" && !draft.recipientPhone.trim()) {
+    return "Add a driver phone number or switch Share mode to Copy link.";
+  }
+  return "";
 }
 
 function dispatchDraftReducer(state: DispatchDraft, action: DispatchDraftAction): DispatchDraft {
