@@ -14,6 +14,7 @@ import type * as betterAuth_auth from "../betterAuth/auth.js";
 import type * as bookings from "../bookings.js";
 import type * as handoffs from "../handoffs.js";
 import type * as http from "../http.js";
+import type * as lib_rateLimits from "../lib/rateLimits.js";
 import type * as lib_staff from "../lib/staff.js";
 import type * as paymentRecords from "../paymentRecords.js";
 import type * as payments from "../payments.js";
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   bookings: typeof bookings;
   handoffs: typeof handoffs;
   http: typeof http;
+  "lib/rateLimits": typeof lib_rateLimits;
   "lib/staff": typeof lib_staff;
   paymentRecords: typeof paymentRecords;
   payments: typeof payments;
@@ -64,4 +66,5 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   betterAuth: import("@convex-dev/better-auth/_generated/component.js").ComponentApi<"betterAuth">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };

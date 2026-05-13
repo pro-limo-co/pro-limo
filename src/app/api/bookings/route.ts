@@ -1,4 +1,5 @@
 import { ConvexHttpClient } from "convex/browser";
+import { isRateLimitError } from "@convex-dev/rate-limiter";
 import { api } from "@convex/_generated/api";
 
 const bookingModes = ["oneway", "hourly", "airport"] as const;
@@ -73,6 +74,16 @@ export async function POST(request: Request) {
       publicReference: result.publicReference,
     });
   } catch (error) {
+    if (isRateLimitError(error)) {
+      return Response.json(
+        {
+          status: "error",
+          message: "Too many booking attempts. Please wait a few minutes before trying again.",
+        },
+        { status: 429 },
+      );
+    }
+
     console.error("Booking submission failed", error);
     return Response.json(
       {

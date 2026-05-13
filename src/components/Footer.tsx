@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "./Logo";
 
 const copyrightYear = "2026";
@@ -5,19 +6,44 @@ const copyrightYear = "2026";
 const cols = [
   {
     label: "Services",
-    items: ["Airport transfers", "By the hour", "City to city", "Events", "Roadshows"],
+    items: [
+      { label: "Airport transfers", href: "/services/airport-transfer" },
+      { label: "By the hour", href: "/services/hourly-chauffeur" },
+      { label: "City to city", href: "/services/city-to-city" },
+      { label: "Events", href: "/services/events-roadshows" },
+      { label: "Business travel", href: "/services/for-business" },
+    ],
   },
   {
     label: "For business",
-    items: ["Business travel", "Travel managers", "Duty of care", "Accounts", "Concierge desk"],
+    items: [
+      { label: "Business travel", href: "/business" },
+      { label: "Travel managers", href: "/business" },
+      { label: "Duty of care", href: "/business" },
+      { label: "Accounts", href: "/business" },
+      { label: "Concierge desk", href: "/#reserve" },
+    ],
   },
   {
     label: "Locations",
-    items: ["Portland", "Seattle", "Eugene", "Cannon Beach", "Astoria", "All locations"],
+    items: [
+      { label: "Portland", href: "/cities/portland" },
+      { label: "Seattle", href: "/cities/seattle" },
+      { label: "Eugene", href: "/cities/eugene" },
+      { label: "Cannon Beach", href: "/cities/cannon-beach" },
+      { label: "Service area", href: "/service-area" },
+      { label: "All locations", href: "/cities" },
+    ],
   },
   {
     label: "Company",
-    items: ["About", "Chauffeurs", "Sustainability", "Press", "Careers"],
+    items: [
+      { label: "About", href: "/" },
+      { label: "Chauffeurs", href: "/#standards" },
+      { label: "Experience", href: "/#experience" },
+      { label: "Process", href: "/#process" },
+      { label: "Reserve", href: "/#book" },
+    ],
   },
 ];
 
@@ -65,13 +91,13 @@ export function Footer() {
                 </h4>
                 <ul className="mt-5 space-y-3">
                   {c.items.map((it) => (
-                    <li key={it}>
-                      <a
-                        href={`#${it.toLowerCase().replace(/\s+/g, "-")}`}
+                    <li key={it.href}>
+                      <Link
+                        href={it.href}
                         className="text-[0.9rem] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors link-gold"
                       >
-                        {it}
-                      </a>
+                        {it.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>

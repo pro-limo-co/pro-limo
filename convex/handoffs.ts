@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { limitDriverHandoffResponse, limitDriverStatusUpdate } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
 
 const handoffChannel = v.union(v.literal("email"), v.literal("sms"), v.literal("copy"));
@@ -138,6 +139,8 @@ export const respond = mutation({
     response: handoffResponse,
   },
   handler: async (ctx, args) => {
+    await limitDriverHandoffResponse(ctx, args.token);
+
     const handoff = await ctx.db
       .query("rideHandoffs")
       .withIndex("by_token", (q) => q.eq("token", args.token))
@@ -182,6 +185,8 @@ export const updateRideStatus = mutation({
     status: driverRideStatus,
   },
   handler: async (ctx, args) => {
+    await limitDriverStatusUpdate(ctx, args.token);
+
     const handoff = await ctx.db
       .query("rideHandoffs")
       .withIndex("by_token", (q) => q.eq("token", args.token))

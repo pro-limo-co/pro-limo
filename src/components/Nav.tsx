@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 
 const links = [
-  { label: "Services", href: "#services" },
-  { label: "Fleet", href: "#fleet" },
-  { label: "Locations", href: "#cities" },
+  { label: "Services", href: "/#services" },
+  { label: "Fleet", href: "/#fleet" },
+  { label: "Locations", href: "/service-area" },
   { label: "Business", href: "/business" },
 ];
 
@@ -54,13 +54,13 @@ export function Nav() {
 
         <nav className="hidden md:flex items-center gap-9 font-condensed text-[0.78rem] tracking-[0.16em] uppercase">
           {links.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               className="link-gold text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -100,13 +100,13 @@ export function Nav() {
           <ul className="flex flex-col px-6 py-4">
             {links.map((l) => (
               <li key={l.href}>
-                <a
+                <Link
                   href={l.href}
                   onClick={() => setOpen(false)}
                   className="block py-3 font-condensed tracking-[0.14em] uppercase text-[0.85rem] text-[color:var(--color-bone-dim)] border-b border-[color:var(--color-divider-soft)] last:border-b-0"
                 >
                   {l.label}
-                </a>
+                </Link>
               </li>
             ))}
             <li>

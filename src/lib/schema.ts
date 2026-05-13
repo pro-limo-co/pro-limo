@@ -29,11 +29,6 @@ const websiteSchema: WithContext<Record<string, unknown>> = {
   "@type": "WebSite",
   name: siteConfig.name,
   url: siteConfig.url,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${siteConfig.url}/search?q={query}`,
-    "query-input": "required name=query",
-  },
 };
 
 export const homePageSchemas: WithContext<Record<string, unknown>>[] = [
@@ -138,6 +133,43 @@ export function serviceSchemas(service: Service): WithContext<Record<string, unk
         { "@type": "ListItem", position: 2, name: "Services", item: `${siteConfig.url}/services` },
         { "@type": "ListItem", position: 3, name: service.name, item: url },
       ],
+    },
+  ];
+}
+
+export function serviceAreaSchemas(cities: City[], services: Service[]): WithContext<Record<string, unknown>>[] {
+  const url = `${siteConfig.url}/service-area`;
+
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Service Area",
+      url,
+      description:
+        "Regional chauffeur service area for Professional Limousine Driver, with city and service pages for airport transfers, hourly chauffeurs, business travel, events, and city-to-city rides.",
+      isPartOf: { "@id": siteConfig.url },
+      about: services.map((service) => service.name),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+        { "@type": "ListItem", position: 2, name: "Service Area", item: url },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Professional Limousine Driver service cities",
+      numberOfItems: cities.length,
+      itemListElement: cities.map((city, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: city.name,
+        url: `${siteConfig.url}/cities/${city.slug}`,
+      })),
     },
   ];
 }

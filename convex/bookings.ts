@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { limitBookingSubmission } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
 
 const bookingMode = v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport"));
@@ -37,6 +38,11 @@ export const create = mutation({
     notes: optionalString,
   },
   handler: async (ctx, args) => {
+    await limitBookingSubmission(ctx, {
+      customerEmail: args.customerEmail,
+      customerPhone: args.customerPhone,
+    });
+
     const now = Date.now();
     const bookingId = await ctx.db.insert("bookings", {
       ...args,
