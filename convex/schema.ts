@@ -6,6 +6,7 @@ const bookingStatus = v.union(
   v.literal("quoted"),
   v.literal("assigned"),
   v.literal("driver_en_route"),
+  v.literal("arrived"),
   v.literal("in_progress"),
   v.literal("completed"),
   v.literal("canceled"),

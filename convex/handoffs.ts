@@ -7,13 +7,15 @@ const handoffChannel = v.union(v.literal("email"), v.literal("sms"), v.literal("
 const handoffResponse = v.union(v.literal("accepted"), v.literal("declined"));
 const driverRideStatus = v.union(
   v.literal("driver_en_route"),
+  v.literal("arrived"),
   v.literal("in_progress"),
   v.literal("completed"),
 );
-type DriverRideStatus = "driver_en_route" | "in_progress" | "completed";
+type DriverRideStatus = "driver_en_route" | "arrived" | "in_progress" | "completed";
 const requiredPreviousBookingStatus: Record<DriverRideStatus, readonly string[]> = {
   driver_en_route: ["assigned"],
-  in_progress: ["driver_en_route"],
+  arrived: ["driver_en_route"],
+  in_progress: ["arrived"],
   completed: ["in_progress"],
 };
 

@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const rideStatuses = [
   { value: "driver_en_route", label: "On the way" },
+  { value: "arrived", label: "Arrived" },
   { value: "in_progress", label: "Passenger onboard" },
   { value: "completed", label: "Completed" },
 ] as const;
@@ -249,7 +250,8 @@ function getNextRideStatus(
   if (handoffStatus !== "accepted") return null;
 
   if (bookingStatus === "assigned") return "driver_en_route";
-  if (bookingStatus === "driver_en_route") return "in_progress";
+  if (bookingStatus === "driver_en_route") return "arrived";
+  if (bookingStatus === "arrived") return "in_progress";
   if (bookingStatus === "in_progress") return "completed";
 
   return null;

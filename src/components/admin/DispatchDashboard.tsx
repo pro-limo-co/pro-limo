@@ -32,6 +32,7 @@ const statuses = [
   "quoted",
   "assigned",
   "driver_en_route",
+  "arrived",
   "in_progress",
   "completed",
   "canceled",
