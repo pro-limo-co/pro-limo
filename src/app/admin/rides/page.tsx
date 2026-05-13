@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
 import { DispatchDashboard } from "@/components/admin/DispatchDashboard";
 
@@ -15,7 +14,6 @@ export default function RidesPage() {
       <main className="min-h-[100svh]">
         <DispatchDashboard title="Rides" />
       </main>
-      <Footer />
     </>
   );
 }

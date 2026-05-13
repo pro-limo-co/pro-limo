@@ -1,7 +1,6 @@
 import { ConvexHttpClient } from "convex/browser";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -56,7 +55,6 @@ export default async function BookingReferencePage({ params }: { params: Params 
           </Card>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

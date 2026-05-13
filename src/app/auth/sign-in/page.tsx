@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { sanitizeInternalPath } from "@/lib/redirects";
@@ -25,7 +24,6 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
           </Suspense>
         </div>
       </main>
-      <Footer />
     </>
   );
 }
