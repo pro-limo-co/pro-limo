@@ -37,9 +37,17 @@ const statuses = [
   "canceled",
 ] as const;
 
+const eventTimestampFormatter = new Intl.DateTimeFormat(undefined, {
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
+
 type Status = (typeof statuses)[number];
 type Booking = FunctionReturnType<typeof api.bookings.listForDispatch>[number];
 type Handoff = FunctionReturnType<typeof api.handoffs.listForBooking>[number];
+type BookingEvent = FunctionReturnType<typeof api.bookings.listEvents>[number];
 type DispatchDraft = {
   status: Status;
   quote: string;
@@ -204,6 +212,7 @@ function DispatchBookingRow({
   const [rowUi, dispatchRowUi] = useReducer(rowUiReducer, { booking, initialOpen }, createRowUiState);
   const { expanded, handoffDraft, handoffResult, message, pending } = rowUi;
   const handoffs = useQuery(api.handoffs.listForBooking, expanded ? { bookingId: booking._id } : "skip");
+  const events = useQuery(api.bookings.listEvents, expanded ? { bookingId: booking._id } : "skip");
   const [draft, dispatchDraft] = useReducer(dispatchDraftReducer, booking, createDispatchDraft);
 
   const routeSummary = useMemo(() => {
@@ -354,6 +363,7 @@ function DispatchBookingRow({
             onPrepareHandoff={prepareHandoff}
             pending={pending}
           />
+          <OperationsLogSection events={events ?? []} loading={events === undefined} />
         </CardContent>
       )}
     </Card>
@@ -641,6 +651,55 @@ function DriverLinkSection({
             pending={pending}
           />
         </>
+      )}
+    </section>
+  );
+}
+
+function OperationsLogSection({
+  events,
+  loading,
+}: {
+  events: BookingEvent[];
+  loading: boolean;
+}) {
+  return (
+    <section className="grid content-start gap-4 lg:col-span-3">
+      <SectionHeading
+        title="Operations log"
+        description="Live dispatch, payment, handoff, driver-status, and staff-note updates."
+      />
+      {loading ? (
+        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          Loading updates.
+        </p>
+      ) : events.length === 0 ? (
+        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          No updates recorded yet.
+        </p>
+      ) : (
+        <ol className="grid gap-2">
+          {events.slice(0, 8).map((event) => (
+            <li key={event._id} className="rounded-md border bg-background p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={getEventBadgeVariant(event.kind)}>
+                  {formatStatus(event.kind)}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {formatTimestamp(event.createdAt)}
+                </span>
+                {event.actorName && (
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {event.actorName}
+                  </span>
+                )}
+              </div>
+              <p className="mt-2 break-words text-sm leading-6 text-foreground [overflow-wrap:anywhere]">
+                {event.message}
+              </p>
+            </li>
+          ))}
+        </ol>
       )}
     </section>
   );
@@ -984,6 +1043,16 @@ function RideLinkActions({
 
 function formatStatus(status: string) {
   return status.replaceAll("_", " ");
+}
+
+function formatTimestamp(timestamp: number) {
+  return eventTimestampFormatter.format(new Date(timestamp));
+}
+
+function getEventBadgeVariant(kind: BookingEvent["kind"]) {
+  if (kind === "handoff_declined") return "destructive";
+  if (kind === "note_added") return "outline";
+  return "secondary";
 }
 
 function isTerminalBooking(status: string) {
