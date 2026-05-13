@@ -10,6 +10,12 @@ const driverRideStatus = v.union(
   v.literal("in_progress"),
   v.literal("completed"),
 );
+type DriverRideStatus = "driver_en_route" | "in_progress" | "completed";
+const requiredPreviousBookingStatus: Record<DriverRideStatus, readonly string[]> = {
+  driver_en_route: ["assigned"],
+  in_progress: ["driver_en_route"],
+  completed: ["in_progress"],
+};
 
 export const create = mutation({
   args: {
@@ -193,9 +199,20 @@ export const updateRideStatus = mutation({
       .unique();
     if (!handoff) throw new Error("Ride link not found");
     if (handoff.status === "declined") throw new Error("Ride was declined");
+    if (handoff.status === "sent") throw new Error("Accept the ride before updating status");
+    if (handoff.status === "completed") throw new Error("Ride is already completed");
 
     const booking = await ctx.db.get(handoff.bookingId);
     if (!booking) throw new Error("Booking not found");
+    if (booking.status === "canceled") throw new Error("Ride was canceled");
+    if (booking.status === "completed") throw new Error("Ride is already completed");
+
+    const allowedPreviousStatuses = requiredPreviousBookingStatus[args.status];
+    if (!allowedPreviousStatuses.includes(booking.status)) {
+      throw new Error(
+        `Ride must be ${allowedPreviousStatuses.map(formatStatus).join(" or ")} before ${formatStatus(args.status)}`,
+      );
+    }
 
     const now = Date.now();
     await Promise.all([
@@ -223,4 +240,8 @@ export const updateRideStatus = mutation({
 function normalizeOptional(value: string | undefined) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function formatStatus(status: string) {
+  return status.replaceAll("_", " ");
 }

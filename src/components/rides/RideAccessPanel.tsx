@@ -44,8 +44,10 @@ export function RideAccessPanel({ token }: { token: string }) {
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
     .join(" -> ");
-  const accepted = handoff.status === "accepted" || handoff.status === "completed";
+  const accepted = handoff.status === "accepted";
   const closed = handoff.status === "declined" || handoff.status === "completed" || booking.status === "completed";
+  const nextRideStatus = getNextRideStatus(booking.status, handoff.status);
+  const actionHint = getActionHint(booking.status, handoff.status, nextRideStatus);
 
   async function answer(response: "accepted" | "declined") {
     setPending(response);
@@ -117,18 +119,21 @@ export function RideAccessPanel({ token }: { token: string }) {
             <CardDescription>Update dispatch from this ride link.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
+            <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+              {actionHint}
+            </p>
             <Button
               type="button"
-              disabled={Boolean(pending) || accepted}
+              disabled={Boolean(pending) || handoff.status !== "sent" || closed}
               onClick={() => void answer("accepted")}
             >
               <CheckCircle2 className="size-4" aria-hidden />
-              {pending === "accepted" ? "Accepting" : "Accept ride"}
+              {pending === "accepted" ? "Accepting" : accepted ? "Ride accepted" : "Accept ride"}
             </Button>
             <Button
               type="button"
               variant="outline"
-              disabled={Boolean(pending) || accepted || closed}
+              disabled={Boolean(pending) || handoff.status !== "sent" || closed}
               onClick={() => void answer("declined")}
             >
               <XCircle className="size-4" aria-hidden />
@@ -139,8 +144,8 @@ export function RideAccessPanel({ token }: { token: string }) {
               <Button
                 key={status.value}
                 type="button"
-                variant={booking.status === status.value ? "default" : "outline"}
-                disabled={Boolean(pending) || closed || booking.status === status.value}
+                variant={booking.status === status.value || nextRideStatus === status.value ? "default" : "outline"}
+                disabled={Boolean(pending) || closed || nextRideStatus !== status.value}
                 onClick={() => void updateStatus(status.value)}
               >
                 <Navigation className="size-4" aria-hidden />
@@ -211,6 +216,32 @@ function RideFact({
 
 function formatStatus(status: string) {
   return status.replaceAll("_", " ");
+}
+
+function getNextRideStatus(
+  bookingStatus: string,
+  handoffStatus: string,
+): RideStatus | null {
+  if (handoffStatus !== "accepted") return null;
+
+  if (bookingStatus === "assigned") return "driver_en_route";
+  if (bookingStatus === "driver_en_route") return "in_progress";
+  if (bookingStatus === "in_progress") return "completed";
+
+  return null;
+}
+
+function getActionHint(
+  bookingStatus: string,
+  handoffStatus: string,
+  nextRideStatus: RideStatus | null,
+) {
+  if (handoffStatus === "sent") return "Accept the ride to unlock live status updates.";
+  if (handoffStatus === "declined") return "This ride was declined.";
+  if (handoffStatus === "completed" || bookingStatus === "completed") return "This ride is completed.";
+  if (!nextRideStatus) return "Dispatch controls are current. No driver update is available.";
+
+  return `Next: ${formatStatus(nextRideStatus)}.`;
 }
 
 function formatPassengerCount(count: number) {
