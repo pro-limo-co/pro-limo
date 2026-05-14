@@ -62,6 +62,8 @@ export async function POST(request: Request) {
       flightNumber: readOptionalString(formData, "flightNumber"),
       passengerCount,
       luggage,
+      requestedVehicleLabel: readOptionalString(formData, "requestedVehicleLabel"),
+      paymentPreference: readOptionalString(formData, "paymentPreference"),
       customerName,
       customerEmail,
       customerPhone,

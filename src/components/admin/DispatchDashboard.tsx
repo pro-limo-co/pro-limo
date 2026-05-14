@@ -588,6 +588,8 @@ function BookingDetailsSection({
     <section className="grid min-w-0 content-start gap-4">
       <SectionHeading title="Booking" description={routeSummary} />
       <InfoRow label="Mode" value={booking.bookingMode} />
+      {booking.requestedVehicleLabel && <InfoRow label="Requested car" value={booking.requestedVehicleLabel} />}
+      {booking.paymentPreference && <InfoRow label="Payment" value={booking.paymentPreference} />}
       {booking.flightNumber && <InfoRow label="Flight" value={booking.flightNumber} />}
       {booking.notes && <InfoBlock label="Passenger notes">{booking.notes}</InfoBlock>}
     </section>

@@ -129,6 +129,8 @@ export default defineSchema({
     flightNumber: v.optional(v.string()),
     passengerCount: v.number(),
     luggage: v.string(),
+    requestedVehicleLabel: v.optional(v.string()),
+    paymentPreference: v.optional(v.string()),
     customerName: v.string(),
     customerEmail: v.string(),
     customerPhone: v.string(),

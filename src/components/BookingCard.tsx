@@ -1,25 +1,79 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Headphones } from "lucide-react";
-import { FormEvent, type ReactNode, useReducer, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarClock,
+  CarFront,
+  CheckCircle2,
+  CreditCard,
+  Headphones,
+  MapPin,
+  UserRound,
+} from "lucide-react";
+import { FormEvent, useReducer } from "react";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 
-const tabs = [
-  { id: "oneway", label: "One-way" },
-  { id: "hourly", label: "Hourly" },
-  { id: "airport", label: "Airport" },
+const serviceOptions = [
+  {
+    id: "airport",
+    label: "Airport transfer",
+    description: "Pickup or drop-off at PDX, private terminals, hotels, and homes.",
+  },
+  {
+    id: "oneway",
+    label: "Point-to-point",
+    description: "Direct private ride between two addresses, venues, or cities.",
+  },
+  {
+    id: "hourly",
+    label: "Hourly chauffeur",
+    description: "Keep the car and chauffeur available for meetings, dinners, or events.",
+  },
 ] as const;
 
-type TabId = (typeof tabs)[number]["id"];
+const steps = [
+  { label: "Service", icon: CarFront },
+  { label: "Address", icon: MapPin },
+  { label: "Date & time", icon: CalendarClock },
+  { label: "Car", icon: CarFront },
+  { label: "Details", icon: UserRound },
+  { label: "Payment", icon: CreditCard },
+] as const;
 
+const vehicleOptions = [
+  {
+    label: "Executive Sedan",
+    detail: "1-3 passengers / 2 bags",
+  },
+  {
+    label: "Premium SUV",
+    detail: "1-6 passengers / 5 bags",
+  },
+  {
+    label: "Executive Sprinter",
+    detail: "Up to 12 passengers / group luggage",
+  },
+  {
+    label: "Stretch Limousine",
+    detail: "Event-ready option, dispatch confirmed",
+  },
+] as const;
+
+const passengerOptions = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10+"];
+const luggageOptions = ["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"];
+const durationOptions = ["2 hours", "3 hours", "4 hours", "6 hours", "Full day (8h)", "Full day (10h)"];
+const airportTripOptions = ["Airport pickup", "Airport drop-off", "Round trip", "Private terminal"];
+const paymentOptions = ["Secure payment link", "Pay after dispatch call", "Corporate account", "Cash or card with chauffeur"];
+
+type TabId = (typeof serviceOptions)[number]["id"];
 type BookingCardProps = {
   defaultTab?: TabId;
   citySlug?: string;
@@ -28,15 +82,51 @@ type BookingCardProps = {
   sourcePath?: string;
 };
 
-const initialState: BookingSubmissionState = {
-  status: "idle",
-  message: "",
-};
-
 type BookingSubmissionState = {
   status: "idle" | "success" | "error";
   message: string;
   publicReference?: string;
+};
+
+type BookingFormState = {
+  bookingMode: TabId;
+  pickupLocation: string;
+  dropoffLocation: string;
+  airportTrip: string;
+  duration: string;
+  pickupDate: string;
+  pickupTime: string;
+  flightNumber: string;
+  requestedVehicleLabel: string;
+  passengerCount: string;
+  luggage: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  notes: string;
+  paymentPreference: string;
+};
+
+type BookingUiState = {
+  form: BookingFormState;
+  step: number;
+  submitting: boolean;
+  submission: BookingSubmissionState;
+};
+
+type BookingUiAction =
+  | { type: "field"; field: keyof BookingFormState; value: string }
+  | { type: "service"; value: TabId }
+  | { type: "goToStep"; step: number }
+  | { type: "next" }
+  | { type: "back" }
+  | { type: "submitting"; value: boolean }
+  | { type: "submission"; value: BookingSubmissionState }
+  | { type: "reset"; defaultTab: TabId };
+
+const initialSubmission: BookingSubmissionState = {
+  status: "idle",
+  message: "",
 };
 
 export function BookingCard({
@@ -46,118 +136,93 @@ export function BookingCard({
   sourceLabel = "Website",
   sourcePath = "/",
 }: BookingCardProps) {
-  const [state, setState] = useState<BookingSubmissionState>(initialState);
-  const [submitting, setSubmitting] = useState(false);
-  const [formKey, setFormKey] = useState(0);
-  const [tab, setTab] = useReducer((_current: TabId, next: TabId) => next, defaultTab);
-  const isAirport = tab === "airport";
-  const isHourly = tab === "hourly";
-  const isSubmitted = state.status === "success" && Boolean(state.publicReference);
+  const [state, dispatch] = useReducer(bookingUiReducer, defaultTab, createBookingUiState);
+  const isSubmitted = state.submission.status === "success" && Boolean(state.submission.publicReference);
+  const activeStep = steps[state.step];
+  const stepComplete = isStepComplete(state.form, state.step);
+  const canGoNext = stepComplete && state.step < steps.length - 1;
+  const canSubmit = steps.every((_, index) => isStepComplete(state.form, index));
 
   return (
-    <Card className="pld-ui border-border bg-card text-card-foreground shadow-2xl shadow-black/20">
-      <CardHeader className="space-y-3 p-5 pb-3 sm:p-6 sm:pb-4">
+    <Card className="pld-ui overflow-hidden border-border bg-card text-card-foreground shadow-2xl shadow-black/20">
+      <CardHeader className="space-y-4 border-b bg-muted/30 p-5 pb-4 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="text-2xl font-semibold tracking-normal">Book a ride</CardTitle>
             <CardDescription className="mt-2 text-muted-foreground">
-              Send the request. Dispatch confirms price and availability.
+              Six quick steps. Dispatch confirms availability, quote, and final payment link.
             </CardDescription>
           </div>
           <div className="hidden rounded-md bg-accent px-3 py-2 text-xs font-medium text-accent-foreground sm:block">
             24/7 desk
           </div>
         </div>
+        <StepProgress currentStep={state.step} onStepChange={(step) => dispatch({ type: "goToStep", step })} />
       </CardHeader>
-      <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
-        <form key={formKey} onSubmit={handleSubmit} className="grid gap-4">
-          <input type="hidden" name="bookingMode" value={tab} />
-          <input type="hidden" name="sourceLabel" value={sourceLabel} />
-          <input type="hidden" name="sourcePath" value={sourcePath} />
-          {citySlug && <input type="hidden" name="citySlug" value={citySlug} />}
-          {serviceSlug && <input type="hidden" name="serviceSlug" value={serviceSlug} />}
-
-          <Tabs value={tab} onValueChange={(value) => setTab(value as TabId)}>
-            <TabsList className="grid w-full grid-cols-3 bg-muted">
-              {tabs.map((item) => (
-                <TabsTrigger key={item.id} value={item.id} className="text-sm">
-                  {item.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          <div className="grid gap-3">
-            <SectionTitle>Trip</SectionTitle>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label={isAirport ? "Pickup location" : "Pickup"} name="pickupLocation" placeholder="Address, airport, or hotel" required />
-              {isHourly ? (
-                <SelectField
-                  label="Duration"
-                  name="duration"
-                  placeholder="Choose hours"
-                  options={["2 hours", "3 hours", "4 hours", "6 hours", "Full day (8h)", "Full day (10h)"]}
-                  required
-                />
-              ) : (
-                <Field label={isAirport ? "Drop-off location" : "Drop-off"} name="dropoffLocation" placeholder="Final destination" required />
-              )}
-              {isAirport && (
-                <SelectField
-                  label="Airport trip"
-                  name="airportTrip"
-                  placeholder="Pickup or drop-off"
-                  options={["Airport pickup", "Airport drop-off", "Round trip", "Private terminal"]}
-                  required
-                />
-              )}
-              <Field label="Date" name="pickupDate" type="date" required />
-              <Field label="Time" name="pickupTime" type="time" required />
-              {isAirport && <Field label="Flight number" name="flightNumber" placeholder="AS 342" />}
-            </div>
+      <CardContent className="p-5 sm:p-6">
+        <form onSubmit={handleSubmit} className="grid gap-5">
+          <div className="grid gap-1">
+            <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+              Step {state.step + 1} / {steps.length}
+            </p>
+            <h3 className="text-xl font-semibold text-foreground">
+              {activeStep.label}
+            </h3>
           </div>
 
-          <div className="grid gap-3">
-            <SectionTitle>Passengers</SectionTitle>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <SelectField label="Passengers" name="passengerCount" placeholder="Select" options={["1", "2", "3", "4", "5", "6", "7"]} required />
-              <SelectField
-                label="Luggage"
-                name="luggage"
-                placeholder="Select"
-                options={["Carry-on only", "1 large bag", "2 large bags", "3 large bags", "4 large bags", "5+ large bags"]}
-                required
+          <div className="min-h-[22rem]">
+            {state.step === 0 && (
+              <ServiceStep
+                value={state.form.bookingMode}
+                onChange={(value) => dispatch({ type: "service", value })}
               />
-            </div>
+            )}
+            {state.step === 1 && (
+              <AddressStep
+                form={state.form}
+                onFieldChange={(field, value) => dispatch({ type: "field", field, value })}
+              />
+            )}
+            {state.step === 2 && (
+              <DateTimeStep
+                form={state.form}
+                onFieldChange={(field, value) => dispatch({ type: "field", field, value })}
+              />
+            )}
+            {state.step === 3 && (
+              <VehicleStep
+                form={state.form}
+                onFieldChange={(field, value) => dispatch({ type: "field", field, value })}
+              />
+            )}
+            {state.step === 4 && (
+              <DetailsStep
+                form={state.form}
+                onFieldChange={(field, value) => dispatch({ type: "field", field, value })}
+              />
+            )}
+            {state.step === 5 && (
+              <PaymentStep
+                form={state.form}
+                onFieldChange={(field, value) => dispatch({ type: "field", field, value })}
+              />
+            )}
           </div>
 
-          <div className="grid gap-3">
-            <SectionTitle>Contact</SectionTitle>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Name" name="customerName" placeholder="Passenger name" required />
-              <Field label="Email" name="customerEmail" type="email" placeholder="you@example.com" required />
-              <Field label="Phone" name="customerPhone" type="tel" placeholder="+1 503 555 0100" required />
-              <div className="sm:col-span-2">
-                <Label htmlFor="booking-notes">Notes</Label>
-                <Textarea id="booking-notes" name="notes" placeholder="Arrival details or preferences" className="mt-2 min-h-16" />
-              </div>
-            </div>
-          </div>
-
-          {state.status !== "idle" && (
+          {state.submission.status !== "idle" && (
             <Alert
-              variant={state.status === "success" ? "success" : "destructive"}
-              role={state.status === "success" ? "status" : "alert"}
+              variant={state.submission.status === "success" ? "success" : "destructive"}
+              role={state.submission.status === "success" ? "status" : "alert"}
               aria-live="polite"
             >
               <div className="flex gap-3">
-                {state.status === "success" && <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />}
+                {state.submission.status === "success" && <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />}
                 <div className="min-w-0">
-                  <p>{state.message}</p>
-                  {state.publicReference && (
+                  <p>{state.submission.message}</p>
+                  {state.submission.publicReference && (
                     <>
                       <strong className="mt-1 block font-mono text-success">
-                        {state.publicReference}
+                        {state.submission.publicReference}
                       </strong>
                       <p className="mt-1 text-muted-foreground">
                         Dispatch can see it now in ProLimo OS.
@@ -169,30 +234,60 @@ export function BookingCard({
             </Alert>
           )}
 
-          {isSubmitted && state.publicReference ? (
+          {isSubmitted && state.submission.publicReference ? (
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
               <Button asChild size="lg" className="w-full">
-                <a href={`/booking/${encodeURIComponent(state.publicReference)}`}>
+                <a href={`/booking/${encodeURIComponent(state.submission.publicReference)}`}>
                   Track request
                   <ArrowRight className="size-4" aria-hidden />
                 </a>
               </Button>
-              <Button type="button" variant="outline" size="lg" onClick={handleStartAnother}>
+              <Button type="button" variant="outline" size="lg" onClick={() => dispatch({ type: "reset", defaultTab })}>
                 New request
               </Button>
             </div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <Button type="submit" disabled={submitting} size="lg" className="w-full">
-                {submitting ? "Sending request" : "Send booking request"}
-                <ArrowRight className="size-4" aria-hidden />
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <a href={`mailto:${siteConfig.contact.email}`}>
-                  <Headphones className="size-4" aria-hidden />
-                  Concierge
-                </a>
-              </Button>
+            <div className="grid gap-3">
+              {!stepComplete && (
+                <p className="text-sm text-muted-foreground">
+                  Complete this step to continue.
+                </p>
+              )}
+              <div className="grid gap-3 sm:grid-cols-[auto_1fr_auto]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  disabled={state.step === 0 || state.submitting}
+                  onClick={() => dispatch({ type: "back" })}
+                >
+                  <ArrowLeft className="size-4" aria-hidden />
+                  Back
+                </Button>
+                {state.step < steps.length - 1 ? (
+                  <Button
+                    type="button"
+                    size="lg"
+                    disabled={!canGoNext || state.submitting}
+                    onClick={() => dispatch({ type: "next" })}
+                    className="w-full"
+                  >
+                    Continue
+                    <ArrowRight className="size-4" aria-hidden />
+                  </Button>
+                ) : (
+                  <Button type="submit" disabled={!canSubmit || state.submitting} size="lg" className="w-full">
+                    {state.submitting ? "Sending request" : "Submit booking"}
+                    <ArrowRight className="size-4" aria-hidden />
+                  </Button>
+                )}
+                <Button asChild variant="outline" size="lg">
+                  <a href={`mailto:${siteConfig.contact.email}`}>
+                    <Headphones className="size-4" aria-hidden />
+                    Concierge
+                  </a>
+                </Button>
+              </div>
             </div>
           )}
         </form>
@@ -200,90 +295,592 @@ export function BookingCard({
     </Card>
   );
 
-  function handleStartAnother() {
-    setState(initialState);
-    setFormKey((key) => key + 1);
-  }
-
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitting(true);
-    setState(initialState);
+    if (!canSubmit) {
+      dispatch({ type: "goToStep", step: getFirstIncompleteStep(state.form) });
+      return;
+    }
+
+    dispatch({ type: "submitting", value: true });
+    dispatch({ type: "submission", value: initialSubmission });
     try {
       const response = await fetch("/api/bookings", {
         method: "POST",
-        body: new FormData(event.currentTarget),
+        body: createBookingFormData({
+          citySlug,
+          form: state.form,
+          serviceSlug,
+          sourceLabel,
+          sourcePath,
+        }),
       });
       const result = (await response.json()) as BookingSubmissionState;
-      setState(result);
+      dispatch({ type: "submission", value: result });
     } catch {
-      setState({
-        status: "error",
-        message: "We could not submit this request. Please call the concierge desk.",
+      dispatch({
+        type: "submission",
+        value: {
+          status: "error",
+          message: "We could not submit this request. Please call the concierge desk.",
+        },
       });
     } finally {
-      setSubmitting(false);
+      dispatch({ type: "submitting", value: false });
     }
   }
 }
 
-function SectionTitle({ children }: { children: ReactNode }) {
+function StepProgress({
+  currentStep,
+  onStepChange,
+}: {
+  currentStep: number;
+  onStepChange: (step: number) => void;
+}) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-      {children}
-    </p>
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      {steps.map((step, index) => {
+        const Icon = step.icon;
+        const active = index === currentStep;
+        const complete = index < currentStep;
+        return (
+          <button
+            key={step.label}
+            type="button"
+            onClick={() => onStepChange(index)}
+            className={cn(
+              "flex min-h-14 items-center gap-2 rounded-md border px-2.5 py-2 text-left text-xs font-medium transition-colors",
+              active && "border-primary bg-primary text-primary-foreground",
+              complete && !active && "border-primary/40 bg-accent text-accent-foreground",
+              !active && !complete && "border-border bg-background text-muted-foreground hover:bg-muted",
+            )}
+            aria-current={active ? "step" : undefined}
+          >
+            <Icon className="size-4 shrink-0" aria-hidden />
+            <span className="min-w-0 truncate">{step.label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
+
+function ServiceStep({
+  onChange,
+  value,
+}: {
+  onChange: (value: TabId) => void;
+  value: TabId;
+}) {
+  return (
+    <div className="grid gap-3">
+      {serviceOptions.map((option) => (
+        <Button
+          key={option.id}
+          type="button"
+          variant={value === option.id ? "default" : "outline"}
+          className="h-auto justify-start whitespace-normal p-4 text-left"
+          onClick={() => onChange(option.id)}
+        >
+          <span className="grid gap-1">
+            <span className="text-base font-semibold">{option.label}</span>
+            <span className={cn("text-sm leading-6", value === option.id ? "text-primary-foreground/80" : "text-muted-foreground")}>
+              {option.description}
+            </span>
+          </span>
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+function AddressStep({
+  form,
+  onFieldChange,
+}: {
+  form: BookingFormState;
+  onFieldChange: FieldChangeHandler;
+}) {
+  const isAirport = form.bookingMode === "airport";
+  const isHourly = form.bookingMode === "hourly";
+
+  return (
+    <div className="grid gap-4">
+      <Field
+        label={isAirport ? "Airport or pickup address" : "Pickup address"}
+        name="pickupLocation"
+        value={form.pickupLocation}
+        placeholder="Address, airport, hotel, or venue"
+        required
+        onChange={(value) => onFieldChange("pickupLocation", value)}
+      />
+      {isHourly ? (
+        <OptionGroup
+          label="Duration"
+          name="duration"
+          value={form.duration}
+          options={durationOptions}
+          required
+          onChange={(value) => onFieldChange("duration", value)}
+        />
+      ) : (
+        <Field
+          label={isAirport ? "Drop-off address" : "Drop-off address"}
+          name="dropoffLocation"
+          value={form.dropoffLocation}
+          placeholder="Final destination"
+          required
+          onChange={(value) => onFieldChange("dropoffLocation", value)}
+        />
+      )}
+      {isAirport && (
+        <OptionGroup
+          label="Airport trip"
+          name="airportTrip"
+          value={form.airportTrip}
+          options={airportTripOptions}
+          required
+          onChange={(value) => onFieldChange("airportTrip", value)}
+        />
+      )}
+    </div>
+  );
+}
+
+function DateTimeStep({
+  form,
+  onFieldChange,
+}: {
+  form: BookingFormState;
+  onFieldChange: FieldChangeHandler;
+}) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Field
+        label="Date"
+        name="pickupDate"
+        value={form.pickupDate}
+        placeholder="June 30, 2026"
+        required
+        onChange={(value) => onFieldChange("pickupDate", value)}
+      />
+      <Field
+        label="Time"
+        name="pickupTime"
+        value={form.pickupTime}
+        placeholder="10:30 AM"
+        required
+        onChange={(value) => onFieldChange("pickupTime", value)}
+      />
+      {form.bookingMode === "airport" && (
+        <div className="sm:col-span-2">
+          <Field
+            label="Flight number"
+            name="flightNumber"
+            value={form.flightNumber}
+            placeholder="AS 342"
+            onChange={(value) => onFieldChange("flightNumber", value)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VehicleStep({
+  form,
+  onFieldChange,
+}: {
+  form: BookingFormState;
+  onFieldChange: FieldChangeHandler;
+}) {
+  return (
+    <div className="grid gap-4">
+      <div className="grid gap-3">
+        {vehicleOptions.map((vehicle) => (
+          <Button
+            key={vehicle.label}
+            type="button"
+            variant={form.requestedVehicleLabel === vehicle.label ? "default" : "outline"}
+            className="h-auto justify-between whitespace-normal p-4 text-left"
+            onClick={() => onFieldChange("requestedVehicleLabel", vehicle.label)}
+          >
+            <span className="grid gap-1">
+              <span className="text-base font-semibold">{vehicle.label}</span>
+              <span
+                className={cn(
+                  "text-sm leading-6",
+                  form.requestedVehicleLabel === vehicle.label ? "text-primary-foreground/80" : "text-muted-foreground",
+                )}
+              >
+                {vehicle.detail}
+              </span>
+            </span>
+          </Button>
+        ))}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <OptionGroup
+          label="Passengers"
+          name="passengerCount"
+          value={form.passengerCount}
+          options={passengerOptions}
+          required
+          onChange={(value) => onFieldChange("passengerCount", value)}
+        />
+        <OptionGroup
+          label="Luggage"
+          name="luggage"
+          value={form.luggage}
+          options={luggageOptions}
+          required
+          onChange={(value) => onFieldChange("luggage", value)}
+        />
+      </div>
+    </div>
+  );
+}
+
+function DetailsStep({
+  form,
+  onFieldChange,
+}: {
+  form: BookingFormState;
+  onFieldChange: FieldChangeHandler;
+}) {
+  return (
+    <div className="grid gap-4">
+      <Field
+        label="Name"
+        name="customerName"
+        value={form.customerName}
+        placeholder="Passenger name"
+        required
+        onChange={(value) => onFieldChange("customerName", value)}
+      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field
+          label="Email"
+          name="customerEmail"
+          type="email"
+          value={form.customerEmail}
+          placeholder="you@example.com"
+          required
+          onChange={(value) => onFieldChange("customerEmail", value)}
+        />
+        <Field
+          label="Phone"
+          name="customerPhone"
+          type="tel"
+          value={form.customerPhone}
+          placeholder="+1 503 555 0100"
+          required
+          onChange={(value) => onFieldChange("customerPhone", value)}
+        />
+      </div>
+      <div>
+        <Label htmlFor="booking-notes">Notes</Label>
+        <Textarea
+          id="booking-notes"
+          value={form.notes}
+          onChange={(event) => onFieldChange("notes", event.target.value)}
+          placeholder="Arrival details, preferences, child seats, or stops"
+          className="mt-2 min-h-24"
+        />
+      </div>
+    </div>
+  );
+}
+
+function PaymentStep({
+  form,
+  onFieldChange,
+}: {
+  form: BookingFormState;
+  onFieldChange: FieldChangeHandler;
+}) {
+  return (
+    <div className="grid gap-4">
+      <div className="rounded-md border bg-muted/30 p-4">
+        <div className="flex items-start gap-3">
+          <CreditCard className="mt-1 size-5 shrink-0 text-primary" aria-hidden />
+          <div>
+            <h4 className="font-semibold text-foreground">Payment is prepared after dispatch confirms the quote.</h4>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              This request goes to ProLimo OS first. Staff confirms the exact fare and then sends a secure payment link from the booking.
+            </p>
+          </div>
+        </div>
+      </div>
+      <OptionGroup
+        label="Payment preference"
+        name="paymentPreference"
+        value={form.paymentPreference}
+        options={paymentOptions}
+        required
+        onChange={(value) => onFieldChange("paymentPreference", value)}
+      />
+      <BookingSummary form={form} />
+    </div>
+  );
+}
+
+function BookingSummary({ form }: { form: BookingFormState }) {
+  const route = form.bookingMode === "hourly"
+    ? `${form.pickupLocation || "Pickup"} / ${form.duration || "duration"}`
+    : `${form.pickupLocation || "Pickup"} to ${form.dropoffLocation || "drop-off"}`;
+
+  return (
+    <div className="grid gap-2 rounded-md border bg-background p-4 text-sm">
+      <SummaryRow label="Service" value={getServiceLabel(form.bookingMode)} />
+      <SummaryRow label="Route" value={route} />
+      <SummaryRow label="When" value={[form.pickupDate, form.pickupTime].filter(Boolean).join(" at ") || "Not set"} />
+      <SummaryRow label="Car" value={form.requestedVehicleLabel || "Not set"} />
+      <SummaryRow label="Passenger" value={form.customerName || "Not set"} />
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="break-words font-medium text-foreground [overflow-wrap:anywhere]">{value}</span>
+    </div>
+  );
+}
+
+type FieldChangeHandler = (field: keyof BookingFormState, value: string) => void;
 
 function Field({
   label,
   name,
-  type = "text",
+  onChange,
   placeholder,
   required,
+  type = "text",
+  value,
 }: {
   label: string;
-  name: string;
-  type?: string;
+  name: keyof BookingFormState;
+  onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
+  type?: string;
+  value: string;
 }) {
   return (
     <div>
-      <Label htmlFor={name}>{label}</Label>
-      <Input id={name} name={name} type={type} placeholder={placeholder} required={required} className="mt-2" />
+      <Label htmlFor={`booking-${name}`}>
+        {label}
+        {required && <span className="text-destructive"> *</span>}
+      </Label>
+      <Input
+        id={`booking-${name}`}
+        value={value}
+        type={type}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-2"
+      />
     </div>
   );
 }
 
-function SelectField({
+function OptionGroup({
   label,
   name,
-  placeholder,
+  onChange,
   options,
   required,
+  value,
 }: {
   label: string;
-  name: string;
-  placeholder: string;
-  options: string[];
+  name: keyof BookingFormState;
+  onChange: (value: string) => void;
+  options: readonly string[];
   required?: boolean;
+  value: string;
 }) {
   return (
     <div>
-      <Label htmlFor={name}>{label}</Label>
-      <Select name={name} required={required}>
-        <SelectTrigger id={name} className="mt-2">
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="pld-ui">
-          {options.map((option) => (
-            <SelectItem key={option} value={option}>
+      <Label>
+        {label}
+        {required && <span className="text-destructive"> *</span>}
+      </Label>
+      <div className="mt-2 grid gap-2" role="radiogroup" aria-label={label} data-field={name}>
+        {options.map((option) => (
+          <Button
+            key={option}
+            type="button"
+            variant={value === option ? "default" : "outline"}
+            className="h-auto justify-start whitespace-normal px-3 py-2 text-left"
+            aria-pressed={value === option}
+            onClick={() => onChange(option)}
+          >
+            <span className="text-sm">
               {option}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            </span>
+          </Button>
+        ))}
+      </div>
     </div>
   );
+}
+
+function createBookingUiState(defaultTab: TabId): BookingUiState {
+  return {
+    form: createBookingFormState(defaultTab),
+    step: 0,
+    submitting: false,
+    submission: initialSubmission,
+  };
+}
+
+function createBookingFormState(defaultTab: TabId): BookingFormState {
+  return {
+    bookingMode: defaultTab,
+    pickupLocation: "",
+    dropoffLocation: "",
+    airportTrip: defaultTab === "airport" ? "Airport pickup" : "",
+    duration: defaultTab === "hourly" ? "3 hours" : "",
+    pickupDate: "",
+    pickupTime: "",
+    flightNumber: "",
+    requestedVehicleLabel: "",
+    passengerCount: "",
+    luggage: "",
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    notes: "",
+    paymentPreference: "Secure payment link",
+  };
+}
+
+function bookingUiReducer(state: BookingUiState, action: BookingUiAction): BookingUiState {
+  switch (action.type) {
+    case "field":
+      return {
+        ...state,
+        submission: initialSubmission,
+        form: { ...state.form, [action.field]: action.value },
+      };
+    case "service":
+      return {
+        ...state,
+        submission: initialSubmission,
+        form: normalizeFormForService({
+          ...state.form,
+          bookingMode: action.value,
+        }),
+      };
+    case "goToStep":
+      return { ...state, step: clampStep(action.step) };
+    case "next":
+      return { ...state, step: clampStep(state.step + 1) };
+    case "back":
+      return { ...state, step: clampStep(state.step - 1) };
+    case "submitting":
+      return { ...state, submitting: action.value };
+    case "submission":
+      return { ...state, submission: action.value };
+    case "reset":
+      return createBookingUiState(action.defaultTab);
+  }
+}
+
+function normalizeFormForService(form: BookingFormState): BookingFormState {
+  if (form.bookingMode === "hourly") {
+    return {
+      ...form,
+      airportTrip: "",
+      duration: form.duration || "3 hours",
+    };
+  }
+  if (form.bookingMode === "airport") {
+    return {
+      ...form,
+      airportTrip: form.airportTrip || "Airport pickup",
+      duration: "",
+    };
+  }
+  return {
+    ...form,
+    airportTrip: "",
+    duration: "",
+  };
+}
+
+function isStepComplete(form: BookingFormState, step: number) {
+  if (step === 0) return Boolean(form.bookingMode);
+  if (step === 1) {
+    const hasRoute = form.bookingMode === "hourly"
+      ? Boolean(form.pickupLocation.trim() && form.duration)
+      : Boolean(form.pickupLocation.trim() && form.dropoffLocation.trim());
+    return form.bookingMode === "airport" ? hasRoute && Boolean(form.airportTrip) : hasRoute;
+  }
+  if (step === 2) return Boolean(form.pickupDate && form.pickupTime);
+  if (step === 3) return Boolean(form.requestedVehicleLabel && form.passengerCount && form.luggage);
+  if (step === 4) {
+    return Boolean(form.customerName.trim() && form.customerEmail.trim() && form.customerPhone.trim());
+  }
+  if (step === 5) return Boolean(form.paymentPreference);
+  return false;
+}
+
+function getFirstIncompleteStep(form: BookingFormState) {
+  const index = steps.findIndex((_, step) => !isStepComplete(form, step));
+  return index === -1 ? steps.length - 1 : index;
+}
+
+function clampStep(step: number) {
+  return Math.min(Math.max(step, 0), steps.length - 1);
+}
+
+function createBookingFormData({
+  citySlug,
+  form,
+  serviceSlug,
+  sourceLabel,
+  sourcePath,
+}: {
+  citySlug?: string;
+  form: BookingFormState;
+  serviceSlug?: string;
+  sourceLabel: string;
+  sourcePath: string;
+}) {
+  const formData = new FormData();
+  appendFormValue(formData, "bookingMode", form.bookingMode);
+  appendFormValue(formData, "sourceLabel", sourceLabel);
+  appendFormValue(formData, "sourcePath", sourcePath);
+  appendFormValue(formData, "citySlug", citySlug);
+  appendFormValue(formData, "serviceSlug", serviceSlug);
+  appendFormValue(formData, "pickupLocation", form.pickupLocation);
+  appendFormValue(formData, "dropoffLocation", form.bookingMode === "hourly" ? undefined : form.dropoffLocation);
+  appendFormValue(formData, "airportTrip", form.bookingMode === "airport" ? form.airportTrip : undefined);
+  appendFormValue(formData, "duration", form.bookingMode === "hourly" ? form.duration : undefined);
+  appendFormValue(formData, "pickupDate", form.pickupDate);
+  appendFormValue(formData, "pickupTime", form.pickupTime);
+  appendFormValue(formData, "flightNumber", form.flightNumber);
+  appendFormValue(formData, "passengerCount", form.passengerCount);
+  appendFormValue(formData, "luggage", form.luggage);
+  appendFormValue(formData, "requestedVehicleLabel", form.requestedVehicleLabel);
+  appendFormValue(formData, "paymentPreference", form.paymentPreference);
+  appendFormValue(formData, "customerName", form.customerName);
+  appendFormValue(formData, "customerEmail", form.customerEmail);
+  appendFormValue(formData, "customerPhone", form.customerPhone);
+  appendFormValue(formData, "notes", form.notes);
+  return formData;
+}
+
+function appendFormValue(formData: FormData, key: string, value: string | undefined) {
+  const trimmed = value?.trim();
+  if (trimmed) formData.append(key, trimmed);
+}
+
+function getServiceLabel(value: TabId) {
+  return serviceOptions.find((option) => option.id === value)?.label ?? value;
 }
