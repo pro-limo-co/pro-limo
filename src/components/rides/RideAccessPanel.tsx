@@ -164,7 +164,7 @@ export function RideAccessPanel({ token }: { token: string }) {
                 onClick={() => void updateStatus(nextRideStatus)}
               >
                 <Navigation className="size-4" aria-hidden />
-                {pending === nextRideStatus ? "Saving" : getRideStatusLabel(nextRideStatus)}
+                {pending === nextRideStatus ? "Saving" : getRideStatusActionLabel(nextRideStatus)}
               </Button>
             )}
             {terminalAction && (
@@ -186,7 +186,7 @@ export function RideAccessPanel({ token }: { token: string }) {
                   >
                     <span>{status.label}</span>
                     <Badge variant={isRideStepReached(booking.status, status.value) ? "default" : "outline"}>
-                      {isRideStepReached(booking.status, status.value) ? "done" : "pending"}
+                      {isRideStepReached(booking.status, status.value) ? "Done" : "Pending"}
                     </Badge>
                   </div>
                 ))}
@@ -279,7 +279,7 @@ function getActionHint(
   if (handoffStatus === "completed" || bookingStatus === "completed") return "This ride is completed.";
   if (!nextRideStatus) return "Dispatch controls are current. No driver update is available.";
 
-  return `Next: ${formatStatus(nextRideStatus)}.`;
+  return `Next: ${getRideStatusHint(nextRideStatus)}.`;
 }
 
 function getTerminalActionLabel(bookingStatus: string, handoffStatus: string) {
@@ -292,8 +292,26 @@ function getTerminalActionLabel(bookingStatus: string, handoffStatus: string) {
   return null;
 }
 
-function getRideStatusLabel(status: RideStatus) {
-  return rideStatuses.find((item) => item.value === status)?.label ?? formatStatus(status);
+function getRideStatusActionLabel(status: RideStatus) {
+  const labels: Record<RideStatus, string> = {
+    arrived: "Mark arrived",
+    completed: "Complete ride",
+    driver_en_route: "Mark on the way",
+    in_progress: "Passenger onboard",
+  };
+
+  return labels[status];
+}
+
+function getRideStatusHint(status: RideStatus) {
+  const hints: Record<RideStatus, string> = {
+    arrived: "mark the driver arrived",
+    completed: "complete the ride",
+    driver_en_route: "mark the driver on the way",
+    in_progress: "mark the passenger onboard",
+  };
+
+  return hints[status];
 }
 
 function isRideStepReached(bookingStatus: string, status: RideStatus) {
