@@ -1,3 +1,5 @@
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Reveal } from "./Reveal";
 
 export function CTA() {
@@ -26,13 +28,15 @@ export function CTA() {
         </Reveal>
         <Reveal delay={360}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a href="#book" className="btn btn-gold">
-              Reserve a chauffeur
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
-            <a href="#concierge" className="btn btn-ghost">Speak with concierge</a>
+            <Button asChild size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+              <a href="#book">
+                Reserve a chauffeur
+                <ArrowRight className="size-4" aria-hidden />
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+              <a href="#concierge">Speak with concierge</a>
+            </Button>
           </div>
         </Reveal>
       </div>

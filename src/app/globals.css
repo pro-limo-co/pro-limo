@@ -341,51 +341,6 @@ html {
   color: var(--color-pewter-dim);
 }
 
-/* Button base, Bugatti-pill (9999px) with 1px hairline border */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  height: 3.25rem;
-  padding-inline: 1.6rem;
-  font-family: var(--font-condensed);
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-weight: 500;
-  border-radius: 9999px;
-  border: 1px solid transparent;
-  transition:
-    background 220ms var(--ease-stage),
-    color 220ms var(--ease-stage),
-    border-color 220ms var(--ease-stage),
-    transform 220ms var(--ease-stage);
-}
-.btn-primary {
-  background: var(--color-bone);
-  color: var(--color-ink);
-}
-.btn-primary:hover {
-  background: var(--color-champagne-bright);
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--color-bone);
-  border-color: color-mix(in oklab, var(--color-bone) 28%, transparent);
-}
-.btn-ghost:hover {
-  border-color: var(--color-bone);
-  color: var(--color-bone);
-}
-.btn-gold {
-  background: var(--color-champagne);
-  color: var(--color-ink);
-}
-.btn-gold:hover {
-  background: var(--color-champagne-bright);
-}
-
 /* Focus rings, explicit (luxury system: "Ensure hover, focus-visible, active, disabled, and loading states are explicit") */
 :where(button, a, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-champagne);

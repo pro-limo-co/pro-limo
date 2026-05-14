@@ -1,4 +1,6 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { cities, featuredCitySlugs } from "@/data/cities";
 import { Reveal } from "./Reveal";
 
@@ -58,12 +60,12 @@ export function Cities() {
             Location pages are built for airport, hourly, intercity, business,
             and event search intent in each city.
           </p>
-          <Link href="/cities" className="btn btn-ghost !h-12">
-            View every location
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
+          <Button asChild variant="outline" size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+            <Link href="/cities">
+              View every location
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

@@ -1,3 +1,5 @@
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BookingCard } from "./BookingCard";
 
 export function Hero() {
@@ -5,7 +7,7 @@ export function Hero() {
     <section
       id="top"
       aria-labelledby="hero-heading"
-      className="relative min-h-[100svh] grain spotlight overflow-hidden pt-[100px] lg:pt-[140px]"
+      className="relative min-h-[100svh] grain spotlight overflow-hidden pt-[86px] lg:pt-[104px]"
     >
       {/* Atmospheric halo */}
       <div className="pointer-events-none absolute inset-x-0 -top-40 h-[800px] flex items-start justify-center" aria-hidden>
@@ -20,7 +22,7 @@ export function Hero() {
       <div className="pointer-events-none absolute left-0 right-0 top-[58%] h-px bg-gradient-to-r from-transparent via-[color:color-mix(in_oklab,var(--color-bone)_18%,transparent)] to-transparent" aria-hidden />
 
       <div className="relative mx-auto max-w-[1400px] px-6 lg:px-10 z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end pt-10 lg:pt-20 pb-16 lg:pb-24">
+        <div className="grid grid-cols-1 items-start gap-8 pt-8 pb-14 lg:grid-cols-12 lg:gap-12 lg:pt-10 lg:pb-20">
           <div className="lg:col-span-7 xl:col-span-7">
             <p className="eyebrow rise rise-1">
               <span className="mr-2 text-[color:var(--color-champagne)]">·</span>
@@ -40,12 +42,12 @@ export function Hero() {
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 rise rise-4">
-              <a href="#book" className="btn btn-primary">
-                Reserve a chauffeur
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
+              <Button asChild size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+                <a href="#book">
+                  Reserve a chauffeur
+                  <ArrowRight className="size-4" aria-hidden />
+                </a>
+              </Button>
               <a
                 href="#fleet"
                 className="link-gold text-[0.9rem] tracking-wide text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] transition-colors"
@@ -54,17 +56,15 @@ export function Hero() {
               </a>
             </div>
 
-            <dl className="mt-14 grid grid-cols-3 max-w-md rise rise-5 border-t hairline pt-6">
-              <Fact value="250mi" label="Service radius" />
-              <Fact value="60s" label="Pickup change window" />
-              <Fact value="24/7" label="Concierge desk" />
-            </dl>
+            <HeroFacts className="mt-14 hidden max-w-md rise rise-5 border-t hairline pt-6 lg:grid" />
           </div>
 
-          <div className="lg:col-span-5 xl:col-span-5 lg:pt-12 rise rise-6" id="book">
+          <div className="lg:col-span-5 xl:col-span-5 rise rise-6" id="book">
             <BookingCard sourceLabel="Homepage" sourcePath="/" />
           </div>
         </div>
+
+        <HeroFacts className="grid border-t hairline pt-6 lg:hidden" />
 
         {/* Scroll cue */}
         <div className="hidden lg:flex items-center gap-3 absolute bottom-10 left-10 text-[0.72rem] tracking-[0.2em] uppercase text-[color:var(--color-pewter)]">
@@ -76,6 +76,16 @@ export function Hero() {
       {/* Decorative car silhouette */}
       <CarSilhouette className="pointer-events-none absolute right-0 -bottom-6 lg:-bottom-10 w-[140%] sm:w-[80%] lg:w-[55%] xl:w-[48%] opacity-[0.18] mix-blend-screen" />
     </section>
+  );
+}
+
+function HeroFacts({ className }: { className?: string }) {
+  return (
+    <dl className={["grid grid-cols-3", className].filter(Boolean).join(" ")}>
+      <Fact value="250mi" label="Service radius" />
+      <Fact value="60s" label="Pickup change window" />
+      <Fact value="24/7" label="Concierge desk" />
+    </dl>
   );
 }
 

@@ -93,11 +93,13 @@ type RowUiAction =
   | { type: "handoffError"; message: string };
 
 export function DispatchDashboard({
-  title = "Dispatch",
+  title = "Staff queue",
 }: {
   title?: string;
 }) {
   const [status, setStatus] = useState<Status | "all">("all");
+  const [claimAccessMessage, setClaimAccessMessage] = useState("");
+  const [claimAccessPending, setClaimAccessPending] = useState(false);
   const viewer = useQuery(api.auth.getViewer);
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
   const bookings = useQuery(
@@ -110,6 +112,19 @@ export function DispatchDashboard({
       : "skip",
   );
   const session = authClient.useSession();
+
+  async function handleClaimStaffAccess() {
+    setClaimAccessPending(true);
+    setClaimAccessMessage("");
+    try {
+      await claimStaffAccess({});
+      setClaimAccessMessage("Staff access enabled. Loading the queue.");
+    } catch (error) {
+      setClaimAccessMessage(error instanceof Error ? error.message : "Could not claim staff access.");
+    } finally {
+      setClaimAccessPending(false);
+    }
+  }
 
   if (viewer === undefined || session.isPending) {
     return (
@@ -153,10 +168,15 @@ export function DispatchDashboard({
               Claim access with an email listed in DISPATCH_ADMIN_EMAILS.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button type="button" size="lg" onClick={() => void claimStaffAccess({})}>
-              Claim access
+          <CardContent className="grid gap-3">
+            <Button type="button" size="lg" disabled={claimAccessPending} onClick={() => void handleClaimStaffAccess()}>
+              {claimAccessPending ? "Checking access" : "Claim access"}
             </Button>
+            {claimAccessMessage && (
+              <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground" aria-live="polite">
+                {claimAccessMessage}
+              </p>
+            )}
           </CardContent>
         </Card>
       </DispatchShell>
@@ -221,7 +241,7 @@ function DispatchBookingRow({
     const parts = [booking.pickupLocation];
     if (booking.dropoffLocation) parts.push(booking.dropoffLocation);
     if (booking.duration) parts.push(booking.duration);
-    return parts.join(" -> ");
+    return parts.join(" to ");
   }, [booking.dropoffLocation, booking.duration, booking.pickupLocation]);
 
   async function saveDispatch() {
@@ -288,7 +308,7 @@ function DispatchBookingRow({
         type: "setMessage",
         message:
           result.status === "quote_required"
-              ? "Add a quote first."
+            ? "Add a quote first."
             : result.status === "closed"
               ? `Payment links are closed for ${formatStatusInSentence(booking.status)} rides.`
               : "Stripe is not configured.",
@@ -1018,7 +1038,7 @@ function RideLinkActions({
           size="sm"
           className={cn("w-full", !email && "pointer-events-none opacity-50")}
         >
-          <a href={email ? buildMailto(email, booking, message) : undefined} aria-disabled={!email}>
+          <a href={email ? buildMailto(email, booking, message) : undefined} aria-disabled={!email} tabIndex={email ? undefined : -1}>
             <Mail className="size-4" aria-hidden />
             Email
           </a>
@@ -1029,7 +1049,7 @@ function RideLinkActions({
           size="sm"
           className={cn("w-full", !phone && "pointer-events-none opacity-50")}
         >
-          <a href={phone ? buildSms(phone, message) : undefined} aria-disabled={!phone}>
+          <a href={phone ? buildSms(phone, message) : undefined} aria-disabled={!phone} tabIndex={phone ? undefined : -1}>
             <Phone className="size-4" aria-hidden />
             Text
           </a>

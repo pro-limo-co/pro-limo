@@ -55,7 +55,7 @@ export function BookingCard({
 
   return (
     <Card className="pld-ui border-border bg-card text-card-foreground shadow-2xl shadow-black/20">
-      <CardHeader className="space-y-3 pb-4">
+      <CardHeader className="space-y-3 p-5 pb-3 sm:p-6 sm:pb-4">
         <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="text-2xl font-semibold tracking-normal">Book a ride</CardTitle>
@@ -68,8 +68,8 @@ export function BookingCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <form key={formKey} onSubmit={handleSubmit} className="grid gap-5">
+      <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
+        <form key={formKey} onSubmit={handleSubmit} className="grid gap-4">
           <input type="hidden" name="bookingMode" value={tab} />
           <input type="hidden" name="sourceLabel" value={sourceLabel} />
           <input type="hidden" name="sourcePath" value={sourcePath} />
@@ -86,7 +86,7 @@ export function BookingCard({
             </TabsList>
           </Tabs>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             <SectionTitle>Trip</SectionTitle>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label={isAirport ? "Pickup location" : "Pickup"} name="pickupLocation" placeholder="Address, airport, or hotel" required />
@@ -116,7 +116,7 @@ export function BookingCard({
             </div>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             <SectionTitle>Passengers</SectionTitle>
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField label="Passengers" name="passengerCount" placeholder="Select" options={["1", "2", "3", "4", "5", "6", "7"]} required />
@@ -130,7 +130,7 @@ export function BookingCard({
             </div>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             <SectionTitle>Contact</SectionTitle>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Name" name="customerName" placeholder="Passenger name" required />
@@ -138,7 +138,7 @@ export function BookingCard({
               <Field label="Phone" name="customerPhone" type="tel" placeholder="+1 503 555 0100" required />
               <div className="sm:col-span-2">
                 <Label htmlFor="booking-notes">Notes</Label>
-                <Textarea id="booking-notes" name="notes" placeholder="Arrival details or preferences" className="mt-2 min-h-20" />
+                <Textarea id="booking-notes" name="notes" placeholder="Arrival details or preferences" className="mt-2 min-h-16" />
               </div>
             </div>
           </div>
@@ -187,7 +187,7 @@ export function BookingCard({
           ) : (
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
               <Button type="submit" disabled={submitting} size="lg" className="w-full">
-                {submitting ? "Submitting" : "Submit booking"}
+                {submitting ? "Sending request" : "Send booking request"}
                 <ArrowRight className="size-4" aria-hidden />
               </Button>
               <Button asChild variant="outline" size="lg">

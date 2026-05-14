@@ -1,7 +1,9 @@
 "use client";
 
+import { ArrowRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
 
 const links = [
@@ -81,31 +83,27 @@ export function Nav({
           <div className="flex items-center gap-3">
             <Link
               href="/auth/sign-in?next=/admin/dispatch"
-              className="hidden sm:inline-flex font-condensed text-[0.78rem] tracking-[0.16em] uppercase text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-bone)] transition-colors px-3 py-2"
+              className="hidden px-3 py-2 font-condensed text-[0.78rem] uppercase tracking-[0.16em] text-[color:var(--color-bone-dim)] transition-colors hover:text-[color:var(--color-bone)] sm:inline-flex"
             >
               Sign in
             </Link>
-            <Link href="/#book" className="btn btn-primary !h-10 !px-5 !text-[0.7rem]">
-              Reserve
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-            <button
+            <Button asChild size="sm" className="font-condensed text-[0.7rem] uppercase tracking-[0.18em]">
+              <Link href="/#book">
+                Reserve
+                <ArrowRight className="size-3.5" aria-hidden />
+              </Link>
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="icon"
               onClick={() => setOpen((o) => !o)}
-              className="md:hidden ml-1 inline-flex size-10 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)]"
+              className="ml-1 text-[color:var(--color-bone-dim)] md:hidden"
               aria-expanded={open}
               aria-label="Toggle menu"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                {open ? (
-                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                ) : (
-                  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                )}
-              </svg>
-            </button>
+              {open ? <X className="size-4" aria-hidden /> : <Menu className="size-4" aria-hidden />}
+            </Button>
           </div>
         )}
       </div>

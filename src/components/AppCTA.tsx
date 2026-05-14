@@ -77,6 +77,7 @@ export function AppCTA() {
 function PhoneMock() {
   return (
     <div
+      aria-hidden="true"
       className="relative w-[280px] h-[560px] rounded-[44px] p-2 surface-raised shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
       style={{ transform: "rotate(-3deg)" }}
     >
@@ -153,9 +154,9 @@ function PhoneMock() {
         </div>
 
         <div className="absolute inset-x-0 bottom-4 px-4">
-          <button className="btn btn-primary !h-11 w-full !text-[0.72rem]">
+          <div className="inline-flex h-11 w-full items-center justify-center rounded-md bg-primary px-4 py-2 font-condensed text-[0.72rem] font-medium uppercase tracking-[0.18em] text-primary-foreground">
             Track arrival
-          </button>
+          </div>
         </div>
       </div>
     </div>

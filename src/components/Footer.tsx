@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
 
 const copyrightYear = "2026";
@@ -72,13 +73,15 @@ export function Footer() {
                   placeholder="you@yourdomain.com"
                   className="field h-11 bg-transparent text-[0.95rem]"
                 />
-                <button
+                <Button
                   type="button"
                   aria-label="Subscribe to The Dispatch"
-                  className="text-[color:var(--color-champagne-bright)] transition-colors hover:text-[color:var(--color-champagne)] p-2"
+                  variant="ghost"
+                  size="icon"
+                  className="text-[color:var(--color-champagne-bright)] hover:text-[color:var(--color-ink)]"
                 >
                   <ArrowRight className="size-[18px]" aria-hidden />
-                </button>
+                </Button>
               </div>
               <p className="mt-3 text-[0.72rem] text-[color:var(--color-pewter)]">
                 Travel essays and city guides, no marketing.

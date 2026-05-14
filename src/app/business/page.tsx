@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { PageHeader } from "@/components/PageHeader";
@@ -101,10 +102,12 @@ export default function BusinessPage() {
                 </h2>
               </div>
               <div className="lg:col-span-5 flex flex-col sm:flex-row gap-3 lg:justify-end">
-                <a href="mailto:business@prolimodriver.com" className="btn btn-gold">
-                  Email business desk
-                </a>
-                <Link href="/services" className="btn btn-ghost">View all services</Link>
+                <Button asChild size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+                  <a href="mailto:business@prolimodriver.com">Email business desk</a>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+                  <Link href="/services">View all services</Link>
+                </Button>
               </div>
             </div>
           </Reveal>

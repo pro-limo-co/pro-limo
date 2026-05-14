@@ -3,7 +3,7 @@ import { Nav } from "@/components/Nav";
 import { DispatchDashboard } from "@/components/admin/DispatchDashboard";
 
 export const metadata: Metadata = {
-  title: "ProLimo OS - Dispatch",
+  title: "ProLimo OS - Staff Queue",
   robots: { index: false, follow: false },
 };
 
