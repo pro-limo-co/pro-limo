@@ -2,7 +2,7 @@
 
 import type { FunctionReturnType } from "convex/server";
 import { useQuery } from "convex/react";
-import { CalendarClock, CarFront, CreditCard, MapPin, UserRound } from "lucide-react";
+import { CalendarClock, CarFront, CreditCard, MapPin, UserRound, XCircle } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { api } from "@convex/_generated/api";
@@ -57,11 +57,14 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
     .join(" to ");
+  const canceled = booking.status === "canceled";
 
   return (
-    <StatusShell reference={booking.publicReference}>
+    <StatusShell reference={booking.publicReference} status={booking.status}>
       <div className="flex flex-wrap items-center gap-2">
-        <Badge>{formatStatus(booking.status)}</Badge>
+        <Badge variant={canceled ? "destructive" : "default"}>
+          {formatStatus(booking.status)}
+        </Badge>
         <Badge variant="outline">{formatPaymentStatus(booking.paymentStatus)}</Badge>
       </div>
 
@@ -72,11 +75,23 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
             <CardDescription>{getStatusDescription(booking)}</CardDescription>
           </CardHeader>
           <CardContent>
-            <ol className="grid gap-2">
-              {statusSteps.map((step) => (
-                <StatusStep key={step.value} bookingStatus={booking.status} step={step} />
-              ))}
-            </ol>
+            {canceled ? (
+              <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+                <XCircle className="mt-0.5 size-5 shrink-0 text-destructive" aria-hidden />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Ride canceled</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    This booking is closed. No further driver or passenger status updates will appear on this link.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <ol className="grid gap-2">
+                {statusSteps.map((step) => (
+                  <StatusStep key={step.value} bookingStatus={booking.status} step={step} />
+                ))}
+              </ol>
+            )}
           </CardContent>
         </Card>
 
@@ -150,9 +165,11 @@ function StatusStep({
 function StatusShell({
   children,
   reference,
+  status,
 }: {
   children: ReactNode;
   reference: string;
+  status?: BookingStatus;
 }) {
   return (
     <section className="mx-auto max-w-5xl">
@@ -163,7 +180,9 @@ function StatusShell({
         {reference.toUpperCase()}
       </h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-        This page updates from ProLimo OS as dispatch and the driver move the ride forward.
+        {status === "canceled"
+          ? "This booking is closed in ProLimo OS."
+          : "This page updates from ProLimo OS as dispatch and the driver move the ride forward."}
       </p>
       <div className="mt-8">{children}</div>
     </section>
@@ -212,7 +231,6 @@ function getStatusDescription(booking: Booking) {
 }
 
 function getStepState(current: BookingStatus, step: (typeof statusSteps)[number]["value"]) {
-  if (current === "canceled") return "stopped";
   const currentIndex = statusSteps.findIndex((item) => item.value === current);
   const stepIndex = statusSteps.findIndex((item) => item.value === step);
   if (stepIndex < currentIndex) return "done";
