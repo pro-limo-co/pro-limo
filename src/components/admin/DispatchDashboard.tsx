@@ -62,6 +62,11 @@ type DispatchDraft = {
   staffNote: string;
 };
 type DispatchDraftSync = Pick<DispatchDraft, "status" | "quote" | "driver" | "vehicle" | "notes">;
+type DashboardStat = {
+  label: string;
+  value: string;
+};
+const EMPTY_DASHBOARD_STATS: DashboardStat[] = [];
 type DispatchDraftAction =
   | { type: "status"; value: Status }
   | { type: "quote" | "driver" | "vehicle" | "notes" | "staffNote"; value: string }
@@ -189,8 +194,19 @@ export function DispatchDashboard({
     );
   }
 
+  const visibleBookingCount = bookings?.length;
+  const queueLabel = getQueueLabel(status);
+
   return (
-    <DispatchShell title={title} showSignOut>
+    <DispatchShell
+      title={title}
+      showSignOut
+      stats={[
+        { label: "Queue", value: queueLabel },
+        { label: "Visible rides", value: visibleBookingCount === undefined ? "Loading" : String(visibleBookingCount) },
+        { label: "Realtime", value: "Live" },
+      ]}
+    >
       <div className="no-scrollbar mt-6 flex items-center gap-2 overflow-x-auto pb-1">
         <FilterButton label="Active" active={status === "active"} onClick={() => setStatus("active")} />
         <FilterButton label="All" active={status === "all"} onClick={() => setStatus("all")} />
@@ -898,14 +914,16 @@ function RecentHandoffs({
 function DispatchShell({
   title,
   children,
+  stats = EMPTY_DASHBOARD_STATS,
   showSignOut = false,
 }: {
   title: string;
   children?: ReactNode;
+  stats?: DashboardStat[];
   showSignOut?: boolean;
 }) {
   return (
-    <section className="pld-ui min-h-[100svh] bg-background text-foreground">
+    <section className="pld-ui min-h-[100svh] bg-muted/30 text-foreground">
       <div className="mx-auto max-w-[1500px] px-6 pt-28 pb-16 lg:px-10">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -931,6 +949,22 @@ function DispatchShell({
             </Button>
           )}
         </div>
+        {stats.length > 0 && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {stats.map((stat) => (
+              <Card key={stat.label} className="shadow-none">
+                <CardContent className="p-4">
+                  <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1 text-lg font-semibold text-foreground">
+                    {stat.value}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
         {children}
       </div>
     </section>
@@ -1002,6 +1036,12 @@ function isStatus(value: StatusView): value is Status {
 function getEmptyQueueMessage(status: StatusView) {
   if (status === "active") return "No active bookings need dispatch right now.";
   return "No bookings in this view.";
+}
+
+function getQueueLabel(status: StatusView) {
+  if (status === "active") return "Active";
+  if (status === "all") return "All rides";
+  return formatStatus(status);
 }
 
 function SectionHeading({ title, description }: { title: string; description: string }) {

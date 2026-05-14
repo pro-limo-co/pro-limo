@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono, Oswald } from "next/font/google";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 import "./globals.css";
 
@@ -73,10 +74,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${cormorant.variable} ${geist.variable} ${geistMono.variable} ${oswald.variable}`}
     >
       <body className="page-frame">
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   /* Cinema-black surface (Bugatti × Open Design luxury) */
   --color-ink: #000000;
@@ -52,30 +54,6 @@
 }
 
 :root {
-  color-scheme: dark;
-  --background: var(--color-ink);
-  --foreground: var(--color-bone);
-  --popover: var(--color-ink-raised);
-  --popover-foreground: var(--color-bone);
-  --primary: var(--color-champagne);
-  --primary-foreground: var(--color-ink);
-  --secondary: var(--color-ink-raised);
-  --secondary-foreground: var(--color-bone);
-  --muted: var(--color-ink-raised);
-  --muted-foreground: var(--color-bone-dim);
-  --accent: var(--color-champagne-bright);
-  --accent-foreground: var(--color-ink);
-  --destructive: #ef4444;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --card: var(--color-ink-soft);
-  --card-foreground: var(--color-bone);
-  --border: var(--color-divider);
-  --input: var(--color-divider);
-  --ring: var(--color-champagne);
-}
-
-.pld-ui {
   color-scheme: light;
   --color-ink: #f8fafc;
   --color-ink-soft: #ffffff;
@@ -110,24 +88,65 @@
   --border: #d7dee8;
   --input: #cbd5e1;
   --ring: #2563eb;
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-card: #ffffff;
-  --color-card-foreground: #0f172a;
-  --color-popover: #ffffff;
-  --color-popover-foreground: #0f172a;
-  --color-primary: #1d4ed8;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #e2e8f0;
-  --color-secondary-foreground: #0f172a;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-accent: #e0f2fe;
-  --color-accent-foreground: #075985;
-  --color-destructive: #dc2626;
-  --color-border: #d7dee8;
-  --color-input: #cbd5e1;
-  --color-ring: #2563eb;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+.dark {
+  color-scheme: dark;
+  --color-ink: #000000;
+  --color-ink-soft: #0A0A0A;
+  --color-ink-raised: #131312;
+  --color-ink-elevated: #1B1A18;
+  --color-divider: #232220;
+  --color-divider-soft: #161514;
+  --color-bone: #FFFFFF;
+  --color-bone-dim: #C9C7C2;
+  --color-pewter: #8A8884;
+  --color-pewter-dim: #565552;
+  --color-champagne: #C8A96A;
+  --color-champagne-bright: #E5C98F;
+  --color-champagne-dim: #8C7848;
+  --background: var(--color-ink);
+  --foreground: var(--color-bone);
+  --card: var(--color-ink-soft);
+  --card-foreground: var(--color-bone);
+  --popover: var(--color-ink-raised);
+  --popover-foreground: var(--color-bone);
+  --primary: var(--color-champagne);
+  --primary-foreground: var(--color-ink);
+  --secondary: var(--color-ink-raised);
+  --secondary-foreground: var(--color-bone);
+  --muted: var(--color-ink-raised);
+  --muted-foreground: var(--color-bone-dim);
+  --accent: var(--color-champagne-bright);
+  --accent-foreground: var(--color-ink);
+  --destructive: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --border: var(--color-divider);
+  --input: var(--color-divider);
+  --ring: var(--color-champagne);
+}
+
+.pld-ui {
+  color-scheme: inherit;
 }
 
 * {
@@ -222,7 +241,7 @@ html {
 .spotlight {
   background:
     radial-gradient(60% 40% at 50% 0%, color-mix(in oklab, var(--color-champagne) 6%, transparent), transparent 60%),
-    radial-gradient(80% 60% at 50% 110%, color-mix(in oklab, #14110b 70%, transparent), transparent 70%),
+    radial-gradient(80% 60% at 50% 110%, color-mix(in oklab, var(--color-ink-soft) 70%, transparent), transparent 70%),
     var(--color-ink);
 }
 

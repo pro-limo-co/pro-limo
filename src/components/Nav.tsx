@@ -3,6 +3,7 @@
 import { ArrowRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ModeToggle } from "@/components/theme/ModeToggle";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
 
@@ -79,33 +80,38 @@ export function Nav({
           </nav>
         )}
 
-        {!minimal && (
-          <div className="flex items-center gap-3">
-            <Link
-              href="/auth/sign-in?next=/admin/dispatch"
-              className="hidden px-3 py-2 font-condensed text-[0.78rem] uppercase tracking-[0.16em] text-[color:var(--color-bone-dim)] transition-colors hover:text-[color:var(--color-bone)] sm:inline-flex"
-            >
-              Sign in
-            </Link>
-            <Button asChild size="sm" className="font-condensed text-[0.7rem] uppercase tracking-[0.18em]">
-              <Link href="/#book">
-                Reserve
-                <ArrowRight className="size-3.5" aria-hidden />
+        <div className="flex items-center gap-2 sm:gap-3">
+          {!minimal ? (
+            <>
+              <Link
+                href="/auth/sign-in?next=/admin/dispatch"
+                className="hidden px-3 py-2 font-condensed text-[0.78rem] uppercase tracking-[0.16em] text-[color:var(--color-bone-dim)] transition-colors hover:text-[color:var(--color-bone)] sm:inline-flex"
+              >
+                Sign in
               </Link>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => setOpen((o) => !o)}
-              className="ml-1 text-[color:var(--color-bone-dim)] md:hidden"
-              aria-expanded={open}
-              aria-label="Toggle menu"
-            >
-              {open ? <X className="size-4" aria-hidden /> : <Menu className="size-4" aria-hidden />}
-            </Button>
-          </div>
-        )}
+              <Button asChild size="sm" className="font-condensed text-[0.7rem] uppercase tracking-[0.18em]">
+                <Link href="/#book">
+                  Reserve
+                  <ArrowRight className="size-3.5" aria-hidden />
+                </Link>
+              </Button>
+              <ModeToggle className="hidden sm:inline-flex" />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setOpen((o) => !o)}
+                className="ml-1 text-[color:var(--color-bone-dim)] md:hidden"
+                aria-expanded={open}
+                aria-label="Toggle menu"
+              >
+                {open ? <X className="size-4" aria-hidden /> : <Menu className="size-4" aria-hidden />}
+              </Button>
+            </>
+          ) : (
+            <ModeToggle />
+          )}
+        </div>
       </div>
 
       {!minimal && open && (
@@ -130,6 +136,12 @@ export function Nav({
               >
                 Sign in
               </Link>
+            </li>
+            <li className="flex items-center justify-between gap-3 py-3">
+              <span className="font-condensed text-[0.85rem] uppercase tracking-[0.14em] text-[color:var(--color-bone-dim)]">
+                Theme
+              </span>
+              <ModeToggle />
             </li>
           </ul>
         </div>
