@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type MutationCtx } from "./_generated/server";
 import { limitBookingSubmission } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
 
@@ -64,16 +64,19 @@ export const create = mutation({
     });
     const publicReference = `PLD-${bookingId.slice(-8).toUpperCase()}`;
 
-    await ctx.db.patch(bookingId, {
-      publicReference,
-      updatedAt: now,
-    });
-    await ctx.db.insert("bookingEvents", {
-      bookingId,
-      kind: "submitted",
-      message: `Booking ${publicReference} submitted by ${args.customerName}.`,
-      createdAt: now,
-    });
+    await Promise.all([
+      ctx.db.patch(bookingId, {
+        publicReference,
+        updatedAt: now,
+      }),
+      ctx.db.insert("bookingEvents", {
+        bookingId,
+        kind: "submitted",
+        message: `Booking ${publicReference} submitted by ${args.customerName}.`,
+        createdAt: now,
+      }),
+      upsertCustomerProfile(ctx, args, now),
+    ]);
 
     return {
       bookingId,
@@ -284,3 +287,81 @@ export const addNote = mutation({
     });
   },
 });
+
+type CustomerProfileBookingInput = {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  pickupLocation: string;
+  dropoffLocation?: string;
+};
+
+async function upsertCustomerProfile(
+  ctx: MutationCtx,
+  input: CustomerProfileBookingInput,
+  now: number,
+) {
+  const emailKey = normalizeEmailKey(input.customerEmail);
+  const phoneKey = normalizePhoneKey(input.customerPhone);
+  const existingByEmail = await ctx.db
+    .query("customerProfiles")
+    .withIndex("by_emailKey", (q) => q.eq("emailKey", emailKey))
+    .unique();
+  const existing =
+    existingByEmail ??
+    (phoneKey
+      ? await ctx.db
+          .query("customerProfiles")
+          .withIndex("by_phoneKey", (q) => q.eq("phoneKey", phoneKey))
+          .unique()
+      : null);
+
+  if (existing) {
+    await ctx.db.patch(existing._id, {
+      emailKey,
+      phoneKey,
+      name: input.customerName.trim(),
+      email: input.customerEmail.trim(),
+      phone: input.customerPhone.trim(),
+      pickupLocations: appendUniqueLocation(existing.pickupLocations, input.pickupLocation),
+      dropoffLocations: appendUniqueLocation(existing.dropoffLocations, input.dropoffLocation),
+      bookingCount: existing.bookingCount + 1,
+      lastBookingAt: now,
+      updatedAt: now,
+    });
+    return;
+  }
+
+  await ctx.db.insert("customerProfiles", {
+    emailKey,
+    phoneKey,
+    name: input.customerName.trim(),
+    email: input.customerEmail.trim(),
+    phone: input.customerPhone.trim(),
+    pickupLocations: appendUniqueLocation([], input.pickupLocation),
+    dropoffLocations: appendUniqueLocation([], input.dropoffLocation),
+    marketingOptIn: true,
+    bookingCount: 1,
+    lastBookingAt: now,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
+
+function appendUniqueLocation(values: string[], nextValue?: string) {
+  const trimmed = nextValue?.trim();
+  if (!trimmed) return values.slice(0, 8);
+
+  return [
+    trimmed,
+    ...values.filter((value) => value.toLowerCase() !== trimmed.toLowerCase()),
+  ].slice(0, 8);
+}
+
+function normalizeEmailKey(email: string) {
+  return email.trim().toLowerCase();
+}
+
+function normalizePhoneKey(phone: string) {
+  return phone.replace(/\D/g, "") || phone.trim().toLowerCase();
+}

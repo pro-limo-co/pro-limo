@@ -1194,6 +1194,9 @@ function DispatchShell({
               <Button asChild variant="outline" className="self-start sm:self-auto">
                 <Link href="/admin/fleet">Fleet</Link>
               </Button>
+              <Button asChild variant="outline" className="self-start sm:self-auto">
+                <Link href="/admin/customers">Customers</Link>
+              </Button>
               <Button
                 type="button"
                 variant="outline"

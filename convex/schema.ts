@@ -90,6 +90,27 @@ export default defineSchema({
     .index("by_active_and_sortOrder", ["active", "sortOrder"])
     .index("by_sortOrder", ["sortOrder"]),
 
+  customerProfiles: defineTable({
+    emailKey: v.string(),
+    phoneKey: v.string(),
+    name: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    pickupLocations: v.array(v.string()),
+    dropoffLocations: v.array(v.string()),
+    preferredVehicle: v.optional(v.string()),
+    preferredDrivingStyle: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    marketingOptIn: v.boolean(),
+    bookingCount: v.number(),
+    lastBookingAt: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_emailKey", ["emailKey"])
+    .index("by_phoneKey", ["phoneKey"])
+    .index("by_lastBookingAt", ["lastBookingAt"]),
+
   bookings: defineTable({
     publicReference: v.string(),
     bookingMode: v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport")),

@@ -67,6 +67,7 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 | `/services` | 1 | All-services index |
 | `/services/[service]` | 5 | One per service in `src/data/services.ts` |
 | `/business` | 1 | Professional Limousine Driver for Business |
+| `/admin/customers` | dynamic | Staff customer memory, preferences, address history, and marketing opt-in |
 | `/admin/dispatch` | dynamic | Staff-only dispatch workflow |
 | `/admin/fleet` | dynamic | Staff driver and vehicle roster feeding dispatch assignments |
 | `/admin/rates` | dynamic | Staff rate profiles for distance, hourly, airport, stop, gratuity, tax, and peak pricing |
@@ -100,6 +101,7 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 - Staff can manage rate profiles in `/admin/rates`. Dispatch uses those profiles to estimate quotes from vehicle type, distance, billable hours, airport fee, meet-and-greet, extra stops, gratuity, tax, and peak surcharge inputs.
 - Rate profiles intentionally mirror the useful parts of legacy limo software rate management: vehicle-level distance/hourly rules, minimum fares, airport add-ons, and operator-controlled fee percentages. Account-specific matrices, zones, and live map distance lookup are the next deeper layers.
 - Staff can manage drivers and vehicles in `/admin/fleet`. Dispatch reads those Convex profiles live so saved chauffeur contact details can flow into driver handoff links while still allowing manual affiliate overrides.
+- Booking submissions upsert `/admin/customers` profiles with customer contact history, pickup/drop-off memory, preferred vehicle, driving style, staff notes, and marketing opt-in.
 - The Reveal component uses IntersectionObserver to fade-in sections as they scroll into view.
 - The "rise" CSS animation (in `globals.css`) handles the on-load hero stagger without JS.
 

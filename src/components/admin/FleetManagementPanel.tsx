@@ -150,6 +150,9 @@ export function FleetManagementPanel() {
           <Button asChild variant="outline">
             <Link href="/admin/rates">Rates</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/customers">Customers</Link>
+          </Button>
           <Button type="button" disabled={!canEdit || pending} onClick={() => void handleInstallDefaults()}>
             <Settings2 className="size-4" aria-hidden />
             Install defaults
@@ -358,6 +361,9 @@ function FleetShell({
               </Button>
               <Button asChild variant="outline" className="self-start sm:self-auto">
                 <Link href="/admin/rates">Rates</Link>
+              </Button>
+              <Button asChild variant="outline" className="self-start sm:self-auto">
+                <Link href="/admin/customers">Customers</Link>
               </Button>
               <Button
                 type="button"

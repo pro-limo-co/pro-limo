@@ -141,6 +141,9 @@ export function RateManagementPanel() {
           <Button asChild variant="outline">
             <Link href="/admin/fleet">Fleet</Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/customers">Customers</Link>
+          </Button>
           <Button type="button" disabled={!canEdit || pending} onClick={() => void handleInstallDefaults()}>
             <Settings2 className="size-4" aria-hidden />
             Install defaults
