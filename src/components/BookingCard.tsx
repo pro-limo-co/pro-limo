@@ -78,7 +78,7 @@ export function BookingCard({
           {serviceSlug && <input type="hidden" name="serviceSlug" value={serviceSlug} />}
 
           <Tabs value={tab} onValueChange={(value) => setTab(value as TabId)}>
-            <TabsList className="grid h-11 w-full grid-cols-3 bg-muted">
+            <TabsList className="grid w-full grid-cols-3 bg-muted">
               {tabs.map((item) => (
                 <TabsTrigger key={item.id} value={item.id} className="text-sm">
                   {item.label}
