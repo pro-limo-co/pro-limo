@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -191,7 +192,7 @@ export function BookingCard({
                 <ArrowRight className="size-4" aria-hidden />
               </Button>
               <Button asChild variant="outline" size="lg">
-                <a href="#concierge">
+                <a href={`mailto:${siteConfig.contact.email}`}>
                   <Headphones className="size-4" aria-hidden />
                   Concierge
                 </a>

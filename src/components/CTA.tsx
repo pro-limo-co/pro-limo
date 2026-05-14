@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/seo";
 import { Reveal } from "./Reveal";
 
 export function CTA() {
@@ -35,7 +36,7 @@ export function CTA() {
               </a>
             </Button>
             <Button asChild variant="outline" size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
-              <a href="#concierge">Speak with concierge</a>
+              <a href={`mailto:${siteConfig.contact.email}`}>Speak with concierge</a>
             </Button>
           </div>
         </Reveal>
