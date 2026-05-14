@@ -214,7 +214,7 @@ export function RideAccessPanel({ token }: { token: string }) {
       </Card>
 
       {message && (
-        <p className="mt-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" aria-live="polite">
+        <p className="mt-4 rounded-md border bg-muted px-4 py-3 text-sm text-muted-foreground" aria-live="polite">
           {message}
         </p>
       )}
