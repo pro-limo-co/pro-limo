@@ -520,15 +520,39 @@ function DispatchEditorSection({
 }) {
   const terminalBooking = isTerminalBooking(booking.status);
 
+  if (terminalBooking) {
+    return (
+      <section className="grid min-w-0 content-start gap-4">
+        <SectionHeading
+          title="Dispatch"
+          description="This ride is closed. Dispatch details are locked; add an internal note if the record needs more context."
+        />
+        <InfoRow label="Status" value={booking.status} />
+        <InfoRow label="Payment" value={formatPaymentStatus(booking.paymentStatus)} />
+        {booking.quotedAmountCents !== undefined && (
+          <InfoRow label="Quote USD" value={formatQuote(booking.quotedAmountCents)} />
+        )}
+        {booking.vehicleLabel && <InfoRow label="Vehicle" value={booking.vehicleLabel} />}
+        {booking.assignedChauffeurName && <InfoRow label="Chauffeur" value={booking.assignedChauffeurName} />}
+        {booking.dispatchNotes && <InfoBlock label="Dispatch notes">{booking.dispatchNotes}</InfoBlock>}
+        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          Payment links and dispatch changes are closed for {formatStatusInSentence(booking.status)} rides.
+        </p>
+        <StaffNoteEditor
+          bookingId={booking._id}
+          note={draft.staffNote}
+          onChange={(value) => dispatchDraft({ type: "staffNote", value })}
+          onSaveNote={onSaveNote}
+        />
+      </section>
+    );
+  }
+
   return (
     <section className="grid min-w-0 content-start gap-4">
       <SectionHeading
         title="Dispatch"
-        description={
-          terminalBooking
-            ? "Review the closed ride or correct dispatch details."
-            : "Set quote, driver, vehicle, and status."
-        }
+        description="Set quote, driver, vehicle, and status."
       />
       <InfoRow label="Payment" value={formatPaymentStatus(booking.paymentStatus)} />
       <StatusSelect
@@ -577,34 +601,50 @@ function DispatchEditorSection({
         <Button
           type="button"
           variant="outline"
-          disabled={pending || terminalBooking}
+          disabled={pending}
           onClick={() => void onOpenCheckout()}
         >
           <CreditCard className="size-4" aria-hidden />
-          {terminalBooking ? "Payment closed" : "Payment link"}
+          Payment link
         </Button>
       </div>
-      {terminalBooking && (
-        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          Payment links are closed for {formatStatusInSentence(booking.status)} rides.
-        </p>
-      )}
-      <div className="grid min-w-0 gap-2">
-        <Label htmlFor={`staff-note-${booking._id}`}>Internal note</Label>
-        <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-          <Input
-            id={`staff-note-${booking._id}`}
-            value={draft.staffNote}
-            onChange={(event) => dispatchDraft({ type: "staffNote", value: event.target.value })}
-            placeholder="Add note"
-          />
-          <Button type="button" variant="secondary" onClick={() => void onSaveNote()}>
-            <Plus className="size-4" aria-hidden />
-            Add
-          </Button>
-        </div>
-      </div>
+      <StaffNoteEditor
+        bookingId={booking._id}
+        note={draft.staffNote}
+        onChange={(value) => dispatchDraft({ type: "staffNote", value })}
+        onSaveNote={onSaveNote}
+      />
     </section>
+  );
+}
+
+function StaffNoteEditor({
+  bookingId,
+  note,
+  onChange,
+  onSaveNote,
+}: {
+  bookingId: string;
+  note: string;
+  onChange: (value: string) => void;
+  onSaveNote: () => Promise<void>;
+}) {
+  return (
+    <div className="grid min-w-0 gap-2">
+      <Label htmlFor={`staff-note-${bookingId}`}>Internal note</Label>
+      <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+        <Input
+          id={`staff-note-${bookingId}`}
+          value={note}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="Add note"
+        />
+        <Button type="button" variant="secondary" onClick={() => void onSaveNote()}>
+          <Plus className="size-4" aria-hidden />
+          Add
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -1149,6 +1189,10 @@ function formatPaymentStatus(status: string) {
 
 function formatPassengerCount(count: number) {
   return `${count} ${count === 1 ? "passenger" : "passengers"}`;
+}
+
+function formatQuote(amountCents: number) {
+  return `$${(amountCents / 100).toFixed(2)}`;
 }
 
 function emptyToUndefined(value: string) {
