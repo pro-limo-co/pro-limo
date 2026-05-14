@@ -7,7 +7,7 @@ export function CTA() {
   return (
     <section
       id="reserve"
-      className="relative section spotlight grain overflow-hidden"
+      className="relative section scroll-mt-24 spotlight grain overflow-hidden lg:scroll-mt-28"
       aria-labelledby="cta-heading"
     >
       <div className="relative z-10 mx-auto max-w-[1100px] px-6 lg:px-10 text-center">

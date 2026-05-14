@@ -3,7 +3,7 @@ import { siteConfig } from "@/lib/seo";
 
 export function AppCTA() {
   return (
-    <section id="app" className="section relative overflow-hidden">
+    <section id="app" className="section relative scroll-mt-24 overflow-hidden lg:scroll-mt-28">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div className="lg:col-span-7">

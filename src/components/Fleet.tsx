@@ -33,7 +33,7 @@ const fleet = [
 
 export function Fleet() {
   return (
-    <section id="fleet" className="section relative bg-[color:var(--color-ink-soft)] border-y border-[color:var(--color-divider-soft)] grain overflow-hidden">
+    <section id="fleet" className="section relative scroll-mt-24 bg-[color:var(--color-ink-soft)] border-y border-[color:var(--color-divider-soft)] grain overflow-hidden lg:scroll-mt-28">
       <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16 lg:mb-20">
           <div>

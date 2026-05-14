@@ -12,7 +12,7 @@ const featured = featuredCitySlugs.reduce<(typeof cities)[number][]>((acc, slug)
 
 export function Cities() {
   return (
-    <section id="cities" className="section relative bg-[color:var(--color-ink-soft)] border-y border-[color:var(--color-divider-soft)]">
+    <section id="cities" className="section relative scroll-mt-24 bg-[color:var(--color-ink-soft)] border-y border-[color:var(--color-divider-soft)] lg:scroll-mt-28">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14 lg:mb-20">
           <div className="lg:col-span-6">

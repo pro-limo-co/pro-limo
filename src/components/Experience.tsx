@@ -22,7 +22,7 @@ export function Experience() {
   return (
     <section
       id="experience"
-      className="section relative overflow-hidden"
+      className="section relative scroll-mt-24 overflow-hidden lg:scroll-mt-28"
       aria-labelledby="exp-heading"
     >
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">

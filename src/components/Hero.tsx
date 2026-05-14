@@ -59,7 +59,7 @@ export function Hero() {
             <HeroFacts className="mt-14 hidden max-w-md rise rise-5 border-t hairline pt-6 lg:grid" />
           </div>
 
-          <div className="lg:col-span-5 xl:col-span-5 rise rise-6" id="book">
+          <div className="scroll-mt-24 lg:scroll-mt-28 lg:col-span-5 xl:col-span-5 rise rise-6" id="book">
             <BookingCard sourceLabel="Homepage" sourcePath="/" />
           </div>
         </div>

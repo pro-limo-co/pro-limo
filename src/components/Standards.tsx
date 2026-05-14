@@ -33,7 +33,7 @@ const standards = [
 
 export function Standards() {
   return (
-    <section id="standards" className="section relative" aria-label="Our standards">
+    <section id="standards" className="section relative scroll-mt-24 lg:scroll-mt-28" aria-label="Our standards">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14 lg:mb-20">
           <div className="lg:col-span-5">
