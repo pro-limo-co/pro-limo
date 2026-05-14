@@ -55,6 +55,7 @@ export function RideAccessPanel({ token }: { token: string }) {
   const nextRideStatus = getNextRideStatus(booking.status, handoff.status);
   const actionHint = getActionHint(booking.status, handoff.status, nextRideStatus);
   const terminalAction = getTerminalActionLabel(booking.status, handoff.status);
+  const showHandoffBadge = !canceled && handoff.status !== booking.status;
 
   async function answer(response: "accepted" | "declined") {
     setPending(response);
@@ -91,7 +92,7 @@ export function RideAccessPanel({ token }: { token: string }) {
               <Badge variant={canceled ? "destructive" : "default"}>
                 {formatStatus(booking.status)}
               </Badge>
-              <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
+              {showHandoffBadge && <Badge variant="outline">{formatStatus(handoff.status)}</Badge>}
             </div>
             <CardTitle className="break-words pt-2 [overflow-wrap:anywhere]">
               {booking.customerName}
