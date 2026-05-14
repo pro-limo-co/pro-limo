@@ -364,6 +364,7 @@ function DispatchBookingRow({
   }
 
   const latestHandoffs = handoffs?.slice(0, 2) ?? [];
+  const rowMessage = getRowMessage(message, latestHandoffs[0]);
 
   return (
     <Card className="overflow-hidden">
@@ -395,7 +396,7 @@ function DispatchBookingRow({
             onPrepareHandoff={prepareHandoff}
             pending={pending}
           />
-          {message && <RowMessage>{message}</RowMessage>}
+          {rowMessage && <RowMessage tone={rowMessage.tone}>{rowMessage.message}</RowMessage>}
           <OperationsLogSection events={events ?? []} loading={events === undefined} />
         </CardContent>
       )}
@@ -792,6 +793,8 @@ function DriverLinkControls({
   onPrepareHandoff: () => Promise<void>;
   pending: boolean;
 }) {
+  const activeHandoffResult = getActiveHandoffResult(handoffResult, handoffs);
+
   return (
     <>
       <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]">
@@ -815,16 +818,16 @@ function DriverLinkControls({
           className="mt-2 min-h-20"
         />
       </div>
-      {handoffResult && (
+      {activeHandoffResult && (
         <RideLinkActions
           booking={booking}
-          email={handoffResult.recipientEmail}
-          message={handoffResult.message}
-          phone={handoffResult.recipientPhone}
-          rideUrl={handoffResult.rideUrl}
+          email={activeHandoffResult.recipientEmail}
+          message={activeHandoffResult.message}
+          phone={activeHandoffResult.recipientPhone}
+          rideUrl={activeHandoffResult.rideUrl}
         />
       )}
-      <RecentHandoffs booking={booking} excludedRideUrl={handoffResult?.rideUrl} handoffs={handoffs} />
+      <RecentHandoffs booking={booking} excludedRideUrl={activeHandoffResult?.rideUrl} handoffs={handoffs} />
     </>
   );
 }
@@ -855,7 +858,7 @@ function RecentHandoffs({
               <a href={rideUrl} className="min-w-0 truncate font-mono text-xs text-primary">
                 {rideUrl}
               </a>
-              <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
+              <Badge variant={getHandoffBadgeVariant(handoff.status)}>{formatStatus(handoff.status)}</Badge>
             </div>
             <RideLinkActions
               booking={booking}
@@ -990,9 +993,15 @@ function SectionHeading({ title, description }: { title: string; description: st
   );
 }
 
-function RowMessage({ children }: { children: ReactNode }) {
+function RowMessage({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "warning" }) {
   return (
-    <p className="rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground lg:col-span-3" aria-live="polite">
+    <p
+      className={cn(
+        "rounded-md border px-3 py-2 text-sm lg:col-span-3",
+        tone === "warning" ? "border-destructive/30 bg-destructive/5 text-destructive" : "bg-muted text-muted-foreground",
+      )}
+      aria-live="polite"
+    >
       {children}
     </p>
   );
@@ -1171,6 +1180,33 @@ function getEventBadgeVariant(kind: BookingEvent["kind"]) {
   if (kind === "handoff_declined") return "destructive";
   if (kind === "note_added") return "outline";
   return "secondary";
+}
+
+function getHandoffBadgeVariant(status: Handoff["status"]) {
+  if (status === "declined") return "destructive";
+  return "outline";
+}
+
+function getActiveHandoffResult(result: HandoffResult | null, handoffs: Handoff[]) {
+  if (!result) return null;
+
+  const matchingHandoff = handoffs.find((handoff) => getRideUrl(`/rides/${handoff.token}`) === result.rideUrl);
+  if (matchingHandoff?.status === "declined") return null;
+
+  return result;
+}
+
+function getRowMessage(message: string, latestHandoff?: Handoff) {
+  if (latestHandoff?.status === "declined") {
+    return {
+      message: `${latestHandoff.recipientName} declined this ride. Create a new driver link or cancel the booking.`,
+      tone: "warning" as const,
+    };
+  }
+
+  if (!message) return null;
+
+  return { message, tone: "neutral" as const };
 }
 
 function isTerminalBooking(status: string) {
