@@ -15,7 +15,7 @@ import {
   Send,
 } from "lucide-react";
 import Link from "next/link";
-import { type ReactNode, useMemo, useReducer, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,10 +61,12 @@ type DispatchDraft = {
   notes: string;
   staffNote: string;
 };
+type DispatchDraftSync = Pick<DispatchDraft, "status" | "quote" | "driver" | "vehicle" | "notes">;
 type DispatchDraftAction =
   | { type: "status"; value: Status }
   | { type: "quote" | "driver" | "vehicle" | "notes" | "staffNote"; value: string }
-  | { type: "clearStaffNote" };
+  | { type: "clearStaffNote" }
+  | { type: "syncBooking"; value: DispatchDraftSync };
 type HandoffChannel = "email" | "sms" | "copy";
 type HandoffDraft = {
   recipientName: string;
@@ -241,6 +243,24 @@ function DispatchBookingRow({
   const handoffs = useQuery(api.handoffs.listForBooking, expanded ? { bookingId: booking._id } : "skip");
   const events = useQuery(api.bookings.listEvents, expanded ? { bookingId: booking._id } : "skip");
   const [draft, dispatchDraft] = useReducer(dispatchDraftReducer, booking, createDispatchDraft);
+  const bookingStatus = booking.status;
+  const bookingQuote = booking.quotedAmountCents ? String(booking.quotedAmountCents / 100) : "";
+  const bookingDriver = booking.assignedChauffeurName ?? "";
+  const bookingVehicle = booking.vehicleLabel ?? "";
+  const bookingNotes = booking.dispatchNotes ?? "";
+
+  useEffect(() => {
+    dispatchDraft({
+      type: "syncBooking",
+      value: {
+        status: bookingStatus,
+        quote: bookingQuote,
+        driver: bookingDriver,
+        vehicle: bookingVehicle,
+        notes: bookingNotes,
+      },
+    });
+  }, [bookingDriver, bookingNotes, bookingQuote, bookingStatus, bookingVehicle]);
 
   const routeSummary = useMemo(() => {
     const parts = [booking.pickupLocation];
@@ -1203,6 +1223,18 @@ function getRowMessage(message: string, latestHandoff?: Handoff) {
       tone: "warning" as const,
     };
   }
+  if (latestHandoff?.status === "accepted") {
+    return {
+      message: `${latestHandoff.recipientName} accepted this ride. Driver status updates will appear live here.`,
+      tone: "neutral" as const,
+    };
+  }
+  if (latestHandoff?.status === "completed") {
+    return {
+      message: `${latestHandoff.recipientName} completed this ride.`,
+      tone: "neutral" as const,
+    };
+  }
 
   if (!message) return null;
 
@@ -1257,13 +1289,19 @@ function syncHandoffRecipientFromDriver({
   }
 }
 
-function createDispatchDraft(booking: Booking): DispatchDraft {
+function createDispatchDraftSync(booking: Booking): DispatchDraftSync {
   return {
     status: booking.status,
     quote: booking.quotedAmountCents ? String(booking.quotedAmountCents / 100) : "",
     driver: booking.assignedChauffeurName ?? "",
     vehicle: booking.vehicleLabel ?? "",
     notes: booking.dispatchNotes ?? "",
+  };
+}
+
+function createDispatchDraft(booking: Booking): DispatchDraft {
+  return {
+    ...createDispatchDraftSync(booking),
     staffNote: "",
   };
 }
@@ -1335,6 +1373,9 @@ function getHandoffValidationMessage(draft: HandoffDraft) {
 function dispatchDraftReducer(state: DispatchDraft, action: DispatchDraftAction): DispatchDraft {
   if (action.type === "clearStaffNote") {
     return { ...state, staffNote: "" };
+  }
+  if (action.type === "syncBooking") {
+    return { ...state, ...action.value };
   }
   return {
     ...state,
