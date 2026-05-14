@@ -11,8 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { formatStatus } from "@/lib/status";
 
 const rideStatuses = [
-  { value: "driver_en_route", label: "On the way" },
-  { value: "arrived", label: "Arrived" },
+  { value: "driver_en_route", label: "Driver on the way" },
+  { value: "arrived", label: "Driver arrived" },
   { value: "in_progress", label: "Passenger onboard" },
   { value: "completed", label: "Completed" },
 ] as const;
@@ -153,7 +153,7 @@ export function RideAccessPanel({ token }: { token: string }) {
                   onClick={() => void answer("declined")}
                 >
                   <XCircle className="size-4" aria-hidden />
-                  {pending === "declined" ? "Declining" : "Decline"}
+                  {pending === "declined" ? "Declining" : "Decline ride"}
                 </Button>
               </div>
             )}
@@ -294,10 +294,10 @@ function getTerminalActionLabel(bookingStatus: string, handoffStatus: string) {
 
 function getRideStatusActionLabel(status: RideStatus) {
   const labels: Record<RideStatus, string> = {
-    arrived: "Mark arrived",
+    arrived: "Mark driver arrived",
     completed: "Complete ride",
-    driver_en_route: "Mark on the way",
-    in_progress: "Passenger onboard",
+    driver_en_route: "Mark driver on the way",
+    in_progress: "Mark passenger onboard",
   };
 
   return labels[status];
@@ -305,10 +305,10 @@ function getRideStatusActionLabel(status: RideStatus) {
 
 function getRideStatusHint(status: RideStatus) {
   const hints: Record<RideStatus, string> = {
-    arrived: "mark the driver arrived",
+    arrived: "mark driver arrived",
     completed: "complete the ride",
-    driver_en_route: "mark the driver on the way",
-    in_progress: "mark the passenger onboard",
+    driver_en_route: "mark driver on the way",
+    in_progress: "mark passenger onboard",
   };
 
   return hints[status];

@@ -128,7 +128,7 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
         <Button asChild>
-          <Link href="/">Book another ride</Link>
+          <Link href="/#book">Book another ride</Link>
         </Button>
         <Button asChild variant="outline">
           <Link href="/services">View services</Link>

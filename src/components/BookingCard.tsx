@@ -177,7 +177,7 @@ export function BookingCard({
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
               <Button asChild size="lg" className="w-full">
                 <a href={`/booking/${encodeURIComponent(state.publicReference)}`}>
-                  View request
+                  Track request
                   <ArrowRight className="size-4" aria-hidden />
                 </a>
               </Button>
