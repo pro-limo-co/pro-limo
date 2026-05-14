@@ -46,8 +46,9 @@ export function RideAccessPanel({ token }: { token: string }) {
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
     .join(" to ");
+  const canceled = booking.status === "canceled";
   const closed =
-    booking.status === "canceled" ||
+    canceled ||
     booking.status === "completed" ||
     handoff.status === "declined" ||
     handoff.status === "completed";
@@ -87,7 +88,7 @@ export function RideAccessPanel({ token }: { token: string }) {
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={booking.status === "canceled" ? "destructive" : "default"}>
+              <Badge variant={canceled ? "destructive" : "default"}>
                 {formatStatus(booking.status)}
               </Badge>
               <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
@@ -167,7 +168,7 @@ export function RideAccessPanel({ token }: { token: string }) {
             )}
             {terminalAction && (
               <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm font-medium text-foreground">
-                {booking.status === "canceled" || handoff.status === "declined" ? (
+                {canceled || handoff.status === "declined" ? (
                   <XCircle className="size-4 text-destructive" aria-hidden />
                 ) : (
                   <CheckCircle2 className="size-4 text-primary" aria-hidden />
@@ -175,19 +176,21 @@ export function RideAccessPanel({ token }: { token: string }) {
                 {terminalAction}
               </div>
             )}
-            <div className="grid gap-2 border-t pt-3">
-              {rideStatuses.map((status) => (
-                <div
-                  key={status.value}
-                  className="flex items-center justify-between gap-3 text-sm text-muted-foreground"
-                >
-                  <span>{status.label}</span>
-                  <Badge variant={isRideStepReached(booking.status, status.value) ? "default" : "outline"}>
-                    {isRideStepReached(booking.status, status.value) ? "done" : "pending"}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+            {!canceled && (
+              <div className="grid gap-2 border-t pt-3">
+                {rideStatuses.map((status) => (
+                  <div
+                    key={status.value}
+                    className="flex items-center justify-between gap-3 text-sm text-muted-foreground"
+                  >
+                    <span>{status.label}</span>
+                    <Badge variant={isRideStepReached(booking.status, status.value) ? "default" : "outline"}>
+                      {isRideStepReached(booking.status, status.value) ? "done" : "pending"}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
