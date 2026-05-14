@@ -79,7 +79,7 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
               <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
                 <XCircle className="mt-0.5 size-5 shrink-0 text-destructive" aria-hidden />
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Ride canceled</p>
+                  <p className="text-sm font-semibold text-foreground">Booking closed</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     This booking is closed. No further driver or passenger status updates will appear on this link.
                   </p>
