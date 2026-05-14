@@ -65,6 +65,13 @@ export const create = mutation({
 
     await Promise.all([
       ctx.db.patch(handoffId, { token, updatedAt: now }),
+      ctx.db.patch(args.bookingId, {
+        latestHandoffToken: token,
+        latestHandoffStatus: "sent",
+        latestHandoffRecipientName: recipientName,
+        latestHandoffUpdatedAt: now,
+        updatedAt: now,
+      }),
       ctx.db.insert("bookingEvents", {
         bookingId: args.bookingId,
         kind: "handoff_sent",
@@ -164,6 +171,9 @@ export const respond = mutation({
     if (handoff.status === "completed") {
       throw new Error("Ride is already completed");
     }
+    if (booking.latestHandoffToken && booking.latestHandoffToken !== handoff.token) {
+      throw new Error("A newer driver link exists for this ride");
+    }
 
     const now = Date.now();
     const accepted = args.response === "accepted";
@@ -178,9 +188,19 @@ export const respond = mutation({
         ? ctx.db.patch(handoff.bookingId, {
             status: booking.status === "new" || booking.status === "quoted" ? "assigned" : booking.status,
             assignedChauffeurName: booking.assignedChauffeurName ?? handoff.recipientName,
+            latestHandoffToken: handoff.token,
+            latestHandoffStatus: "accepted",
+            latestHandoffRecipientName: handoff.recipientName,
+            latestHandoffUpdatedAt: now,
             updatedAt: now,
           })
-        : Promise.resolve(),
+        : ctx.db.patch(handoff.bookingId, {
+            latestHandoffToken: handoff.token,
+            latestHandoffStatus: "declined",
+            latestHandoffRecipientName: handoff.recipientName,
+            latestHandoffUpdatedAt: now,
+            updatedAt: now,
+          }),
       ctx.db.insert("bookingEvents", {
         bookingId: handoff.bookingId,
         kind: accepted ? "handoff_accepted" : "handoff_declined",
@@ -212,6 +232,9 @@ export const updateRideStatus = mutation({
     if (!booking) throw new Error("Booking not found");
     if (booking.status === "canceled") throw new Error("Ride was canceled");
     if (booking.status === "completed") throw new Error("Ride is already completed");
+    if (booking.latestHandoffToken && booking.latestHandoffToken !== handoff.token) {
+      throw new Error("A newer driver link exists for this ride");
+    }
 
     const allowedPreviousStatuses = requiredPreviousBookingStatus[args.status];
     if (!allowedPreviousStatuses.includes(booking.status)) {
@@ -231,6 +254,10 @@ export const updateRideStatus = mutation({
       ctx.db.patch(handoff.bookingId, {
         status: args.status,
         assignedChauffeurName: booking.assignedChauffeurName ?? handoff.recipientName,
+        latestHandoffToken: handoff.token,
+        latestHandoffStatus: args.status === "completed" ? "completed" : "accepted",
+        latestHandoffRecipientName: handoff.recipientName,
+        latestHandoffUpdatedAt: now,
         updatedAt: now,
       }),
       ctx.db.insert("bookingEvents", {

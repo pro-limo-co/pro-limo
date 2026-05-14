@@ -3,6 +3,7 @@
 import type { FunctionReturnType } from "convex/server";
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
+  Calculator,
   ChevronDown,
   Copy,
   CreditCard,
@@ -17,6 +18,7 @@ import {
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +27,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
+import {
+  calculateRateQuote,
+  formatMoneyFromCents,
+  type RateProfileForCalculator,
+} from "@/lib/rate-calculator";
 import { formatStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +60,7 @@ type StatusView = "active" | "all" | Status;
 type Booking = FunctionReturnType<typeof api.bookings.listForDispatch>[number];
 type Handoff = FunctionReturnType<typeof api.handoffs.listForBooking>[number];
 type BookingEvent = FunctionReturnType<typeof api.bookings.listEvents>[number];
+type RateProfile = FunctionReturnType<typeof api.rates.list>[number];
 type DispatchDraft = {
   status: Status;
   quote: string;
@@ -101,6 +109,19 @@ type RowUiAction =
   | { type: "startHandoff" }
   | { type: "handoffSuccess"; result: HandoffResult }
   | { type: "handoffError"; message: string };
+type RateQuoteDraft = {
+  profileKey: string;
+  distanceMiles: string;
+  billableHours: string;
+  extraStops: string;
+  includeAirportFee: string;
+  includeMeetAndGreet: string;
+  includePeakSurcharge: string;
+};
+type RateQuoteDraftAction = {
+  type: keyof RateQuoteDraft;
+  value: string;
+};
 
 export function DispatchDashboard({
   title = "Staff queue",
@@ -112,6 +133,7 @@ export function DispatchDashboard({
   const [claimAccessPending, setClaimAccessPending] = useState(false);
   const viewer = useQuery(api.auth.getViewer);
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
+  const rateProfiles = useQuery(api.rates.list, viewer?.staff ? {} : "skip");
   const bookings = useQuery(
     api.bookings.listForDispatch,
     viewer?.staff
@@ -184,9 +206,9 @@ export function DispatchDashboard({
               {claimAccessPending ? "Checking access" : "Claim access"}
             </Button>
             {claimAccessMessage && (
-              <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground" aria-live="polite">
+              <Alert aria-live="polite" role="status">
                 {claimAccessMessage}
-              </p>
+              </Alert>
             )}
           </CardContent>
         </Card>
@@ -235,7 +257,12 @@ export function DispatchDashboard({
           />
         ) : (
           bookings.map((booking, index) => (
-            <DispatchBookingRow key={booking._id} booking={booking} initialOpen={index === 0} />
+            <DispatchBookingRow
+              key={booking._id}
+              booking={booking}
+              initialOpen={index === 0}
+              rateProfiles={rateProfiles ?? []}
+            />
           ))
         )}
       </div>
@@ -246,9 +273,11 @@ export function DispatchDashboard({
 function DispatchBookingRow({
   booking,
   initialOpen,
+  rateProfiles,
 }: {
   booking: Booking;
   initialOpen: boolean;
+  rateProfiles: RateProfile[];
 }) {
   const updateDispatch = useMutation(api.bookings.updateDispatch);
   const addNote = useMutation(api.bookings.addNote);
@@ -422,6 +451,7 @@ function DispatchBookingRow({
             onSaveDispatch={saveDispatch}
             onSaveNote={saveNote}
             pending={pending}
+            rateProfiles={rateProfiles}
           />
           <DriverLinkSection
             booking={booking}
@@ -546,6 +576,7 @@ function DispatchEditorSection({
   onSaveDispatch,
   onSaveNote,
   pending,
+  rateProfiles,
 }: {
   booking: Booking;
   dispatchDraft: (action: DispatchDraftAction) => void;
@@ -554,6 +585,7 @@ function DispatchEditorSection({
   onSaveDispatch: () => Promise<void>;
   onSaveNote: () => Promise<void>;
   pending: boolean;
+  rateProfiles: RateProfile[];
 }) {
   const terminalBooking = isTerminalBooking(booking.status);
 
@@ -592,6 +624,15 @@ function DispatchEditorSection({
         description="Set quote, driver, vehicle, and status."
       />
       <InfoRow label="Payment" value={formatPaymentStatus(booking.paymentStatus)} />
+      <RateQuoteCalculator
+        booking={booking}
+        profiles={rateProfiles}
+        onApplyQuote={({ note, quote, vehicle }) => {
+          dispatchDraft({ type: "quote", value: quote });
+          dispatchDraft({ type: "vehicle", value: vehicle });
+          dispatchDraft({ type: "notes", value: appendDispatchNote(draft.notes, note) });
+        }}
+      />
       <StatusSelect
         id={`status-${booking._id}`}
         value={draft.status}
@@ -680,6 +721,171 @@ function StaffNoteEditor({
           <Plus className="size-4" aria-hidden />
           Add
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function RateQuoteCalculator({
+  booking,
+  onApplyQuote,
+  profiles,
+}: {
+  booking: Booking;
+  onApplyQuote: (estimate: { quote: string; vehicle: string; note: string }) => void;
+  profiles: RateProfile[];
+}) {
+  const activeProfiles = profiles.filter((profile) => profile.active);
+  const availableProfiles = activeProfiles.length > 0 ? activeProfiles : profiles;
+  const [quoteDraft, dispatchQuoteDraft] = useReducer(
+    rateQuoteDraftReducer,
+    booking,
+    createRateQuoteDraft,
+  );
+
+  if (availableProfiles.length === 0) {
+    return (
+      <Alert>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <span>No rate profiles are available yet.</span>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/rates">Open rates</Link>
+          </Button>
+        </div>
+      </Alert>
+    );
+  }
+
+  const selectedProfile =
+    availableProfiles.find((profile) => profile.key === quoteDraft.profileKey) ?? availableProfiles[0];
+  const quote = calculateRateQuote(selectedProfile, {
+    distanceMiles: readDecimal(quoteDraft.distanceMiles),
+    billableHours: readDecimal(quoteDraft.billableHours),
+    extraStops: readDecimal(quoteDraft.extraStops),
+    includeAirportFee: quoteDraft.includeAirportFee === "true",
+    includeMeetAndGreet: quoteDraft.includeMeetAndGreet === "true",
+    includePeakSurcharge: quoteDraft.includePeakSurcharge === "true",
+  });
+
+  return (
+    <div className="grid gap-3 rounded-md border bg-muted/30 p-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <SectionHeading
+          title="Rate calculator"
+          description="Apply distance, hourly, airport, stop, gratuity, tax, and peak rules from the rate card."
+        />
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/rates">Manage rates</Link>
+        </Button>
+      </div>
+
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+        <div>
+          <Label htmlFor={`rate-profile-${booking._id}`}>Rate profile</Label>
+          <Select
+            value={selectedProfile.key}
+            onValueChange={(value) => dispatchQuoteDraft({ type: "profileKey", value })}
+          >
+            <SelectTrigger id={`rate-profile-${booking._id}`} className="mt-2">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="pld-ui">
+              {availableProfiles.map((profile) => (
+                <SelectItem key={profile.key} value={profile.key}>
+                  {profile.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <TextField
+          id={`distance-${booking._id}`}
+          label="Distance miles"
+          value={quoteDraft.distanceMiles}
+          onChange={(value) => dispatchQuoteDraft({ type: "distanceMiles", value })}
+          inputMode="decimal"
+          placeholder="18.5"
+        />
+        <TextField
+          id={`hours-${booking._id}`}
+          label="Billable hours"
+          value={quoteDraft.billableHours}
+          onChange={(value) => dispatchQuoteDraft({ type: "billableHours", value })}
+          inputMode="decimal"
+          placeholder="2"
+        />
+        <TextField
+          id={`extra-stops-${booking._id}`}
+          label="Extra stops"
+          value={quoteDraft.extraStops}
+          onChange={(value) => dispatchQuoteDraft({ type: "extraStops", value })}
+          inputMode="decimal"
+          placeholder="0"
+        />
+      </div>
+
+      <div className="grid min-w-0 gap-3 sm:grid-cols-3">
+        <BooleanSelect
+          id={`airport-fee-${booking._id}`}
+          label="Airport fee"
+          value={quoteDraft.includeAirportFee}
+          onChange={(value) => dispatchQuoteDraft({ type: "includeAirportFee", value })}
+        />
+        <BooleanSelect
+          id={`meet-greet-${booking._id}`}
+          label="Meet and greet"
+          value={quoteDraft.includeMeetAndGreet}
+          onChange={(value) => dispatchQuoteDraft({ type: "includeMeetAndGreet", value })}
+        />
+        <BooleanSelect
+          id={`peak-${booking._id}`}
+          label="Peak surcharge"
+          value={quoteDraft.includePeakSurcharge}
+          onChange={(value) => dispatchQuoteDraft({ type: "includePeakSurcharge", value })}
+        />
+      </div>
+
+      <div className="rounded-md border bg-background p-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
+              Estimate
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">
+              {formatMoneyFromCents(quote.totalCents)}
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={() =>
+              onApplyQuote({
+                quote: (quote.totalCents / 100).toFixed(2),
+                vehicle: selectedProfile.vehicleType,
+                note: buildRateNote(selectedProfile, quote, {
+                  billableHours: quoteDraft.billableHours,
+                  distanceMiles: quoteDraft.distanceMiles,
+                  extraStops: quoteDraft.extraStops,
+                  includeAirportFee: quoteDraft.includeAirportFee,
+                  includeMeetAndGreet: quoteDraft.includeMeetAndGreet,
+                  includePeakSurcharge: quoteDraft.includePeakSurcharge,
+                }),
+              })
+            }
+          >
+            <Calculator className="size-4" aria-hidden />
+            Apply estimate
+          </Button>
+        </div>
+        {quote.lineItems.length > 0 && (
+          <dl className="mt-3 grid gap-1 text-sm text-muted-foreground">
+            {quote.lineItems.map((item) => (
+              <div key={item.label} className="flex items-center justify-between gap-3">
+                <dt>{item.label}</dt>
+                <dd className="font-medium text-foreground">{formatMoneyFromCents(item.amountCents)}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </div>
     </div>
   );
@@ -935,18 +1141,23 @@ function DispatchShell({
             </h1>
           </div>
           {showSignOut && (
-            <Button
-              type="button"
-              variant="outline"
-              className="self-start md:self-auto"
-              onClick={async () => {
-                await authClient.signOut();
-                window.location.href = "/";
-              }}
-            >
-              <LogOut className="size-4" aria-hidden />
-              Sign out
-            </Button>
+            <div className="flex flex-col gap-2 sm:flex-row md:self-auto">
+              <Button asChild variant="outline" className="self-start sm:self-auto">
+                <Link href="/admin/rates">Rates</Link>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="self-start sm:self-auto"
+                onClick={async () => {
+                  await authClient.signOut();
+                  window.location.href = "/";
+                }}
+              >
+                <LogOut className="size-4" aria-hidden />
+                Sign out
+              </Button>
+            </div>
           )}
         </div>
         {stats.length > 0 && (
@@ -1055,15 +1266,14 @@ function SectionHeading({ title, description }: { title: string; description: st
 
 function RowMessage({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "warning" }) {
   return (
-    <p
-      className={cn(
-        "rounded-md border px-3 py-2 text-sm lg:col-span-3",
-        tone === "warning" ? "border-destructive/30 bg-destructive/5 text-destructive" : "bg-muted text-muted-foreground",
-      )}
+    <Alert
+      className="lg:col-span-3"
+      variant={tone === "warning" ? "warning" : "default"}
       aria-live="polite"
+      role="status"
     >
       {children}
-    </p>
+    </Alert>
   );
 }
 
@@ -1114,6 +1324,33 @@ function TextField({
         placeholder={placeholder}
         className="mt-2"
       />
+    </div>
+  );
+}
+
+function BooleanSelect({
+  id,
+  label,
+  onChange,
+  value,
+}: {
+  id: string;
+  label: string;
+  onChange: (value: string) => void;
+  value: string;
+}) {
+  return (
+    <div>
+      <Label htmlFor={id}>{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id} className="mt-2">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="pld-ui">
+          <SelectItem value="true">Yes</SelectItem>
+          <SelectItem value="false">No</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }
@@ -1303,6 +1540,55 @@ function formatQuote(amountCents: number) {
   return `$${(amountCents / 100).toFixed(2)}`;
 }
 
+function readDecimal(value: string) {
+  const numeric = Number.parseFloat(value);
+  return Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
+}
+
+function parseDurationHours(duration?: string) {
+  if (!duration) return 0;
+  const match = duration.match(/(\d+(?:\.\d+)?)/);
+  if (!match) return 0;
+  return readDecimal(match[1] ?? "");
+}
+
+function appendDispatchNote(existing: string, note: string) {
+  const trimmedExisting = existing.trim();
+  if (!trimmedExisting) return note;
+  if (trimmedExisting.includes(note)) return trimmedExisting;
+  return `${trimmedExisting}\n${note}`;
+}
+
+function buildRateNote(
+  profile: RateProfileForCalculator,
+  quote: { totalCents: number },
+  inputs: {
+    billableHours: string;
+    distanceMiles: string;
+    extraStops: string;
+    includeAirportFee: string;
+    includeMeetAndGreet: string;
+    includePeakSurcharge: string;
+  },
+) {
+  const flags = [
+    inputs.includeAirportFee === "true" ? "airport fee" : "",
+    inputs.includeMeetAndGreet === "true" ? "meet-and-greet" : "",
+    inputs.includePeakSurcharge === "true" ? "peak surcharge" : "",
+  ].filter(Boolean);
+
+  return [
+    `Rate estimate: ${profile.name}`,
+    inputs.distanceMiles.trim() ? `${inputs.distanceMiles.trim()} mi` : "",
+    inputs.billableHours.trim() ? `${inputs.billableHours.trim()} hr` : "",
+    readDecimal(inputs.extraStops) > 0 ? `${inputs.extraStops.trim()} extra stop(s)` : "",
+    ...flags,
+    `quote ${formatMoneyFromCents(quote.totalCents)}`,
+  ]
+    .filter(Boolean)
+    .join(" / ");
+}
+
 function emptyToUndefined(value: string) {
   const trimmed = value.trim();
   return trimmed ? trimmed : undefined;
@@ -1417,6 +1703,26 @@ function dispatchDraftReducer(state: DispatchDraft, action: DispatchDraftAction)
   if (action.type === "syncBooking") {
     return { ...state, ...action.value };
   }
+  return {
+    ...state,
+    [action.type]: action.value,
+  };
+}
+
+function createRateQuoteDraft(booking: Booking): RateQuoteDraft {
+  const parsedHours = parseDurationHours(booking.duration);
+  return {
+    profileKey: "",
+    distanceMiles: "",
+    billableHours: parsedHours > 0 ? String(parsedHours) : booking.bookingMode === "hourly" ? "2" : "",
+    extraStops: "0",
+    includeAirportFee: booking.bookingMode === "airport" ? "true" : "false",
+    includeMeetAndGreet: "false",
+    includePeakSurcharge: "false",
+  };
+}
+
+function rateQuoteDraftReducer(state: RateQuoteDraft, action: RateQuoteDraftAction): RateQuoteDraft {
   return {
     ...state,
     [action.type]: action.value,

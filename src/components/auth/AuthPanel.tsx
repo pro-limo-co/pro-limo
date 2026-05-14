@@ -4,6 +4,7 @@ import { ArrowRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useReducer, useState } from "react";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -113,9 +114,9 @@ export function AuthPanel({ next }: { next: string }) {
           />
 
           {error && (
-            <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            <Alert variant="destructive" role="alert">
               {error}
-            </p>
+            </Alert>
           )}
 
           <Button type="submit" disabled={pending} className="mt-2 w-full">

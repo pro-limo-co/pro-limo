@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { api } from "@convex/_generated/api";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -214,9 +215,9 @@ export function RideAccessPanel({ token }: { token: string }) {
       </Card>
 
       {message && (
-        <p className="mt-4 rounded-md border bg-muted px-4 py-3 text-sm text-muted-foreground" aria-live="polite">
+        <Alert className="mt-4" role="status" aria-live="polite">
           {message}
-        </p>
+        </Alert>
       )}
     </RideShell>
   );

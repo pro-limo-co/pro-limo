@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "doctor:react": "react-doctor . --verbose --full --offline --project pro-limo",
-    "doctor:react:score": "react-doctor . --score --full --offline --project pro-limo"
+    "doctor:react:score": "react-doctor . --score --full --offline --project pro-limo",
+    "smoke:prod": "node scripts/smoke-prod.mjs"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.2",

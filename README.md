@@ -68,6 +68,7 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 | `/services/[service]` | 5 | One per service in `src/data/services.ts` |
 | `/business` | 1 | Professional Limousine Driver for Business |
 | `/admin/dispatch` | dynamic | Staff-only dispatch workflow |
+| `/admin/rates` | dynamic | Staff rate profiles for distance, hourly, airport, stop, gratuity, tax, and peak pricing |
 | `/admin/rides` | dynamic | Staff ride ledger and handoff workflow |
 | `/auth/sign-in` | dynamic | Better Auth staff sign-in |
 | `/booking/[reference]` | dynamic | Public booking status page |
@@ -95,8 +96,21 @@ Use `.env.example` as the non-secret template. Do not commit `.env.local` or the
 
 - All marketing pages are React Server Components. Interactive widgets (Nav, BookingCard, Reveal, auth, dispatch) are `"use client"`.
 - Booking submissions persist to Convex through `api.bookings.create`, then staff manage quote, assignment, ride handoff links, notes, and payment links in `/admin/dispatch` or `/admin/rides`.
+- Staff can manage rate profiles in `/admin/rates`. Dispatch uses those profiles to estimate quotes from vehicle type, distance, billable hours, airport fee, meet-and-greet, extra stops, gratuity, tax, and peak surcharge inputs.
+- Rate profiles intentionally mirror the useful parts of legacy limo software rate management: vehicle-level distance/hourly rules, minimum fares, airport add-ons, and operator-controlled fee percentages. Account-specific matrices, zones, and live map distance lookup are the next deeper layers.
 - The Reveal component uses IntersectionObserver to fade-in sections as they scroll into view.
 - The "rise" CSS animation (in `globals.css`) handles the on-load hero stagger without JS.
+
+## Verification
+
+```bash
+npm run lint
+npm run doctor:react
+npm run build
+npm run smoke:prod
+```
+
+`npm run smoke:prod` checks the production health endpoint, robots/sitemap canonical host, and representative public pages without creating bookings.
 
 ## License
 

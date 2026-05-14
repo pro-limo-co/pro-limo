@@ -33,6 +33,31 @@ const handoffStatus = v.union(
 const handoffChannel = v.union(v.literal("email"), v.literal("sms"), v.literal("copy"));
 
 export default defineSchema({
+  rateProfiles: defineTable({
+    key: v.string(),
+    name: v.string(),
+    vehicleType: v.string(),
+    active: v.boolean(),
+    baseFeeCents: v.number(),
+    minimumFareCents: v.number(),
+    includedMiles: v.number(),
+    perMileCents: v.number(),
+    perHourCents: v.number(),
+    airportFeeCents: v.number(),
+    meetAndGreetCents: v.number(),
+    extraStopCents: v.number(),
+    gratuityPercent: v.number(),
+    taxPercent: v.number(),
+    peakSurchargePercent: v.number(),
+    notes: v.optional(v.string()),
+    sortOrder: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_key", ["key"])
+    .index("by_active_and_sortOrder", ["active", "sortOrder"])
+    .index("by_sortOrder", ["sortOrder"]),
+
   bookings: defineTable({
     publicReference: v.string(),
     bookingMode: v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport")),
@@ -60,6 +85,10 @@ export default defineSchema({
     assignedChauffeurName: v.optional(v.string()),
     vehicleLabel: v.optional(v.string()),
     dispatchNotes: v.optional(v.string()),
+    latestHandoffToken: v.optional(v.string()),
+    latestHandoffStatus: v.optional(handoffStatus),
+    latestHandoffRecipientName: v.optional(v.string()),
+    latestHandoffUpdatedAt: v.optional(v.number()),
     stripeCheckoutSessionId: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),

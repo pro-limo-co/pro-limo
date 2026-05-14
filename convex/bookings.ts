@@ -88,10 +88,32 @@ export const getByReference = query({
     publicReference: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const booking = await ctx.db
       .query("bookings")
       .withIndex("by_publicReference", (q) => q.eq("publicReference", args.publicReference))
       .unique();
+
+    if (!booking) return null;
+
+    return {
+      publicReference: booking.publicReference,
+      status: booking.status,
+      paymentStatus: booking.paymentStatus,
+      bookingMode: booking.bookingMode,
+      pickupLocation: booking.pickupLocation,
+      dropoffLocation: booking.dropoffLocation,
+      airportTrip: booking.airportTrip,
+      pickupDate: booking.pickupDate,
+      pickupTime: booking.pickupTime,
+      duration: booking.duration,
+      flightNumber: booking.flightNumber,
+      passengerCount: booking.passengerCount,
+      luggage: booking.luggage,
+      customerName: booking.customerName,
+      assignedChauffeurName: booking.assignedChauffeurName,
+      vehicleLabel: booking.vehicleLabel,
+      updatedAt: booking.updatedAt,
+    };
   },
 });
 
@@ -134,11 +156,19 @@ export const listForDispatch = query({
 
     return await Promise.all(
       bookings.map(async (booking) => {
-        const latestHandoff = await ctx.db
-          .query("rideHandoffs")
-          .withIndex("by_bookingId_and_createdAt", (q) => q.eq("bookingId", booking._id))
-          .order("desc")
-          .first();
+        const latestHandoff =
+          booking.latestHandoffToken && booking.latestHandoffStatus && booking.latestHandoffRecipientName
+            ? {
+                recipientName: booking.latestHandoffRecipientName,
+                status: booking.latestHandoffStatus,
+                token: booking.latestHandoffToken,
+                updatedAt: booking.latestHandoffUpdatedAt ?? booking.updatedAt,
+              }
+            : await ctx.db
+                .query("rideHandoffs")
+                .withIndex("by_bookingId_and_createdAt", (q) => q.eq("bookingId", booking._id))
+                .order("desc")
+                .first();
 
         return {
           ...booking,

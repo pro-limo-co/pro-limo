@@ -18,6 +18,7 @@ import type * as lib_rateLimits from "../lib/rateLimits.js";
 import type * as lib_staff from "../lib/staff.js";
 import type * as paymentRecords from "../paymentRecords.js";
 import type * as payments from "../payments.js";
+import type * as rates from "../rates.js";
 
 import type {
   ApiFromModules,
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   "lib/staff": typeof lib_staff;
   paymentRecords: typeof paymentRecords;
   payments: typeof payments;
+  rates: typeof rates;
 }>;
 
 /**

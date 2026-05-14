@@ -2,6 +2,7 @@
 
 import { ArrowRight, CheckCircle2, Headphones } from "lucide-react";
 import { FormEvent, type ReactNode, useReducer, useState } from "react";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/lib/seo";
-import { cn } from "@/lib/utils";
 
 const tabs = [
   { id: "oneway", label: "One-way" },
@@ -145,13 +145,9 @@ export function BookingCard({
           </div>
 
           {state.status !== "idle" && (
-            <div
-              className={cn(
-                "rounded-md border px-4 py-3 text-sm",
-                state.status === "success"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                  : "border-red-200 bg-red-50 text-red-900",
-              )}
+            <Alert
+              variant={state.status === "success" ? "success" : "destructive"}
+              role={state.status === "success" ? "status" : "alert"}
               aria-live="polite"
             >
               <div className="flex gap-3">
@@ -160,17 +156,17 @@ export function BookingCard({
                   <p>{state.message}</p>
                   {state.publicReference && (
                     <>
-                      <strong className="mt-1 block font-mono text-emerald-700">
+                      <strong className="mt-1 block font-mono text-success">
                         {state.publicReference}
                       </strong>
-                      <p className="mt-1 text-emerald-800">
+                      <p className="mt-1 text-muted-foreground">
                         Dispatch can see it now in ProLimo OS.
                       </p>
                     </>
                   )}
                 </div>
               </div>
-            </div>
+            </Alert>
           )}
 
           {isSubmitted && state.publicReference ? (
