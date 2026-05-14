@@ -46,7 +46,11 @@ export function RideAccessPanel({ token }: { token: string }) {
   const route = [booking.pickupLocation, booking.dropoffLocation ?? booking.duration]
     .filter(Boolean)
     .join(" to ");
-  const closed = handoff.status === "declined" || handoff.status === "completed" || booking.status === "completed";
+  const closed =
+    booking.status === "canceled" ||
+    booking.status === "completed" ||
+    handoff.status === "declined" ||
+    handoff.status === "completed";
   const nextRideStatus = getNextRideStatus(booking.status, handoff.status);
   const actionHint = getActionHint(booking.status, handoff.status, nextRideStatus);
   const terminalAction = getTerminalActionLabel(booking.status, handoff.status);
@@ -83,7 +87,9 @@ export function RideAccessPanel({ token }: { token: string }) {
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge>{formatStatus(booking.status)}</Badge>
+              <Badge variant={booking.status === "canceled" ? "destructive" : "default"}>
+                {formatStatus(booking.status)}
+              </Badge>
               <Badge variant="outline">{formatStatus(handoff.status)}</Badge>
             </div>
             <CardTitle className="break-words pt-2 [overflow-wrap:anywhere]">
@@ -161,7 +167,7 @@ export function RideAccessPanel({ token }: { token: string }) {
             )}
             {terminalAction && (
               <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm font-medium text-foreground">
-                {handoff.status === "declined" ? (
+                {booking.status === "canceled" || handoff.status === "declined" ? (
                   <XCircle className="size-4 text-destructive" aria-hidden />
                 ) : (
                   <CheckCircle2 className="size-4 text-primary" aria-hidden />
@@ -263,6 +269,7 @@ function getActionHint(
   handoffStatus: string,
   nextRideStatus: RideStatus | null,
 ) {
+  if (bookingStatus === "canceled") return "This ride was canceled by dispatch.";
   if (handoffStatus === "sent") return "Accept the ride to unlock live status updates.";
   if (handoffStatus === "declined") return "This ride was declined.";
   if (handoffStatus === "completed" || bookingStatus === "completed") return "This ride is completed.";
@@ -272,6 +279,7 @@ function getActionHint(
 }
 
 function getTerminalActionLabel(bookingStatus: string, handoffStatus: string) {
+  if (bookingStatus === "canceled") return "Ride canceled";
   if (handoffStatus === "declined") return "Ride declined";
   if (handoffStatus === "completed" || bookingStatus === "completed") return "Ride completed";
   if (handoffStatus === "accepted" && !getNextRideStatus(bookingStatus, handoffStatus)) {

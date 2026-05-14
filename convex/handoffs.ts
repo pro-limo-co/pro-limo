@@ -159,6 +159,8 @@ export const respond = mutation({
 
     const booking = await ctx.db.get(handoff.bookingId);
     if (!booking) throw new Error("Booking not found");
+    if (booking.status === "canceled") throw new Error("Ride was canceled");
+    if (booking.status === "completed") throw new Error("Ride is already completed");
     if (handoff.status === "completed") {
       throw new Error("Ride is already completed");
     }
