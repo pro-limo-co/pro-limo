@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { siteConfig } from "@/lib/seo";
 import { Logo } from "./Logo";
 
 const copyrightYear = "2026";
@@ -119,18 +120,18 @@ export function Footer() {
             © {copyrightYear} Professional Limousine Driver. All rights reserved.
           </p>
           <ul className="flex flex-wrap items-center gap-6 text-[0.78rem] text-[color:var(--color-bone-dim)]">
-            <li><a href="#legal" className="link-gold">Legal</a></li>
-            <li><a href="#privacy" className="link-gold">Privacy</a></li>
-            <li><a href="#terms" className="link-gold">Terms</a></li>
-            <li><a href="#cookies" className="link-gold">Cookies</a></li>
+            <li><Link href="/legal" className="link-gold">Legal</Link></li>
+            <li><Link href="/privacy" className="link-gold">Privacy</Link></li>
+            <li><Link href="/terms" className="link-gold">Terms</Link></li>
+            <li><Link href="/cookies" className="link-gold">Cookies</Link></li>
             <li className="flex items-center gap-3">
-              <Social href="#instagram" label="Instagram">
+              <Social href={siteConfig.socials.instagram} label="Instagram">
                 <span className="text-[0.65rem] font-semibold" aria-hidden>IG</span>
               </Social>
-              <Social href="#x" label="X">
+              <Social href={siteConfig.socials.x} label="X">
                 <span className="text-xs font-semibold" aria-hidden>X</span>
               </Social>
-              <Social href="#linkedin" label="LinkedIn">
+              <Social href={siteConfig.socials.linkedin} label="LinkedIn">
                 <span className="text-[0.65rem] font-semibold" aria-hidden>IN</span>
               </Social>
             </li>
@@ -154,6 +155,8 @@ function Social({
     <a
       href={href}
       aria-label={label}
+      rel="noreferrer"
+      target="_blank"
       className="inline-flex size-9 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] hover:border-[color:var(--color-champagne)] transition-colors"
     >
       {children}

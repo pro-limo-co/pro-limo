@@ -6,7 +6,7 @@ const services = [
     title: "Airport transfers",
     sub: "Arrivals and departures.",
     body: "Airport pickup, airport drop-off, live flight tracking for arrivals, and terminal-aware departure timing.",
-    href: "#airport",
+    href: "/services/airport-transfer",
     icon: PlaneIcon,
   },
   {
@@ -14,7 +14,7 @@ const services = [
     title: "By the hour",
     sub: "Your day, on retainer.",
     body: "Reserve a chauffeur and vehicle for two hours or twelve. Stops, detours, and changes of plan are part of the package.",
-    href: "#hourly",
+    href: "/services/hourly-chauffeur",
     icon: ClockIcon,
   },
   {
@@ -22,7 +22,7 @@ const services = [
     title: "City to city",
     sub: "Between cities, done better.",
     body: "Regional private transfers between Portland, Seattle, Eugene, the coast, the valley, and the Gorge.",
-    href: "#intercity",
+    href: "/services/city-to-city",
     icon: RouteIcon,
   },
   {
@@ -30,7 +30,7 @@ const services = [
     title: "For business",
     sub: "Corporate travel, simplified.",
     body: "Centralized billing, traveler profiles, duty-of-care reporting, and a dedicated account director.",
-    href: "#business",
+    href: "/services/for-business",
     icon: BriefcaseIcon,
   },
 ];
