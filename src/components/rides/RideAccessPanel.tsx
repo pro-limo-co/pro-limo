@@ -119,7 +119,7 @@ export function RideAccessPanel({ token }: { token: string }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="order-first lg:order-none">
           <CardHeader>
             <CardTitle className="text-lg">Driver actions</CardTitle>
             <CardDescription>Update dispatch from this ride link.</CardDescription>
