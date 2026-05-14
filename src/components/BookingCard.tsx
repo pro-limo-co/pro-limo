@@ -212,13 +212,21 @@ export function BookingCard({
     event.preventDefault();
     setSubmitting(true);
     setState(initialState);
-    const response = await fetch("/api/bookings", {
-      method: "POST",
-      body: new FormData(event.currentTarget),
-    });
-    const result = (await response.json()) as BookingSubmissionState;
-    setSubmitting(false);
-    setState(result);
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        body: new FormData(event.currentTarget),
+      });
+      const result = (await response.json()) as BookingSubmissionState;
+      setState(result);
+    } catch {
+      setState({
+        status: "error",
+        message: "We could not submit this request. Please call the concierge desk.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   }
 }
 
