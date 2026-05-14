@@ -266,6 +266,12 @@ function DispatchBookingRow({
         vehicleLabel: emptyToUndefined(draft.vehicle),
         dispatchNotes: emptyToUndefined(draft.notes),
       });
+      syncHandoffRecipientFromDriver({
+        currentDriver: booking.assignedChauffeurName,
+        driverDraft: draft.driver,
+        handoffRecipient: handoffDraft.recipientName,
+        onSync: (recipientName) => dispatchRowUi({ type: "handoffDraft", value: { recipientName } }),
+      });
       dispatchRowUi({ type: "setMessage", message: "Dispatch saved." });
     } catch (error) {
       dispatchRowUi({ type: "setMessage", message: error instanceof Error ? error.message : "Could not save dispatch." });
@@ -1106,6 +1112,27 @@ function formatPassengerCount(count: number) {
 function emptyToUndefined(value: string) {
   const trimmed = value.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function syncHandoffRecipientFromDriver({
+  currentDriver,
+  driverDraft,
+  handoffRecipient,
+  onSync,
+}: {
+  currentDriver?: string;
+  driverDraft: string;
+  handoffRecipient: string;
+  onSync: (recipientName: string) => void;
+}) {
+  const nextDriver = driverDraft.trim();
+  if (!nextDriver) return;
+
+  const currentRecipient = handoffRecipient.trim();
+  const existingDriver = currentDriver?.trim() ?? "";
+  if (!currentRecipient || currentRecipient === existingDriver) {
+    onSync(nextDriver);
+  }
 }
 
 function createDispatchDraft(booking: Booking): DispatchDraft {

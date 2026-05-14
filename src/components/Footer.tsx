@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Logo } from "./Logo";
 
 const copyrightYear = "2026";
@@ -63,15 +65,15 @@ export function Footer() {
             </p>
 
             <form className="mt-10 max-w-sm">
-              <label htmlFor="dispatch-email" className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
+              <Label htmlFor="dispatch-email" className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
                 The dispatch, quarterly
-              </label>
+              </Label>
               <div className="mt-3 flex items-center gap-2 border-b border-[color:var(--color-divider)] focus-within:border-[color:var(--color-champagne)] transition-colors">
-                <input
+                <Input
                   id="dispatch-email"
                   type="email"
                   placeholder="you@yourdomain.com"
-                  className="field h-11 bg-transparent text-[0.95rem]"
+                  className="h-11 border-0 bg-transparent px-0 text-[0.95rem] text-[color:var(--color-bone)] shadow-none placeholder:text-[color:var(--color-pewter-dim)] focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 <Button
                   type="button"
@@ -123,21 +125,13 @@ export function Footer() {
             <li><a href="#cookies" className="link-gold">Cookies</a></li>
             <li className="flex items-center gap-3">
               <Social href="#instagram" label="Instagram">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-                  <rect x="3" y="3" width="18" height="18" rx="5" />
-                  <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" />
-                </svg>
+                <span className="text-[0.65rem] font-semibold" aria-hidden>IG</span>
               </Social>
               <Social href="#x" label="X">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M18 3h3l-7.5 8.6L22 21h-6.6l-5.2-6.3L4.4 21H1.4l8-9.2L1 3h6.7l4.7 5.7L18 3zm-2.4 16h1.7L7.2 5H5.4L15.6 19z" />
-                </svg>
+                <span className="text-xs font-semibold" aria-hidden>X</span>
               </Social>
               <Social href="#linkedin" label="LinkedIn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M4 4a2 2 0 110 4 2 2 0 010-4zm-1 6h2v10H3V10zm5 0h2v1.5h.05c.3-.55 1.1-1.5 2.55-1.5 2.7 0 3.4 1.7 3.4 4V20h-2v-4.6c0-1.1-.05-2.5-1.55-2.5s-1.8 1.2-1.8 2.45V20H8V10z" />
-                </svg>
+                <span className="text-[0.65rem] font-semibold" aria-hidden>IN</span>
               </Social>
             </li>
           </ul>
