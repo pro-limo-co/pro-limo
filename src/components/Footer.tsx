@@ -65,23 +65,30 @@ export function Footer() {
               service area. Crafted by chauffeurs, for the people they drive.
             </p>
 
-            <form className="mt-10 max-w-sm">
+            <form
+              action={`mailto:${siteConfig.contact.email}?subject=Subscribe%20to%20The%20Dispatch`}
+              encType="text/plain"
+              method="post"
+              className="mt-10 max-w-sm"
+            >
               <Label htmlFor="dispatch-email" className="font-condensed text-[0.72rem] tracking-[0.24em] uppercase text-[color:var(--color-pewter)]">
                 The dispatch, quarterly
               </Label>
               <div className="mt-3 flex items-center gap-2 border-b border-[color:var(--color-divider)] focus-within:border-[color:var(--color-champagne)] transition-colors">
                 <Input
                   id="dispatch-email"
+                  name="email"
                   type="email"
                   placeholder="you@yourdomain.com"
+                  required
                   className="h-11 border-0 bg-transparent px-0 text-[0.95rem] text-[color:var(--color-bone)] shadow-none placeholder:text-[color:var(--color-pewter-dim)] focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 <Button
-                  type="button"
+                  type="submit"
                   aria-label="Subscribe to The Dispatch"
                   variant="ghost"
                   size="icon"
-                  className="text-[color:var(--color-champagne-bright)] hover:text-[color:var(--color-ink)]"
+                  className="size-11 shrink-0 text-[color:var(--color-champagne-bright)] hover:text-[color:var(--color-ink)]"
                 >
                   <ArrowRight className="size-[18px]" aria-hidden />
                 </Button>
@@ -157,7 +164,7 @@ function Social({
       aria-label={label}
       rel="noreferrer"
       target="_blank"
-      className="inline-flex size-9 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] hover:border-[color:var(--color-champagne)] transition-colors"
+      className="inline-flex size-11 items-center justify-center rounded-full border border-[color:var(--color-divider)] text-[color:var(--color-bone-dim)] hover:text-[color:var(--color-champagne-bright)] hover:border-[color:var(--color-champagne)] transition-colors"
     >
       {children}
     </a>
