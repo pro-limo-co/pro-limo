@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as betterAuth_adapter from "../betterAuth/adapter.js";
 import type * as betterAuth_auth from "../betterAuth/auth.js";
 import type * as bookings from "../bookings.js";
+import type * as fleet from "../fleet.js";
 import type * as handoffs from "../handoffs.js";
 import type * as http from "../http.js";
 import type * as lib_rateLimits from "../lib/rateLimits.js";
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   "betterAuth/adapter": typeof betterAuth_adapter;
   "betterAuth/auth": typeof betterAuth_auth;
   bookings: typeof bookings;
+  fleet: typeof fleet;
   handoffs: typeof handoffs;
   http: typeof http;
   "lib/rateLimits": typeof lib_rateLimits;

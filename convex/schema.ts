@@ -58,6 +58,38 @@ export default defineSchema({
     .index("by_active_and_sortOrder", ["active", "sortOrder"])
     .index("by_sortOrder", ["sortOrder"]),
 
+  driverProfiles: defineTable({
+    key: v.string(),
+    name: v.string(),
+    email: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    active: v.boolean(),
+    notes: v.optional(v.string()),
+    sortOrder: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_key", ["key"])
+    .index("by_active_and_sortOrder", ["active", "sortOrder"])
+    .index("by_sortOrder", ["sortOrder"]),
+
+  vehicleProfiles: defineTable({
+    key: v.string(),
+    label: v.string(),
+    vehicleType: v.string(),
+    capacity: v.number(),
+    luggageCapacity: v.string(),
+    licensePlate: v.optional(v.string()),
+    active: v.boolean(),
+    notes: v.optional(v.string()),
+    sortOrder: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_key", ["key"])
+    .index("by_active_and_sortOrder", ["active", "sortOrder"])
+    .index("by_sortOrder", ["sortOrder"]),
+
   bookings: defineTable({
     publicReference: v.string(),
     bookingMode: v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport")),

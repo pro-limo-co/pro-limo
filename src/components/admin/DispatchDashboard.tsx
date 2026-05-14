@@ -61,6 +61,8 @@ type Booking = FunctionReturnType<typeof api.bookings.listForDispatch>[number];
 type Handoff = FunctionReturnType<typeof api.handoffs.listForBooking>[number];
 type BookingEvent = FunctionReturnType<typeof api.bookings.listEvents>[number];
 type RateProfile = FunctionReturnType<typeof api.rates.list>[number];
+type DriverProfile = FunctionReturnType<typeof api.fleet.listDrivers>[number];
+type VehicleProfile = FunctionReturnType<typeof api.fleet.listVehicles>[number];
 type DispatchDraft = {
   status: Status;
   quote: string;
@@ -122,6 +124,8 @@ type RateQuoteDraftAction = {
   type: keyof RateQuoteDraft;
   value: string;
 };
+const UNASSIGNED_SELECT_VALUE = "__unassigned";
+const CUSTOM_SELECT_VALUE = "__custom";
 
 export function DispatchDashboard({
   title = "Staff queue",
@@ -134,6 +138,8 @@ export function DispatchDashboard({
   const viewer = useQuery(api.auth.getViewer);
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
   const rateProfiles = useQuery(api.rates.list, viewer?.staff ? {} : "skip");
+  const driverProfiles = useQuery(api.fleet.listDrivers, viewer?.staff ? {} : "skip");
+  const vehicleProfiles = useQuery(api.fleet.listVehicles, viewer?.staff ? {} : "skip");
   const bookings = useQuery(
     api.bookings.listForDispatch,
     viewer?.staff
@@ -218,6 +224,7 @@ export function DispatchDashboard({
 
   const visibleBookingCount = bookings?.length;
   const queueLabel = getQueueLabel(status);
+  const fleetLabel = getFleetLabel(driverProfiles, vehicleProfiles);
 
   return (
     <DispatchShell
@@ -226,7 +233,7 @@ export function DispatchDashboard({
       stats={[
         { label: "Queue", value: queueLabel },
         { label: "Visible rides", value: visibleBookingCount === undefined ? "Loading" : String(visibleBookingCount) },
-        { label: "Realtime", value: "Live" },
+        { label: "Fleet", value: fleetLabel },
       ]}
     >
       <div className="no-scrollbar mt-6 flex items-center gap-2 overflow-x-auto pb-1">
@@ -261,7 +268,9 @@ export function DispatchDashboard({
               key={booking._id}
               booking={booking}
               initialOpen={index === 0}
+              driverProfiles={driverProfiles ?? []}
               rateProfiles={rateProfiles ?? []}
+              vehicleProfiles={vehicleProfiles ?? []}
             />
           ))
         )}
@@ -272,12 +281,16 @@ export function DispatchDashboard({
 
 function DispatchBookingRow({
   booking,
+  driverProfiles,
   initialOpen,
   rateProfiles,
+  vehicleProfiles,
 }: {
   booking: Booking;
+  driverProfiles: DriverProfile[];
   initialOpen: boolean;
   rateProfiles: RateProfile[];
+  vehicleProfiles: VehicleProfile[];
 }) {
   const updateDispatch = useMutation(api.bookings.updateDispatch);
   const addNote = useMutation(api.bookings.addNote);
@@ -445,13 +458,26 @@ function DispatchBookingRow({
           <BookingDetailsSection booking={booking} routeSummary={routeSummary} />
           <DispatchEditorSection
             booking={booking}
+            driverProfiles={driverProfiles}
             dispatchDraft={dispatchDraft}
             draft={draft}
+            onSelectDriverProfile={(driver) => {
+              dispatchDraft({ type: "driver", value: driver?.name ?? "" });
+              dispatchRowUi({
+                type: "handoffDraft",
+                value: {
+                  recipientEmail: driver?.email ?? "",
+                  recipientName: driver?.name ?? "",
+                  recipientPhone: driver?.phone ?? "",
+                },
+              });
+            }}
             onOpenCheckout={openCheckout}
             onSaveDispatch={saveDispatch}
             onSaveNote={saveNote}
             pending={pending}
             rateProfiles={rateProfiles}
+            vehicleProfiles={vehicleProfiles}
           />
           <DriverLinkSection
             booking={booking}
@@ -570,24 +596,32 @@ function BookingDetailsSection({
 
 function DispatchEditorSection({
   booking,
+  driverProfiles,
   dispatchDraft,
   draft,
+  onSelectDriverProfile,
   onOpenCheckout,
   onSaveDispatch,
   onSaveNote,
   pending,
   rateProfiles,
+  vehicleProfiles,
 }: {
   booking: Booking;
+  driverProfiles: DriverProfile[];
   dispatchDraft: (action: DispatchDraftAction) => void;
   draft: DispatchDraft;
+  onSelectDriverProfile: (driver: DriverProfile | null) => void;
   onOpenCheckout: () => Promise<void>;
   onSaveDispatch: () => Promise<void>;
   onSaveNote: () => Promise<void>;
   pending: boolean;
   rateProfiles: RateProfile[];
+  vehicleProfiles: VehicleProfile[];
 }) {
   const terminalBooking = isTerminalBooking(booking.status);
+  const activeDrivers = driverProfiles.filter((driver) => driver.active);
+  const activeVehicles = vehicleProfiles.filter((vehicle) => vehicle.active);
 
   if (terminalBooking) {
     return (
@@ -646,9 +680,21 @@ function DispatchEditorSection({
           onChange={(value) => dispatchDraft({ type: "quote", value })}
           inputMode="decimal"
         />
+        <DriverProfileSelect
+          bookingId={booking._id}
+          drivers={activeDrivers}
+          value={draft.driver}
+          onChange={onSelectDriverProfile}
+        />
+        <VehicleProfileSelect
+          bookingId={booking._id}
+          vehicles={activeVehicles}
+          value={draft.vehicle}
+          onChange={(vehicle) => dispatchDraft({ type: "vehicle", value: vehicle?.label ?? "" })}
+        />
         <TextField
           id={`vehicle-${booking._id}`}
-          label="Vehicle"
+          label="Vehicle label"
           value={draft.vehicle}
           onChange={(value) => dispatchDraft({ type: "vehicle", value })}
           placeholder="Escalade"
@@ -1145,6 +1191,9 @@ function DispatchShell({
               <Button asChild variant="outline" className="self-start sm:self-auto">
                 <Link href="/admin/rates">Rates</Link>
               </Button>
+              <Button asChild variant="outline" className="self-start sm:self-auto">
+                <Link href="/admin/fleet">Fleet</Link>
+              </Button>
               <Button
                 type="button"
                 variant="outline"
@@ -1253,6 +1302,25 @@ function getQueueLabel(status: StatusView) {
   if (status === "active") return "Active";
   if (status === "all") return "All rides";
   return formatStatus(status);
+}
+
+function getFleetLabel(drivers?: DriverProfile[], vehicles?: VehicleProfile[]) {
+  if (!drivers || !vehicles) return "Loading";
+  const activeDrivers = drivers.filter((driver) => driver.active).length;
+  const activeVehicles = vehicles.filter((vehicle) => vehicle.active).length;
+  return `${activeDrivers} drivers / ${activeVehicles} vehicles`;
+}
+
+function getDriverProfileSelectValue(value: string, drivers: DriverProfile[]) {
+  const trimmed = value.trim();
+  if (!trimmed) return UNASSIGNED_SELECT_VALUE;
+  return drivers.find((driver) => driver.name === trimmed)?.key ?? CUSTOM_SELECT_VALUE;
+}
+
+function getVehicleProfileSelectValue(value: string, vehicles: VehicleProfile[]) {
+  const trimmed = value.trim();
+  if (!trimmed) return UNASSIGNED_SELECT_VALUE;
+  return vehicles.find((vehicle) => vehicle.label === trimmed)?.key ?? CUSTOM_SELECT_VALUE;
 }
 
 function SectionHeading({ title, description }: { title: string; description: string }) {
@@ -1379,6 +1447,108 @@ function StatusSelect({
           ))}
         </SelectContent>
       </Select>
+    </div>
+  );
+}
+
+function DriverProfileSelect({
+  bookingId,
+  drivers,
+  onChange,
+  value,
+}: {
+  bookingId: string;
+  drivers: DriverProfile[];
+  onChange: (driver: DriverProfile | null) => void;
+  value: string;
+}) {
+  const selectValue = getDriverProfileSelectValue(value, drivers);
+  const manualLabel = value.trim() ? `Manual: ${value.trim()}` : "Manual";
+
+  return (
+    <div>
+      <Label htmlFor={`driver-profile-${bookingId}`}>Saved driver</Label>
+      <Select
+        value={selectValue}
+        onValueChange={(nextValue) => {
+          if (nextValue === UNASSIGNED_SELECT_VALUE) {
+            onChange(null);
+            return;
+          }
+          if (nextValue === CUSTOM_SELECT_VALUE) return;
+
+          onChange(drivers.find((driver) => driver.key === nextValue) ?? null);
+        }}
+      >
+        <SelectTrigger id={`driver-profile-${bookingId}`} className="mt-2">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="pld-ui">
+          <SelectItem value={UNASSIGNED_SELECT_VALUE}>No saved driver</SelectItem>
+          {drivers.map((driver) => (
+            <SelectItem key={driver.key} value={driver.key}>
+              {driver.name}
+            </SelectItem>
+          ))}
+          {selectValue === CUSTOM_SELECT_VALUE && (
+            <SelectItem value={CUSTOM_SELECT_VALUE}>{manualLabel}</SelectItem>
+          )}
+        </SelectContent>
+      </Select>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        Saved drivers fill the handoff name, email, and phone.
+      </p>
+    </div>
+  );
+}
+
+function VehicleProfileSelect({
+  bookingId,
+  onChange,
+  value,
+  vehicles,
+}: {
+  bookingId: string;
+  onChange: (vehicle: VehicleProfile | null) => void;
+  value: string;
+  vehicles: VehicleProfile[];
+}) {
+  const selectValue = getVehicleProfileSelectValue(value, vehicles);
+  const manualLabel = value.trim() ? `Manual: ${value.trim()}` : "Manual";
+
+  return (
+    <div>
+      <Label htmlFor={`vehicle-profile-${bookingId}`}>Saved vehicle</Label>
+      <Select
+        value={selectValue}
+        onValueChange={(nextValue) => {
+          if (nextValue === UNASSIGNED_SELECT_VALUE) {
+            onChange(null);
+            return;
+          }
+          if (nextValue === CUSTOM_SELECT_VALUE) return;
+
+          onChange(vehicles.find((vehicle) => vehicle.key === nextValue) ?? null);
+        }}
+      >
+        <SelectTrigger id={`vehicle-profile-${bookingId}`} className="mt-2">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="pld-ui">
+          <SelectItem value={UNASSIGNED_SELECT_VALUE}>No saved vehicle</SelectItem>
+          {vehicles.map((vehicle) => (
+            <SelectItem key={vehicle.key} value={vehicle.key}>
+              {vehicle.label}
+            </SelectItem>
+          ))}
+          {selectValue === CUSTOM_SELECT_VALUE && (
+            <SelectItem value={CUSTOM_SELECT_VALUE}>{manualLabel}</SelectItem>
+          )}
+        </SelectContent>
+      </Select>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        Use the freeform label for affiliate or temporary vehicles.
+      </p>
     </div>
   );
 }
