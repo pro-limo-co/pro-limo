@@ -189,7 +189,7 @@ export function DispatchDashboard({
 
   return (
     <DispatchShell title={title} showSignOut>
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="no-scrollbar mt-6 flex items-center gap-2 overflow-x-auto pb-1">
         <FilterButton label="Active" active={status === "active"} onClick={() => setStatus("active")} />
         <FilterButton label="All" active={status === "all"} onClick={() => setStatus("all")} />
         {statuses.map((item) => (
@@ -878,7 +878,7 @@ function FilterButton({
   onClick: () => void;
 }) {
   return (
-    <Button type="button" variant={active ? "default" : "outline"} size="sm" onClick={onClick}>
+    <Button type="button" variant={active ? "default" : "outline"} size="sm" className="shrink-0" onClick={onClick}>
       {label}
     </Button>
   );
