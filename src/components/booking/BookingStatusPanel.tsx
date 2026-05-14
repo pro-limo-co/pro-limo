@@ -87,7 +87,10 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
             value={`${booking.pickupDate} at ${booking.pickupTime}`}
           />
           <StatusFact icon={<UserRound className="size-4" />} label="Passenger" value={booking.customerName} />
-          <StatusFact icon={<CarFront className="size-4" />} label="Chauffeur" value={booking.assignedChauffeurName ?? "Dispatch assigning"} />
+          <StatusFact icon={<UserRound className="size-4" />} label="Chauffeur" value={booking.assignedChauffeurName ?? "Dispatch assigning"} />
+          {booking.vehicleLabel && (
+            <StatusFact icon={<CarFront className="size-4" />} label="Vehicle" value={booking.vehicleLabel} />
+          )}
           <StatusFact icon={<CreditCard className="size-4" />} label="Payment" value={formatPaymentStatus(booking.paymentStatus)} />
         </div>
       </div>
