@@ -9,6 +9,7 @@ import { api } from "@convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { siteConfig } from "@/lib/seo";
 import { formatStatus } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
@@ -132,6 +133,9 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
         <Button asChild variant="outline">
           <Link href="/services">View services</Link>
         </Button>
+        <Button asChild variant="outline">
+          <a href={`mailto:${siteConfig.contact.email}`}>Contact concierge</a>
+        </Button>
       </div>
     </StatusShell>
   );
@@ -156,7 +160,7 @@ function StatusStep({
     >
       <span className="font-medium">{step.label}</span>
       <Badge variant={state === "current" ? "default" : "outline"}>
-        {formatStatus(state)}
+        {formatStepState(state)}
       </Badge>
     </li>
   );
@@ -180,9 +184,7 @@ function StatusShell({
         {reference.toUpperCase()}
       </h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-        {status === "canceled"
-          ? "This booking is closed in ProLimo OS."
-          : "This page updates from ProLimo OS as dispatch and the driver move the ride forward."}
+        {getStatusShellDescription(status)}
       </p>
       <div className="mt-8">{children}</div>
     </section>
@@ -233,13 +235,25 @@ function getStatusDescription(booking: Booking) {
 function getStepState(current: BookingStatus, step: (typeof statusSteps)[number]["value"]) {
   const currentIndex = statusSteps.findIndex((item) => item.value === current);
   const stepIndex = statusSteps.findIndex((item) => item.value === step);
+  if (current === "completed" && stepIndex <= currentIndex) return "done";
   if (stepIndex < currentIndex) return "done";
   if (stepIndex === currentIndex) return "current";
   return "pending";
 }
 
+function getStatusShellDescription(status?: BookingStatus) {
+  if (status === "canceled") return "This booking is closed in ProLimo OS.";
+  if (status === "completed") return "This ride is complete. The booking record remains here for reference.";
+  return "This page updates from ProLimo OS as dispatch and the driver move the ride forward.";
+}
+
+function formatStepState(state: "current" | "done" | "pending") {
+  if (state === "current") return "Now";
+  return formatStatus(state);
+}
+
 function formatPaymentStatus(status: Booking["paymentStatus"]) {
-  if (status === "not_started") return "Payment pending";
+  if (status === "not_started") return "Dispatch billing";
   if (status === "quote_required") return "Quote pending";
   return formatStatus(status);
 }
