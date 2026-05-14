@@ -100,7 +100,7 @@ export function RateManagementPanel() {
 
   if (!viewer.staff) {
     return (
-      <RatesShell>
+      <RatesShell showSignOut>
         <Card className="mt-8 max-w-xl">
           <CardHeader>
             <CardTitle>Rates are staff-only</CardTitle>
@@ -120,7 +120,7 @@ export function RateManagementPanel() {
   const savedProfileCount = profiles?.filter((profile) => profile.source === "saved").length ?? 0;
 
   return (
-    <RatesShell>
+    <RatesShell showSignOut>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <StatCard label="Profiles" value={profiles === undefined ? "Loading" : String(profiles.length)} />
         <StatCard label="Saved" value={String(savedProfileCount)} />
@@ -309,7 +309,13 @@ function RateProfileCard({
   );
 }
 
-function RatesShell({ children }: { children: ReactNode }) {
+function RatesShell({
+  children,
+  showSignOut = false,
+}: {
+  children: ReactNode;
+  showSignOut?: boolean;
+}) {
   return (
     <section className="pld-ui min-h-[100svh] bg-muted/30 text-foreground">
       <div className="mx-auto max-w-[1500px] px-6 pt-28 pb-16 lg:px-10">
@@ -322,17 +328,19 @@ function RatesShell({ children }: { children: ReactNode }) {
               Rates
             </h1>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="self-start md:self-auto"
-            onClick={async () => {
-              await authClient.signOut();
-              window.location.href = "/";
-            }}
-          >
-            Sign out
-          </Button>
+          {showSignOut && (
+            <Button
+              type="button"
+              variant="outline"
+              className="self-start md:self-auto"
+              onClick={async () => {
+                await authClient.signOut();
+                window.location.href = "/";
+              }}
+            >
+              Sign out
+            </Button>
+          )}
         </div>
         {children}
       </div>
