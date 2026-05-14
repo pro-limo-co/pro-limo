@@ -380,11 +380,11 @@ function DispatchBookingRow({
             handoffDraft={handoffDraft}
             handoffResult={handoffResult}
             handoffs={latestHandoffs}
-            message={message}
             onHandoffDraftChange={(value) => dispatchRowUi({ type: "handoffDraft", value })}
             onPrepareHandoff={prepareHandoff}
             pending={pending}
           />
+          {message && <RowMessage>{message}</RowMessage>}
           <OperationsLogSection events={events ?? []} loading={events === undefined} />
         </CardContent>
       )}
@@ -519,7 +519,7 @@ function DispatchEditorSection({
             : "Set quote, driver, vehicle, and status."
         }
       />
-      <InfoRow label="Payment" value={booking.paymentStatus} />
+      <InfoRow label="Payment" value={formatPaymentStatus(booking.paymentStatus)} />
       <StatusSelect
         id={`status-${booking._id}`}
         value={draft.status}
@@ -602,7 +602,6 @@ function DriverLinkSection({
   handoffDraft,
   handoffResult,
   handoffs,
-  message,
   onHandoffDraftChange,
   onPrepareHandoff,
   pending,
@@ -611,7 +610,6 @@ function DriverLinkSection({
   handoffDraft: HandoffDraft;
   handoffResult: HandoffResult | null;
   handoffs: Handoff[];
-  message: string;
   onHandoffDraftChange: (value: Partial<HandoffDraft>) => void;
   onPrepareHandoff: () => Promise<void>;
   pending: boolean;
@@ -667,7 +665,6 @@ function DriverLinkSection({
             handoffDraft={handoffDraft}
             handoffResult={handoffResult}
             handoffs={handoffs}
-            message={message}
             onHandoffDraftChange={onHandoffDraftChange}
             onPrepareHandoff={onPrepareHandoff}
             pending={pending}
@@ -732,7 +729,6 @@ function DriverLinkControls({
   handoffDraft,
   handoffResult,
   handoffs,
-  message,
   onHandoffDraftChange,
   onPrepareHandoff,
   pending,
@@ -741,7 +737,6 @@ function DriverLinkControls({
   handoffDraft: HandoffDraft;
   handoffResult: HandoffResult | null;
   handoffs: Handoff[];
-  message: string;
   onHandoffDraftChange: (value: Partial<HandoffDraft>) => void;
   onPrepareHandoff: () => Promise<void>;
   pending: boolean;
@@ -779,11 +774,6 @@ function DriverLinkControls({
         />
       )}
       <RecentHandoffs booking={booking} excludedRideUrl={handoffResult?.rideUrl} handoffs={handoffs} />
-      {message && (
-        <p className="rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground" aria-live="polite">
-          {message}
-        </p>
-      )}
     </>
   );
 }
@@ -895,6 +885,14 @@ function SectionHeading({ title, description }: { title: string; description: st
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
       <p className="mt-1 break-words text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">{description}</p>
     </div>
+  );
+}
+
+function RowMessage({ children }: { children: ReactNode }) {
+  return (
+    <p className="rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground lg:col-span-3" aria-live="polite">
+      {children}
+    </p>
   );
 }
 
@@ -1079,6 +1077,12 @@ function isTerminalBooking(status: string) {
 
 function formatStatusInSentence(status: string) {
   return formatStatus(status).toLowerCase();
+}
+
+function formatPaymentStatus(status: string) {
+  if (status === "not_started") return "Payment pending";
+  if (status === "quote_required") return "Quote pending";
+  return formatStatus(status);
 }
 
 function formatPassengerCount(count: number) {
