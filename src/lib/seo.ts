@@ -1,7 +1,9 @@
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") || "https://prolimodriver.com";
+
 export const siteConfig = {
   name: "Professional Limousine Driver",
   legalName: "Professional Limousine Driver",
-  url: "https://prolimodriver.com",
+  url: siteUrl,
   ogImage: "/api/og",
   description:
     "Private chauffeur and airport car service centered on Portland, with service across the Portland metro, the coast, the valley, Puget Sound, and other regional routes.",

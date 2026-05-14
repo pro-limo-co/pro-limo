@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono, Oswald } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { siteConfig } from "@/lib/seo";
 import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 import "./globals.css";
 
@@ -32,7 +33,7 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://prolimodriver.com"),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: "Professional Limousine Driver - Portland Chauffeur Service",
     template: "%s - Professional Limousine Driver",
