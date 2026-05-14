@@ -210,11 +210,11 @@ export function DispatchDashboard({
             </CardContent>
           </Card>
         ) : bookings.length === 0 ? (
-          <Card>
-            <CardContent className="py-6 text-sm text-muted-foreground">
-              {getEmptyQueueMessage(status)}
-            </CardContent>
-          </Card>
+          <EmptyQueueState
+            status={status}
+            onViewActive={() => setStatus("active")}
+            onViewAll={() => setStatus("all")}
+          />
         ) : (
           bookings.map((booking, index) => (
             <DispatchBookingRow key={booking._id} booking={booking} initialOpen={index === 0} />
@@ -887,6 +887,48 @@ function FilterButton({
     <Button type="button" variant={active ? "default" : "outline"} size="sm" className="shrink-0" onClick={onClick}>
       {label}
     </Button>
+  );
+}
+
+function EmptyQueueState({
+  onViewActive,
+  onViewAll,
+  status,
+}: {
+  onViewActive: () => void;
+  onViewAll: () => void;
+  status: StatusView;
+}) {
+  const active = status === "active";
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">
+          {active ? "Active queue is clear" : "No bookings in this view"}
+        </CardTitle>
+        <CardDescription>
+          {getEmptyQueueMessage(status)}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-2 pt-0 sm:grid-cols-[auto_auto] sm:justify-start">
+        {active ? (
+          <Button type="button" variant="outline" onClick={onViewAll}>
+            View all bookings
+          </Button>
+        ) : (
+          <Button type="button" variant="outline" onClick={onViewActive}>
+            View active queue
+          </Button>
+        )}
+        <Button asChild>
+          <Link href="/#book">
+            <Plus className="size-4" aria-hidden />
+            Open booking form
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
