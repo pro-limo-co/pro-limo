@@ -15,6 +15,15 @@ const bookingStatus = v.union(
   v.literal("canceled"),
 );
 
+const activeBookingStatuses = [
+  "new",
+  "quoted",
+  "assigned",
+  "driver_en_route",
+  "arrived",
+  "in_progress",
+] as const;
+
 const optionalString = v.optional(v.string());
 
 export const create = mutation({
@@ -89,6 +98,7 @@ export const getByReference = query({
 export const listForDispatch = query({
   args: {
     status: v.optional(bookingStatus),
+    statusGroup: v.optional(v.literal("active")),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
@@ -103,6 +113,21 @@ export const listForDispatch = query({
         .withIndex("by_status_and_createdAt", (q) => q.eq("status", status))
         .order("desc")
         .take(limit);
+    } else if (args.statusGroup === "active") {
+      const perStatusLimit = Math.max(8, Math.ceil(limit / activeBookingStatuses.length));
+      const groups = await Promise.all(
+        activeBookingStatuses.map((activeStatus) =>
+          ctx.db
+            .query("bookings")
+            .withIndex("by_status_and_createdAt", (q) => q.eq("status", activeStatus))
+            .order("desc")
+            .take(perStatusLimit),
+        ),
+      );
+      bookings = groups
+        .flat()
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, limit);
     } else {
       bookings = await ctx.db.query("bookings").order("desc").take(limit);
     }

@@ -39,6 +39,8 @@ const statuses = [
   "canceled",
 ] as const;
 
+const statusSet = new Set<string>(statuses);
+
 const eventTimestampFormatter = new Intl.DateTimeFormat(undefined, {
   month: "short",
   day: "numeric",
@@ -47,6 +49,7 @@ const eventTimestampFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 type Status = (typeof statuses)[number];
+type StatusView = "active" | "all" | Status;
 type Booking = FunctionReturnType<typeof api.bookings.listForDispatch>[number];
 type Handoff = FunctionReturnType<typeof api.handoffs.listForBooking>[number];
 type BookingEvent = FunctionReturnType<typeof api.bookings.listEvents>[number];
@@ -97,7 +100,7 @@ export function DispatchDashboard({
 }: {
   title?: string;
 }) {
-  const [status, setStatus] = useState<Status | "all">("all");
+  const [status, setStatus] = useState<StatusView>("active");
   const [claimAccessMessage, setClaimAccessMessage] = useState("");
   const [claimAccessPending, setClaimAccessPending] = useState(false);
   const viewer = useQuery(api.auth.getViewer);
@@ -106,7 +109,8 @@ export function DispatchDashboard({
     api.bookings.listForDispatch,
     viewer?.staff
       ? {
-          status: status === "all" ? undefined : status,
+          status: isStatus(status) ? status : undefined,
+          statusGroup: status === "active" ? "active" : undefined,
           limit: 80,
         }
       : "skip",
@@ -186,6 +190,7 @@ export function DispatchDashboard({
   return (
     <DispatchShell title={title} showSignOut>
       <div className="mt-6 flex flex-wrap items-center gap-2">
+        <FilterButton label="Active" active={status === "active"} onClick={() => setStatus("active")} />
         <FilterButton label="All" active={status === "all"} onClick={() => setStatus("all")} />
         {statuses.map((item) => (
           <FilterButton
@@ -207,7 +212,7 @@ export function DispatchDashboard({
         ) : bookings.length === 0 ? (
           <Card>
             <CardContent className="py-6 text-sm text-muted-foreground">
-              No bookings in this view.
+              {getEmptyQueueMessage(status)}
             </CardContent>
           </Card>
         ) : (
@@ -877,6 +882,15 @@ function FilterButton({
       {label}
     </Button>
   );
+}
+
+function isStatus(value: StatusView): value is Status {
+  return statusSet.has(value);
+}
+
+function getEmptyQueueMessage(status: StatusView) {
+  if (status === "active") return "No active bookings need dispatch right now.";
+  return "No bookings in this view.";
 }
 
 function SectionHeading({ title, description }: { title: string; description: string }) {
