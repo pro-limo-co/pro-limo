@@ -424,21 +424,21 @@
 
 <section class="summary" id="summary">
   <h3>Status snapshot</h3>
-  <!-- 12 goals total. SI2 merged; SI1 in review on this branch; SM1 in review on its own branch (PR #2). -->
+  <!-- 12 goals total. SI1 + SI2 merged; SM1 in review on this branch (PR #2). -->
   <div class="summary-bar" aria-label="Goal status distribution">
-    <div class="s-merged"  style="width:8.3%"></div>
+    <div class="s-merged"  style="width:16.7%"></div>
     <div class="s-review"  style="width:8.3%"></div>
     <div class="s-flight"  style="width:0%"></div>
     <div class="s-blocked" style="width:0%"></div>
-    <div class="s-todo"    style="width:58.4%"></div>
+    <div class="s-todo"    style="width:50%"></div>
     <div class="s-defer"   style="width:25%"></div>
   </div>
   <div class="summary-legend">
-    <span><span class="swatch sw-merged"></span>Merged · 1</span>
+    <span><span class="swatch sw-merged"></span>Merged · 2</span>
     <span><span class="swatch sw-review"></span>In review · 1</span>
     <span><span class="swatch sw-flight"></span>In flight · 0</span>
     <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
-    <span><span class="swatch sw-todo"></span>To do · 7</span>
+    <span><span class="swatch sw-todo"></span>To do · 6</span>
     <span><span class="swatch sw-defer"></span>Deferred · 3</span>
   </div>
 </section>
@@ -463,11 +463,11 @@
 
 <div class="goal-grid">
 
-  <article class="goal is-todo" id="SM1">
+  <article class="goal is-flight" id="SM1">
     <div class="goal-head">
       <span class="goal-code">SM1</span>
       <span class="goal-title">Adopt <code>locationValidator</code> on <code>bookings</code></span>
-      <span class="goal-status">To do</span>
+      <span class="goal-status">In flight</span>
     </div>
     <p class="goal-why">Replace <code>pickupLocation</code> / <code>dropoffLocation</code> <code>v.string()</code> with the structured shape from mobile (<code>{address?, city?, state?, zip?, lat, lng, placeId?, name?}</code>). Prerequisite for autocomplete, routing, map previews.</p>
     <dl class="goal-body">
@@ -602,11 +602,11 @@
 
 <div class="goal-grid">
 
-  <article class="goal is-review" id="SI1">
+  <article class="goal is-merged" id="SI1">
     <div class="goal-head">
       <span class="goal-code">SI1</span>
       <span class="goal-title"><code>notificationQueue</code> data plane</span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">Queue&#8209;with&#8209;retry table for outbound notifications (email, SMS). Foundational dependency for <a href="#ST2">ST2</a>. <strong>Scope split:</strong> SI1 ships the table + internal helpers; the cron + sender land with <a href="#ST1">ST1</a> so no row is ever stuck pending without a sender.</p>
     <dl class="goal-body">
@@ -614,7 +614,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:438</code>, <code>convex/notificationQueue.ts</code></dd>
       <dt>Adapt</dt><dd>No <code>userId</code> (web supports guest bookings); rows are booking&#8209;scoped via optional <code>bookingId</code>. Channel union = <code>"email" | "sms"</code> (no push on web). Staff&#8209;facing query uses <code>requireStaff</code>.</dd>
       <dt>Done when</dt><dd>Schema is live; internal helpers (enqueue, listPending, markSent, markFailed-with-backoff, cancelForBooking) exist; dispatch can list per booking. Cron + sender follow in ST1.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/4">#4</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/4">#4</a> &middot; merged</dd>
     </dl>
   </article>
 
