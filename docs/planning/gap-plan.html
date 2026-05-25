@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Salvage Map — pro-limo (web), mining ASTC (mobile)</title>
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --ink: #1a1816;
+    --ink-soft: #4a4640;
+    --ink-mute: #7a746b;
+    --divider: #e8e3da;
+    --champagne: #b89968;
+    --champagne-soft: #f4ecdc;
+    --ok: #2f7a3f;
+    --warn: #b07a16;
+    --gone: #b03434;
+    --na: #7a746b;
+    --code-bg: #f4f1ec;
+    --lift: #2f7a3f;
+    --lift-soft: rgba(47, 122, 63, 0.10);
+    --skip: #b03434;
+    --skip-soft: rgba(176, 52, 52, 0.08);
+    --defer: #b07a16;
+    --defer-soft: rgba(176, 122, 22, 0.08);
+    --shadow: 0 1px 2px rgba(20, 16, 10, 0.04), 0 2px 8px rgba(20, 16, 10, 0.03);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14110d;
+      --surface: #1c1813;
+      --ink: #f3eee3;
+      --ink-soft: #c8c0b1;
+      --ink-mute: #8c8475;
+      --divider: #2b251c;
+      --champagne: #cba973;
+      --champagne-soft: #2a2118;
+      --ok: #6fb87e;
+      --warn: #d4a85a;
+      --gone: #e07a7a;
+      --na: #8c8475;
+      --code-bg: #221d16;
+      --lift: #6fb87e;
+      --lift-soft: rgba(111, 184, 126, 0.10);
+      --skip: #e07a7a;
+      --skip-soft: rgba(224, 122, 122, 0.10);
+      --defer: #d4a85a;
+      --defer-soft: rgba(212, 168, 90, 0.10);
+      --shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  header.hero {
+    border-bottom: 1px solid var(--divider);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 11px;
+    color: var(--champagne);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Georgia", serif;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    margin: 12px 0 8px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 17px;
+    margin: 0;
+  }
+  .meta {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--ink-mute);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta span::before { content: "·"; margin-right: 16px; color: var(--divider); }
+  .meta span:first-child::before { content: none; margin-right: 0; }
+
+  h2 {
+    font-family: "SF Pro Display", -apple-system, sans-serif;
+    font-size: 24px;
+    margin: 56px 0 16px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+  }
+  h3 {
+    font-size: 17px;
+    margin: 32px 0 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  h4 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    margin: 24px 0 8px;
+    font-weight: 600;
+  }
+  p { margin: 0 0 12px; color: var(--ink-soft); }
+  ul, ol { padding-left: 22px; color: var(--ink-soft); }
+  li { margin-bottom: 4px; }
+  li::marker { color: var(--champagne); }
+  ol li::marker { color: var(--champagne); font-weight: 600; }
+
+  code {
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    color: var(--ink);
+    border: 1px solid var(--divider);
+  }
+  a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--champagne);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+  }
+  a:hover { color: var(--champagne); }
+
+  /* Stack-decisions strip */
+  .decisions {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-left: 3px solid var(--champagne);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 20px 0 8px;
+    box-shadow: var(--shadow);
+    font-size: 14px;
+  }
+  .decisions h3 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .decisions dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 16px;
+  }
+  .decisions dt { font-weight: 600; color: var(--ink); }
+  .decisions dd { margin: 0; color: var(--ink-soft); }
+
+  /* TLDR */
+  .tldr {
+    margin: 24px 0;
+  }
+  .tldr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .tldr-card {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-top: 3px solid var(--champagne);
+    border-radius: 6px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .tldr-card.lift { border-top-color: var(--lift); }
+  .tldr-card.skip { border-top-color: var(--skip); }
+  .tldr-card.defer { border-top-color: var(--defer); }
+  .tldr-card h3 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+  .tldr-card.lift h3 { color: var(--lift); }
+  .tldr-card.skip h3 { color: var(--skip); }
+  .tldr-card.defer h3 { color: var(--defer); }
+  .tldr-card ol, .tldr-card ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .tldr-card li { margin-bottom: 6px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    font-size: 14px;
+  }
+  th {
+    background: var(--champagne-soft);
+    color: var(--ink);
+    text-align: left;
+    padding: 12px 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--divider);
+    font-size: 13px;
+  }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--divider);
+    vertical-align: top;
+    color: var(--ink-soft);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--champagne-soft); color: var(--ink); }
+  td code, th code { font-size: 0.82em; }
+
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .b-ok { background: rgba(47, 122, 63, 0.12); color: var(--ok); }
+  .b-warn { background: rgba(176, 122, 22, 0.12); color: var(--warn); }
+  .b-gone { background: rgba(176, 52, 52, 0.12); color: var(--gone); }
+  .b-na { background: rgba(122, 116, 107, 0.12); color: var(--na); }
+
+  .verdict {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .v-lift { background: var(--lift-soft); color: var(--lift); }
+  .v-skip { background: var(--skip-soft); color: var(--skip); }
+  .v-defer { background: var(--defer-soft); color: var(--defer); }
+  .v-keep { background: rgba(122, 116, 107, 0.12); color: var(--na); }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 8px 0 20px;
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+
+  .callout {
+    background: var(--champagne-soft);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: var(--ink);
+    border-left: 3px solid var(--champagne);
+  }
+  .callout strong { color: var(--ink); }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: var(--divider);
+    margin: 48px 0;
+  }
+
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 24px 0 40px;
+    font-size: 14px;
+  }
+  .toc strong {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .toc ol {
+    margin: 0;
+    padding-left: 22px;
+    columns: 2;
+    column-gap: 32px;
+  }
+  .toc li { margin-bottom: 4px; break-inside: avoid; }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; text-decoration-color: var(--champagne); }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 32px 18px 64px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 20px; }
+    table { font-size: 13px; display: block; overflow-x: auto; }
+    th, td { padding: 10px 12px; }
+    .toc ol { columns: 1; }
+    .decisions dl { grid-template-columns: 1fr; gap: 2px 0; }
+    .decisions dt { margin-top: 8px; }
+  }
+
+  @media print {
+    body { background: white; color: black; font-size: 12pt; }
+    .toc, .callout, .tldr-card, .decisions { box-shadow: none; }
+    h2 { page-break-after: avoid; }
+    table { page-break-inside: avoid; box-shadow: none; }
+    a { color: black; text-decoration-color: #888; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Salvage map &middot; research artifact</div>
+  <h1>pro&#8209;limo (web) &mdash; mining ASTC (mobile) for what to lift</h1>
+  <p class="subtitle">The web app is the standard. ASTC is shelved. This doc maps what to <strong>lift</strong>, <strong>skip</strong>, or <strong>defer</strong> from the mobile codebase.</p>
+  <div class="meta">
+    <span>2026&ndash;05&ndash;25</span>
+    <span>Research only &mdash; no code proposed</span>
+    <span>Audience: product &amp; eng decision&#8209;makers</span>
+  </div>
+
+  <div class="decisions">
+    <h3>Stack decisions (settled)</h3>
+    <dl>
+      <dt>Auth</dt><dd>Better Auth stays on web. No Clerk migration.</dd>
+      <dt>SMS / phone</dt><dd>Twilio direct (SDK + Convex action), not delegated to an auth provider.</dd>
+      <dt>Maps</dt><dd>Google Maps APIs (Places, Routes, Maps JS) on web.</dd>
+      <dt>Backend</dt><dd>Convex (already in place).</dd>
+      <dt>Payments</dt><dd>Stripe Checkout (already in place).</dd>
+    </dl>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#context">Context</a></li>
+    <li><a href="#tldr">TL;DR &mdash; lift / skip / defer</a></li>
+    <li><a href="#lift">Lift sheet</a></li>
+    <li><a href="#twilio">Twilio &mdash; build fresh</a></li>
+    <li><a href="#maps">Google Maps &mdash; adapt to web</a></li>
+    <li><a href="#matrix">Feature parity matrix</a></li>
+    <li><a href="#sequencing">Recommended sequencing</a></li>
+    <li><a href="#files">Critical files for follow&#8209;up</a></li>
+    <li><a href="#verify">Verification</a></li>
+    <li><a href="#oos">Out of scope</a></li>
+  </ol>
+</nav>
+
+<section id="context">
+<h2>Context</h2>
+<p><strong>The web app is the standard now.</strong> The ASTC Expo/React Native app was built before this web app, never launched, and is being shelved. We&rsquo;re not converging two products &mdash; we&rsquo;re salvaging useful patterns, schema, and code from the mobile codebase to accelerate the web app, which is our canonical product going forward.</p>
+<p>A future mobile app will be a <em>new</em> app built to whatever standards the web app sets &mdash; not a port of ASTC, not something the web has to be compatible with.</p>
+<p>This doc identifies what to <strong>lift, adapt, or skip</strong> from the ASTC codebase. No code is being changed here &mdash; it&rsquo;s a salvage map.</p>
+</section>
+
+<section id="tldr" class="tldr">
+<h2>TL;DR &mdash; lift / skip / defer</h2>
+
+<div class="tldr-grid">
+
+  <div class="tldr-card lift">
+    <h3>Worth lifting</h3>
+    <ol>
+      <li><strong><code>locationValidator</code> schema shape</strong> &mdash; <code>{address?, city?, state?, zip?, lat, lng, placeId?, name?}</code>. Drop into <code>bookings</code>. Unlocks Maps, distance quoting, previews.</li>
+      <li><strong><code>notificationQueue</code> + cron pattern</strong> &mdash; queue&#8209;with&#8209;retry for SMS (Twilio), email, push later. Web has nothing like it today.</li>
+      <li><strong>Quoting flow</strong> &mdash; distance &times; per&#8209;mile + surcharges. Wire to Google <strong>Routes API</strong>, not mobile&rsquo;s Haversine shortcut. Feeds web&rsquo;s existing rich <code>rateProfiles</code> math.</li>
+      <li><strong><code>tripShares</code> table</strong> &mdash; public token&#8209;based shareable links.</li>
+      <li><strong><code>auditLogs</code> table</strong> &mdash; system&#8209;wide mutation audit beyond <code>bookingEvents</code>.</li>
+      <li><strong><code>idempotencyKeys</code> table</strong> &mdash; prevents duplicate booking submissions on retries.</li>
+      <li><strong>Twilio approach</strong> &mdash; <em>not</em> mobile&rsquo;s code (deleted). Build fresh as a Convex action; the schema already models <code>"sms"</code> as a handoff channel.</li>
+    </ol>
+  </div>
+
+  <div class="tldr-card skip">
+    <h3>Skip</h3>
+    <ul>
+      <li>Clerk auth (<code>@clerk/clerk-expo</code>, webhook sync, etc.).</li>
+      <li>Expo push tokens / <code>pushTokens</code> table.</li>
+      <li><code>react-native-maps</code>, <code>@appandflow/react-native-google-autocomplete</code>, <code>@mapbox/polyline</code>.</li>
+      <li><code>(driver)</code> and <code>(owner)</code> Expo UI stacks &mdash; RN-specific.</li>
+      <li><code>syncQueue</code> / <code>syncLogs</code> (LimoAnywhere) &mdash; unless it&rsquo;s on the roadmap.</li>
+    </ul>
+  </div>
+
+  <div class="tldr-card defer">
+    <h3>Defer (useful, not urgent)</h3>
+    <ul>
+      <li><code>recurringBookings</code> + cron generator.</li>
+      <li><code>bookingStops</code> multi-stop trips.</li>
+      <li><code>tripReceipts</code> (PDF in Convex <code>_storage</code>).</li>
+      <li><code>featureFlags</code> table (mobile already modeled a <code>web</code> scope).</li>
+    </ul>
+  </div>
+
+</div>
+</section>
+
+<hr />
+
+<section id="lift">
+<h2>Lift sheet &mdash; what to take from ASTC</h2>
+
+<h3>Schema additions to web <code>convex/schema.ts</code></h3>
+<table>
+<thead><tr><th>Add</th><th>From mobile</th><th>Adapt how</th></tr></thead>
+<tbody>
+<tr><td><code>locationValidator</code> (object)</td><td><code>convex/schema.ts:148</code></td><td>Copy verbatim. Use in place of <code>v.string()</code> for <code>bookings.pickupLocation</code> and <code>dropoffLocation</code>.</td></tr>
+<tr><td><code>savedAddressValidator</code> (object)</td><td><code>convex/schema.ts:166</code></td><td>Adopt only when customer accounts ship (Better Auth user preferences).</td></tr>
+<tr><td><code>notificationQueue</code> table</td><td><code>convex/schema.ts:438</code></td><td>Copy structure; channel = <code>"push" | "email" | "sms"</code>. Make <code>userId</code> optional (web has guest bookings) with <code>bookingId</code> as fallback.</td></tr>
+<tr><td><code>tripShares</code> table</td><td><code>convex/schema.ts:543</code></td><td>Drop&#8209;in. Wire to existing <code>publicReference</code> model.</td></tr>
+<tr><td><code>auditLogs</code> table</td><td><code>convex/schema.ts:525</code></td><td>Drop&#8209;in. Web&rsquo;s existing <code>bookingEvents</code> is booking&#8209;scoped; <code>auditLogs</code> is system&#8209;wide.</td></tr>
+<tr><td><code>idempotencyKeys</code> table</td><td><code>convex/schema.ts:620</code></td><td>Drop&#8209;in. Wire into <code>convex/bookings.ts:create</code>.</td></tr>
+<tr><td><code>bookings.estimatedDistance</code>, <code>estimatedDuration</code></td><td><code>convex/schema.ts:301</code></td><td>Add as optional <code>v.number()</code>. Populated by the Routes API call at quote time.</td></tr>
+</tbody>
+</table>
+
+<h3>Convex modules / patterns to lift</h3>
+<table>
+<thead><tr><th>Take</th><th>From mobile path</th><th>Use for</th></tr></thead>
+<tbody>
+<tr><td><code>notificationQueue.ts</code> queries/mutations</td><td><code>convex/notificationQueue.ts</code></td><td>Reference for enqueue, mark sent, retry. Adapt to web&rsquo;s auth (<code>requireStaff</code> instead of Clerk&rsquo;s <code>getAuthUserId</code>).</td></tr>
+<tr><td>Cron processor pattern</td><td><code>convex/crons.ts</code></td><td>Reference for <code>processNotificationQueue</code>. Web has no <code>crons.ts</code> yet &mdash; this is a new file.</td></tr>
+<tr><td><code>idempotencyKeys</code> usage pattern</td><td>mobile <code>convex/bookings.ts</code> (<code>create</code>)</td><td>Apply to web&rsquo;s <code>convex/bookings.ts</code> <code>create</code> mutation.</td></tr>
+<tr><td><code>tripShares.ts</code> queries/mutations</td><td><code>convex/tripShares.ts</code></td><td>Direct port; map to web&rsquo;s <code>publicReference</code> and <code>bookings</code> table.</td></tr>
+<tr><td>Status&#8209;machine pattern</td><td><code>convex/lib/statusMachine.ts</code></td><td>Reference for <code>isValidTransition()</code> / <code>canCancelFromStatus()</code>. Apply to web&rsquo;s 8&#8209;status enum (not mobile&rsquo;s 10).</td></tr>
+<tr><td>Token generator</td><td><code>convex/lib/generators.ts</code></td><td>Web already generates <code>PLD&#8209;XXXX</code>; only lift the <em>share token</em> generator.</td></tr>
+</tbody>
+</table>
+</section>
+
+<hr />
+
+<section id="twilio">
+<h2>Twilio integration &mdash; build fresh, mobile is not a reference</h2>
+<p>Mobile <em>removed</em> its Twilio code, so there&rsquo;s nothing to port. The new build is small:</p>
+<table>
+<thead><tr><th>Component</th><th>Where</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Convex action <code>sendSms</code></td><td>new <code>convex/actions/twilio.ts</code></td><td>Calls Twilio Messages API. Env: <code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code>, <code>TWILIO_FROM_NUMBER</code>.</td></tr>
+<tr><td>Hook into <code>handoffs.create</code></td><td><code>convex/handoffs.ts</code></td><td>When <code>channel === "sms"</code>, enqueue into <code>notificationQueue</code> with type <code>handoff_sms</code> and <code>recipientPhone</code>.</td></tr>
+<tr><td>Hook into <code>bookings.create</code></td><td><code>convex/bookings.ts</code></td><td>Enqueue customer confirmation SMS at submission.</td></tr>
+<tr><td>(Future) Twilio Verify for customer phone</td><td>new <code>convex/actions/twilio.ts</code> (<code>startVerification</code>, <code>checkVerification</code>)</td><td>Only if Better Auth phone OTP is needed. Better Auth supports custom OTP delivery via a plugin/hook. Defer until customer accounts land.</td></tr>
+<tr><td>(Future) Click&#8209;to&#8209;call (Voice API)</td><td>n/a today</td><td>Out of scope for now.</td></tr>
+</tbody>
+</table>
+</section>
+
+<hr />
+
+<section id="maps">
+<h2>Google Maps integration &mdash; adapt mobile&rsquo;s concepts to web</h2>
+<p>Mobile&rsquo;s RN libraries don&rsquo;t port. The web equivalents:</p>
+<table>
+<thead><tr><th>Capability</th><th>Web library / API</th><th>Where it lands</th></tr></thead>
+<tbody>
+<tr><td>Address autocomplete on booking form</td><td><code>@vis.gl/react&#8209;google&#8209;maps</code> (Autocomplete) or Google Places JS direct</td><td><code>src/components/BookingCard.tsx</code> &mdash; replace plain text input.</td></tr>
+<tr><td>Map preview (dispatcher and customer)</td><td><code>@vis.gl/react&#8209;google&#8209;maps</code> (Map + Marker + Polyline)</td><td>New component, used in <code>DispatchDashboard.tsx</code> and <code>src/app/booking/[reference]/page.tsx</code>.</td></tr>
+<tr><td>Distance + duration for quotes</td><td>Google Routes API via a Convex action</td><td>New <code>convex/actions/routes.ts</code>. Replaces mobile&rsquo;s Haversine shortcut. Result cached on <code>bookings.estimatedDistance</code> / <code>estimatedDuration</code>.</td></tr>
+<tr><td>Service&#8209;area validation</td><td>Polygon&#8209;in&#8209;polygon check on submit</td><td>Use the <code>service&#8209;area</code> page data; new util in <code>src/lib/serviceArea.ts</code>. Mobile doesn&rsquo;t do this either &mdash; net&#8209;new.</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>Single Google Cloud project.</strong> Maps JS + Places + Routes APIs enabled. Web key restricted to your domains. (A future mobile app would get its own key restricted to its bundle IDs &mdash; not relevant now.)
+</div>
+</section>
+
+<hr />
+
+<section id="matrix">
+<h2>Feature parity matrix</h2>
+<p>For reference only; the goal is what to lift, not to converge.</p>
+
+<div class="legend">
+  Status:
+  <span><span class="badge b-ok">&#10003;</span> present</span>
+  <span><span class="badge b-warn">~</span> partial / stub</span>
+  <span><span class="badge b-gone">&#10007;</span> absent</span>
+  <span><span class="badge b-na">&ndash;</span> N/A</span>
+  &nbsp;|&nbsp;
+  Verdict:
+  <span><span class="verdict v-lift">LIFT</span></span>
+  <span><span class="verdict v-defer">DEFER</span></span>
+  <span><span class="verdict v-skip">SKIP</span></span>
+  <span><span class="verdict v-keep">KEEP web</span></span>
+</div>
+
+<h3>Customer&#8209;facing booking</h3>
+<table>
+<thead><tr><th>Feature</th><th>Web</th><th>Mobile</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Guest booking form (no account)</td><td><span class="badge b-ok">&#10003;</span> <code>BookingCard.tsx</code>, 6&#8209;step</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Booking modes: oneway / hourly / airport</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="badge b-warn">~</span> implied</td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Multi&#8209;stop trips</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> <code>bookingStops</code></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Recurring bookings</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> <code>recurringBookings</code></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Address input (structured + autocomplete)</td><td><span class="badge b-gone">&#10007;</span> plain text</td><td><span class="badge b-ok">&#10003;</span> Places + map drag</td><td><span class="verdict v-lift">LIFT schema, build web UI</span></td></tr>
+<tr><td>Live booking tracking page</td><td><span class="badge b-ok">&#10003;</span> status only</td><td><span class="badge b-ok">&#10003;</span> + driver GPS</td><td><span class="verdict v-defer">DEFER GPS</span></td></tr>
+<tr><td>Public booking reference (<code>PLD&#8209;XXXX</code>)</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="badge b-gone">&#10007;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Shareable trip link</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> <code>tripShares</code></td><td><span class="verdict v-lift">LIFT</span></td></tr>
+<tr><td>Booking event audit log</td><td><span class="badge b-ok">&#10003;</span> (9 kinds)</td><td><span class="badge b-ok">&#10003;</span> (5 kinds)</td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Customer&#8209;facing receipts (PDF)</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> <code>tripReceipts</code></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+</tbody>
+</table>
+
+<h3>Customer accounts &amp; preferences</h3>
+<table>
+<thead><tr><th>Feature</th><th>Web</th><th>Mobile</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Customer accounts</td><td><span class="badge b-gone">&#10007;</span> (Better Auth staff&#8209;only)</td><td><span class="badge b-ok">&#10003;</span> Clerk</td><td><span class="verdict v-defer">DEFER, Better Auth</span></td></tr>
+<tr><td>Saved addresses</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Saved payment methods</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> Stripe SetupIntent</td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Notification preferences</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Past&#8209;booking history UI</td><td><span class="badge b-warn">~</span> data only</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+</tbody>
+</table>
+
+<h3>Payments</h3>
+<table>
+<thead><tr><th>Feature</th><th>Web</th><th>Mobile</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Provider</td><td>Stripe Checkout</td><td>Stripe SetupIntent + saved cards</td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Post&#8209;quote payment link</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="badge b-gone">&#10007;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Stored card on file</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Refunds</td><td><span class="badge b-warn">~</span> enum, no flow</td><td><span class="badge b-warn">~</span> enum, no flow</td><td><span class="verdict v-defer">DEFER</span></td></tr>
+</tbody>
+</table>
+
+<h3>Driver experience</h3>
+<table>
+<thead><tr><th>Feature</th><th>Web</th><th>Mobile</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Driver surface</td><td>Token&#8209;link <code>/rides/[token]</code></td><td>Native <code>(driver)</code> stack</td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Driver GPS broadcast</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> <code>drivers.location</code></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Driver profile (rich)</td><td><span class="badge b-warn">~</span> minimal</td><td><span class="badge b-ok">&#10003;</span> bio/photo/rating</td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>Push notification to driver</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span> Expo push</td><td><span class="verdict v-skip">SKIP</span></td></tr>
+</tbody>
+</table>
+
+<h3>Staff / admin / dispatch</h3>
+<table>
+<thead><tr><th>Feature</th><th>Web</th><th>Mobile</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Dispatch dashboard</td><td><span class="badge b-ok">&#10003;</span> <code>/admin/dispatch</code></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Quote pricing UI</td><td><span class="badge b-ok">&#10003;</span> + rate calc</td><td><span class="badge b-warn">~</span> config&#8209;driven</td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Rate profile management</td><td><span class="badge b-ok">&#10003;</span> <code>/admin/rates</code> (rich)</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Customer management</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Fleet management</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+<tr><td>Send handoff link (email/sms/copy)</td><td><span class="badge b-ok">&#10003;</span> SMS unwired</td><td><span class="badge b-na">&ndash;</span></td><td><span class="verdict v-lift">WIRE SMS via Twilio</span></td></tr>
+</tbody>
+</table>
+
+<h3>Infrastructure / cross&#8209;cutting</h3>
+<table>
+<thead><tr><th>Feature</th><th>Web</th><th>Mobile</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Notification queue + retry</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-lift">LIFT</span></td></tr>
+<tr><td>Idempotency keys</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-lift">LIFT</span></td></tr>
+<tr><td>Audit log (system&#8209;wide)</td><td><span class="badge b-gone">&#10007;</span> (booking only)</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-lift">LIFT</span></td></tr>
+<tr><td>Feature flags</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-defer">DEFER</span></td></tr>
+<tr><td>External&#8209;sync queue (LimoAnywhere)</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-defer">Only if on roadmap</span></td></tr>
+<tr><td>Crons</td><td><span class="badge b-gone">&#10007;</span></td><td><span class="badge b-ok">&#10003;</span></td><td><span class="verdict v-lift">LIFT pattern</span></td></tr>
+<tr><td>Rate limiting</td><td><span class="badge b-ok">&#10003;</span></td><td><span class="badge b-warn">~</span></td><td><span class="verdict v-keep">KEEP web</span></td></tr>
+</tbody>
+</table>
+</section>
+
+<hr />
+
+<section id="sequencing">
+<h2>Recommended sequencing</h2>
+<p>This is a doc, not a sprint plan, but a sensible order if you start lifting:</p>
+<ol>
+  <li><strong>Google Maps + structured locations</strong> &mdash; biggest customer&#8209;visible win.
+    <ul>
+      <li>Add <code>locationValidator</code>; migrate <code>bookings.pickupLocation</code>/<code>dropoffLocation</code> via widen&#8209;migrate&#8209;narrow per the <code>convex&#8209;migration&#8209;helper</code> skill.</li>
+      <li>Add <code>@vis.gl/react&#8209;google&#8209;maps</code> to <code>BookingCard.tsx</code>.</li>
+      <li>Add <code>convex/actions/routes.ts</code> calling Google Routes API; populate <code>estimatedDistance</code> / <code>estimatedDuration</code> at quote time.</li>
+      <li>Wire into <code>rateProfiles</code> quoting math.</li>
+    </ul>
+  </li>
+  <li><strong><code>notificationQueue</code> + Twilio SMS for dispatch handoffs</strong>.
+    <ul>
+      <li>Add <code>notificationQueue</code> table.</li>
+      <li>Add <code>convex/actions/twilio.ts</code> (<code>sendSms</code>).</li>
+      <li>Add <code>convex/crons.ts</code> with <code>processNotificationQueue</code>.</li>
+      <li>Hook into <code>handoffs.create</code> when <code>channel === "sms"</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>idempotencyKeys</code> + <code>auditLogs</code></strong> &mdash; small, safe drop&#8209;ins.</li>
+  <li><strong><code>tripShares</code></strong> &mdash; small, customer&#8209;facing win.</li>
+  <li>Everything else (recurring, multi&#8209;stop, receipts, customer accounts) when actually needed.</li>
+</ol>
+</section>
+
+<hr />
+
+<section id="files">
+<h2>Critical files for follow&#8209;up reading</h2>
+
+<h4>Web (where lifts land)</h4>
+<ul>
+  <li><code>convex/schema.ts</code> &mdash; receives <code>locationValidator</code>, <code>notificationQueue</code>, <code>tripShares</code>, <code>auditLogs</code>, <code>idempotencyKeys</code>.</li>
+  <li><code>convex/bookings.ts</code> &mdash; receives <code>idempotencyKeys</code> check; switches to structured locations.</li>
+  <li><code>convex/handoffs.ts</code> &mdash; receives Twilio SMS hook via <code>notificationQueue</code>.</li>
+  <li><code>src/components/BookingCard.tsx</code> &mdash; receives Places autocomplete.</li>
+  <li><code>src/components/admin/DispatchDashboard.tsx</code> &mdash; receives map preview.</li>
+  <li><code>src/app/api/bookings/route.ts</code> &mdash; submission endpoint, may need updated validation for structured locations.</li>
+</ul>
+
+<h4>Mobile (reference, read&#8209;only)</h4>
+<ul>
+  <li><code>convex/schema.ts</code> &mdash; source of all lifted validators and tables.</li>
+  <li><code>convex/notificationQueue.ts</code> &mdash; queue ops reference.</li>
+  <li><code>convex/tripShares.ts</code> &mdash; port target.</li>
+  <li><code>convex/crons.ts</code> &mdash; scheduled&#8209;job reference.</li>
+  <li><code>convex/lib/statusMachine.ts</code> &mdash; status&#8209;transition pattern.</li>
+  <li><code>convex/lib/generators.ts</code> &mdash; token generator pattern.</li>
+</ul>
+</section>
+
+<hr />
+
+<section id="verify">
+<h2>Verification</h2>
+<p>Research artifact &mdash; nothing to run. To pressure&#8209;test:</p>
+<ol>
+  <li><strong>Confirm web has nothing to throw away:</strong> <code>rg &#8209;i 'twilio|TWILIO_' src convex</code> from web root returns only schema <code>"sms"</code> mentions (no SDK, no send code). <code>rg &#8209;i 'google.*map|@vis.gl|@react&#8209;google&#8209;maps|placeId' src convex</code> returns nothing.</li>
+  <li><strong>Confirm mobile schema additions are drop&#8209;in:</strong> open mobile <code>convex/schema.ts</code> and verify <code>locationValidator</code>, <code>notificationQueue</code>, <code>tripShares</code>, <code>auditLogs</code>, <code>idempotencyKeys</code> have no Clerk&#8209;specific (<code>clerkId</code>) or Expo&#8209;specific (<code>pushTokens</code>) coupling.</li>
+  <li><strong>Confirm web&rsquo;s <code>rateProfiles</code> is richer than mobile&rsquo;s <code>pricingConfig</code>:</strong> open web <code>convex/schema.ts</code> at <code>rateProfiles</code> &mdash; it has base/mile/hour/airport/peak/tax math; mobile&rsquo;s <code>pricingConfig</code> is just a mode toggle.</li>
+  <li><strong>Confirm Better Auth + Twilio is a real path:</strong> Better Auth supports custom auth providers and OTP delivery hooks. Follow&#8209;up spike when customer phone&#8209;OTP becomes a requirement.</li>
+</ol>
+</section>
+
+<hr />
+
+<section id="oos">
+<h2>Out of scope</h2>
+<ul>
+  <li><strong>Actual implementation.</strong> This is a salvage map; each lift in &ldquo;Recommended sequencing&rdquo; is its own implementation plan.</li>
+  <li><strong>Mobile&#8209;app revival.</strong> ASTC is being shelved. A future mobile app is a new project against web&rsquo;s standards.</li>
+  <li><strong>LimoAnywhere sync.</strong> Only lift if it&rsquo;s confirmed on the roadmap.</li>
+  <li><strong>Customer&#8209;account UX decisions on web.</strong> Out of scope until product confirms accounts are coming.</li>
+</ul>
+</section>
+
+</div>
+</body>
+</html>
