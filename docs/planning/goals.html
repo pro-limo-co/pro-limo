@@ -512,19 +512,19 @@
     </dl>
   </article>
 
-  <article class="goal is-todo" id="SM4">
+  <article class="goal is-review" id="SM4">
     <div class="goal-head">
       <span class="goal-code">SM4</span>
       <span class="goal-title">Map preview in dispatch &amp; tracker</span>
-      <span class="goal-status">To do</span>
+      <span class="goal-status">In review</span>
     </div>
-    <p class="goal-why">Read&#8209;only map with pickup/dropoff markers + polyline. Used by dispatchers to verify trips and by customers to see their route.</p>
+    <p class="goal-why">Read&#8209;only map with pickup/dropoff markers. Used by dispatchers to verify trips and by customers to see their route.</p>
     <dl class="goal-body">
-      <dt>Touches</dt><dd>new <code>src/components/BookingMapPreview.tsx</code>, used in <code>src/components/admin/DispatchDashboard.tsx</code> and <code>src/app/booking/[reference]/page.tsx</code></dd>
-      <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code> (Map + Marker + Polyline).</dd>
-      <dt>Depends on</dt><dd><a href="#SM1">SM1</a>, <a href="#SM3">SM3</a> (polyline comes from Routes response).</dd>
-      <dt>Done when</dt><dd>Both pages render the map with markers; polyline drawn from cached Routes geometry.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>Touches</dt><dd>new <code>src/components/booking/BookingMapPreview.tsx</code>, slotted into <code>BookingStatusPanel</code> (tracker card) and <code>BookingDetailsSection</code> (dispatch row body)</dd>
+      <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code> (<code>Map</code> + <code>AdvancedMarker</code> + <code>useMap</code> for <code>fitBounds</code>).</dd>
+      <dt>Depends on</dt><dd><a href="#SM1">SM1</a> (lat/lng on booking) &mdash; merged. <a href="#SM3">SM3</a> already cached distance + duration; SM4 also surfaces them as <code>InfoRow</code>s in dispatch.</dd>
+      <dt>Done when</dt><dd>Component renders null silently when no lat/lng or no API key &mdash; safe to drop into any layout. Both pages show the map when present, fall through cleanly when not. Distance &amp; duration appear next to the map in dispatch.</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/15">#15</a></dd>
     </dl>
   </article>
 
@@ -558,11 +558,11 @@
     </dl>
   </article>
 
-  <article class="goal is-review" id="ST2">
+  <article class="goal is-merged" id="ST2">
     <div class="goal-head">
       <span class="goal-code">ST2</span>
       <span class="goal-title">Wire SMS handoffs through <code>notificationQueue</code></span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">When a dispatcher picks the SMS channel on a handoff, enqueue a notification; the queue processor calls <a href="#ST1">ST1</a>. No more silent &ldquo;sms&rdquo; handoffs.</p>
     <dl class="goal-body">
@@ -570,7 +570,7 @@
       <dt>Depends on</dt><dd><a href="#ST1">ST1</a>, <a href="#SI1">SI1</a> (notificationQueue + cron) &mdash; both merged.</dd>
       <dt>Adapt</dt><dd>SMS body is a templated string with the booking ref + full ride link + optional dispatcher message. Uses <code>SITE_URL</code> / <code>NEXT_PUBLIC_SITE_URL</code> env (same pattern as <code>convex/payments.ts</code>) so the link works in production; falls back to the path-only when env is unset (still works once the recipient opens it on the production host).</dd>
       <dt>Done when</dt><dd>Selecting SMS as channel enqueues a row; ST1&rsquo;s cron drains it to Twilio; <code>rideHandoffs.status</code> stays <code>sent</code> on success and the queue row carries the delivery outcome / retries.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/14">#14</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/14">#14</a> &middot; merged</dd>
     </dl>
   </article>
 

@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { BookingMapPreview } from "@/components/booking/BookingMapPreview";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -610,7 +611,24 @@ function BookingDetailsSection({
   return (
     <section className="grid min-w-0 content-start gap-4">
       <SectionHeading title="Booking" description={routeSummary} />
+      <BookingMapPreview
+        pickup={booking.pickupLocationDetails}
+        dropoff={booking.dropoffLocationDetails}
+        mapId="pro-limo-dispatch"
+      />
       <InfoRow label="Mode" value={booking.bookingMode} />
+      {booking.estimatedDistanceMeters !== undefined && (
+        <InfoRow
+          label="Distance"
+          value={`${(booking.estimatedDistanceMeters / 1609.344).toFixed(1)} mi`}
+        />
+      )}
+      {booking.estimatedDurationSeconds !== undefined && (
+        <InfoRow
+          label="Duration"
+          value={`${Math.round(booking.estimatedDurationSeconds / 60)} min`}
+        />
+      )}
       {booking.requestedVehicleLabel && <InfoRow label="Requested car" value={booking.requestedVehicleLabel} />}
       {booking.paymentPreference && <InfoRow label="Payment" value={booking.paymentPreference} />}
       {booking.flightNumber && <InfoRow label="Flight" value={booking.flightNumber} />}

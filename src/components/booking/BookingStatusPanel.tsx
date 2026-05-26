@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { api } from "@convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
+import { BookingMapPreview } from "@/components/booking/BookingMapPreview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { siteConfig } from "@/lib/seo";
@@ -123,6 +124,11 @@ export function BookingStatusPanel({ reference }: { reference: string }) {
               </p>
             </div>
           </div>
+          <BookingMapPreview
+            pickup={booking.pickupLocationDetails}
+            dropoff={booking.dropoffLocationDetails}
+            mapId="pro-limo-tracker"
+          />
         </CardContent>
       </Card>
 
