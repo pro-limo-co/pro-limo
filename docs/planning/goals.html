@@ -424,21 +424,21 @@
 
 <section class="summary" id="summary">
   <h3>Status snapshot</h3>
-  <!-- 12 goals total. SI2 in review on this branch; SM1 is also in review on its own branch (see PR #2). -->
+  <!-- 12 goals total. SI2 merged; SI1 in review on this branch; SM1 in review on its own branch (PR #2). -->
   <div class="summary-bar" aria-label="Goal status distribution">
-    <div class="s-merged"  style="width:0%"></div>
+    <div class="s-merged"  style="width:8.3%"></div>
     <div class="s-review"  style="width:8.3%"></div>
     <div class="s-flight"  style="width:0%"></div>
     <div class="s-blocked" style="width:0%"></div>
-    <div class="s-todo"    style="width:66.7%"></div>
+    <div class="s-todo"    style="width:58.4%"></div>
     <div class="s-defer"   style="width:25%"></div>
   </div>
   <div class="summary-legend">
-    <span><span class="swatch sw-merged"></span>Merged · 0</span>
+    <span><span class="swatch sw-merged"></span>Merged · 1</span>
     <span><span class="swatch sw-review"></span>In review · 1</span>
     <span><span class="swatch sw-flight"></span>In flight · 0</span>
     <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
-    <span><span class="swatch sw-todo"></span>To do · 8</span>
+    <span><span class="swatch sw-todo"></span>To do · 7</span>
     <span><span class="swatch sw-defer"></span>Deferred · 3</span>
   </div>
 </section>
@@ -602,34 +602,34 @@
 
 <div class="goal-grid">
 
-  <article class="goal is-todo" id="SI1">
+  <article class="goal is-review" id="SI1">
     <div class="goal-head">
       <span class="goal-code">SI1</span>
-      <span class="goal-title"><code>notificationQueue</code> table + cron processor</span>
-      <span class="goal-status">To do</span>
+      <span class="goal-title"><code>notificationQueue</code> data plane</span>
+      <span class="goal-status">In review</span>
     </div>
-    <p class="goal-why">Queue&#8209;with&#8209;retry table for outbound notifications (SMS, email, future push). Processor runs on a cron. Foundational dependency for <a href="#ST2">ST2</a>.</p>
+    <p class="goal-why">Queue&#8209;with&#8209;retry table for outbound notifications (email, SMS). Foundational dependency for <a href="#ST2">ST2</a>. <strong>Scope split:</strong> SI1 ships the table + internal helpers; the cron + sender land with <a href="#ST1">ST1</a> so no row is ever stuck pending without a sender.</p>
     <dl class="goal-body">
-      <dt>Touches</dt><dd><code>convex/schema.ts</code>, new <code>convex/notificationQueue.ts</code>, new <code>convex/crons.ts</code></dd>
-      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:438</code>, <code>convex/notificationQueue.ts</code>, <code>convex/crons.ts</code></dd>
-      <dt>Adapt</dt><dd>Use web auth (<code>requireStaff</code>) instead of Clerk&rsquo;s <code>getAuthUserId</code>. Channel union = <code>"push" | "email" | "sms"</code>. Make <code>userId</code> optional (web supports guest bookings).</dd>
-      <dt>Done when</dt><dd>Queue rows can be created, picked up by the cron, marked sent or retried with backoff; observable via <code>auditLogs</code> (after <a href="#SI3">SI3</a>) or a dispatcher view.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, new <code>convex/notifications.ts</code></dd>
+      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:438</code>, <code>convex/notificationQueue.ts</code></dd>
+      <dt>Adapt</dt><dd>No <code>userId</code> (web supports guest bookings); rows are booking&#8209;scoped via optional <code>bookingId</code>. Channel union = <code>"email" | "sms"</code> (no push on web). Staff&#8209;facing query uses <code>requireStaff</code>.</dd>
+      <dt>Done when</dt><dd>Schema is live; internal helpers (enqueue, listPending, markSent, markFailed-with-backoff, cancelForBooking) exist; dispatch can list per booking. Cron + sender follow in ST1.</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SI1">&mdash; pending push</a></dd>
     </dl>
   </article>
 
-  <article class="goal is-review" id="SI2">
+  <article class="goal is-merged" id="SI2">
     <div class="goal-head">
       <span class="goal-code">SI2</span>
       <span class="goal-title"><code>idempotencyKeys</code> on booking submission</span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">Prevents duplicate bookings when a client retries on a flaky network. Web&rsquo;s booking endpoint is rate&#8209;limited but not idempotent.</p>
     <dl class="goal-body">
       <dt>Touches</dt><dd><code>convex/schema.ts</code>, <code>convex/bookings.ts</code> (<code>create</code>), <code>src/app/api/bookings/route.ts</code> (forward key)</dd>
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:620</code></dd>
       <dt>Done when</dt><dd>Replaying the same submission with the same idempotency key returns the original booking instead of creating a duplicate.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/3">#3</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/3">#3</a> &middot; merged</dd>
     </dl>
   </article>
 

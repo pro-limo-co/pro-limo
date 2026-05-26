@@ -32,6 +32,15 @@ const handoffStatus = v.union(
 
 const handoffChannel = v.union(v.literal("email"), v.literal("sms"), v.literal("copy"));
 
+const notificationChannel = v.union(v.literal("email"), v.literal("sms"));
+
+const notificationStatus = v.union(
+  v.literal("pending"),
+  v.literal("sent"),
+  v.literal("failed"),
+  v.literal("cancelled"),
+);
+
 export default defineSchema({
   rateProfiles: defineTable({
     key: v.string(),
@@ -228,4 +237,27 @@ export default defineSchema({
   })
     .index("by_key", ["key"])
     .index("by_createdAt", ["createdAt"]),
+
+  notificationQueue: defineTable({
+    bookingId: v.optional(v.id("bookings")),
+    channel: notificationChannel,
+    type: v.string(),
+    status: notificationStatus,
+    recipientEmail: v.optional(v.string()),
+    recipientPhone: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    body: v.optional(v.string()),
+    payload: v.optional(v.any()),
+    scheduledFor: v.number(),
+    sentAt: v.optional(v.number()),
+    error: v.optional(v.string()),
+    retryCount: v.number(),
+    maxRetries: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status_and_scheduledFor", ["status", "scheduledFor"])
+    .index("by_bookingId", ["bookingId"])
+    .index("by_bookingId_and_status", ["bookingId", "status"])
+    .index("by_type_and_status", ["type", "status"]),
 });
