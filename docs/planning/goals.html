@@ -614,7 +614,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:438</code>, <code>convex/notificationQueue.ts</code></dd>
       <dt>Adapt</dt><dd>No <code>userId</code> (web supports guest bookings); rows are booking&#8209;scoped via optional <code>bookingId</code>. Channel union = <code>"email" | "sms"</code> (no push on web). Staff&#8209;facing query uses <code>requireStaff</code>.</dd>
       <dt>Done when</dt><dd>Schema is live; internal helpers (enqueue, listPending, markSent, markFailed-with-backoff, cancelForBooking) exist; dispatch can list per booking. Cron + sender follow in ST1.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SI1">&mdash; pending push</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/4">#4</a></dd>
     </dl>
   </article>
 
