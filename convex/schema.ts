@@ -263,4 +263,22 @@ export default defineSchema({
     .index("by_bookingId", ["bookingId"])
     .index("by_bookingId_and_status", ["bookingId", "status"])
     .index("by_type_and_status", ["type", "status"]),
+
+  auditLogs: defineTable({
+    actorTokenIdentifier: v.optional(v.string()),
+    actorName: v.optional(v.string()),
+    action: v.string(),
+    entityType: v.string(),
+    entityId: v.optional(v.string()),
+    oldValues: v.optional(v.any()),
+    newValues: v.optional(v.any()),
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+  })
+    .index("by_actorTokenIdentifier", ["actorTokenIdentifier"])
+    .index("by_entityType_and_entityId", ["entityType", "entityId"])
+    .index("by_action_and_createdAt", ["action", "createdAt"])
+    .index("by_createdAt", ["createdAt"]),
 });

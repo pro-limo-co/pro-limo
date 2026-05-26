@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { logAudit } from "./lib/audit";
 import { limitBookingSubmission } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
 import { locationValidator } from "./lib/validators";
@@ -280,6 +281,14 @@ export const updateDispatch = mutation({
     if (args.vehicleLabel !== undefined) patch.vehicleLabel = args.vehicleLabel;
     if (args.dispatchNotes !== undefined) patch.dispatchNotes = args.dispatchNotes;
 
+    const newValues: Record<string, unknown> = {};
+    const oldValues: Record<string, unknown> = {};
+    for (const key of Object.keys(patch)) {
+      if (key === "updatedAt") continue;
+      newValues[key] = (patch as Record<string, unknown>)[key];
+      oldValues[key] = (booking as Record<string, unknown>)[key];
+    }
+
     await Promise.all([
       ctx.db.patch(args.bookingId, patch),
       ctx.db.insert("bookingEvents", {
@@ -289,6 +298,17 @@ export const updateDispatch = mutation({
         actorTokenIdentifier: identity.tokenIdentifier,
         actorName: staff.name ?? staff.email,
         createdAt: now,
+      }),
+      logAudit(ctx, {
+        actor: {
+          tokenIdentifier: identity.tokenIdentifier,
+          name: staff.name ?? staff.email,
+        },
+        action: "booking.updateDispatch",
+        entityType: "bookings",
+        entityId: args.bookingId,
+        oldValues,
+        newValues,
       }),
     ]);
   },
