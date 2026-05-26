@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Salvage Goals — pro-limo</title>
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --ink: #1a1816;
+    --ink-soft: #4a4640;
+    --ink-mute: #7a746b;
+    --divider: #e8e3da;
+    --champagne: #b89968;
+    --champagne-soft: #f4ecdc;
+    --ok: #2f7a3f;
+    --warn: #b07a16;
+    --gone: #b03434;
+    --na: #7a746b;
+    --code-bg: #f4f1ec;
+
+    --todo: #7a746b;
+    --todo-soft: rgba(122, 116, 107, 0.10);
+    --flight: #b07a16;
+    --flight-soft: rgba(176, 122, 22, 0.12);
+    --review: #5566aa;
+    --review-soft: rgba(85, 102, 170, 0.12);
+    --merged: #2f7a3f;
+    --merged-soft: rgba(47, 122, 63, 0.12);
+    --blocked: #b03434;
+    --blocked-soft: rgba(176, 52, 52, 0.12);
+    --defer: #8c8475;
+    --defer-soft: rgba(140, 132, 117, 0.10);
+
+    --shadow: 0 1px 2px rgba(20, 16, 10, 0.04), 0 2px 8px rgba(20, 16, 10, 0.03);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14110d;
+      --surface: #1c1813;
+      --ink: #f3eee3;
+      --ink-soft: #c8c0b1;
+      --ink-mute: #8c8475;
+      --divider: #2b251c;
+      --champagne: #cba973;
+      --champagne-soft: #2a2118;
+      --ok: #6fb87e;
+      --warn: #d4a85a;
+      --gone: #e07a7a;
+      --na: #8c8475;
+      --code-bg: #221d16;
+
+      --todo: #8c8475;
+      --todo-soft: rgba(140, 132, 117, 0.10);
+      --flight: #d4a85a;
+      --flight-soft: rgba(212, 168, 90, 0.14);
+      --review: #8aa0d6;
+      --review-soft: rgba(138, 160, 214, 0.14);
+      --merged: #6fb87e;
+      --merged-soft: rgba(111, 184, 126, 0.14);
+      --blocked: #e07a7a;
+      --blocked-soft: rgba(224, 122, 122, 0.14);
+      --defer: #8c8475;
+      --defer-soft: rgba(140, 132, 117, 0.12);
+
+      --shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+
+  /* Hero */
+  header.hero {
+    border-bottom: 1px solid var(--divider);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 11px;
+    color: var(--champagne);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Georgia", serif;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    margin: 12px 0 8px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 17px;
+    margin: 0;
+  }
+  .meta {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--ink-mute);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta span::before { content: "·"; margin-right: 16px; color: var(--divider); }
+  .meta span:first-child::before { content: none; margin-right: 0; }
+
+  h2 {
+    font-family: "SF Pro Display", -apple-system, sans-serif;
+    font-size: 24px;
+    margin: 56px 0 16px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h2 .area-meta {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  h3 { font-size: 17px; margin: 32px 0 12px; font-weight: 600; color: var(--ink); }
+  h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); margin: 20px 0 6px; font-weight: 600; }
+  p { margin: 0 0 12px; color: var(--ink-soft); }
+  ul, ol { padding-left: 22px; color: var(--ink-soft); }
+  li { margin-bottom: 4px; }
+  li::marker { color: var(--champagne); }
+  ol li::marker { color: var(--champagne); font-weight: 600; }
+  code {
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    color: var(--ink);
+    border: 1px solid var(--divider);
+  }
+  a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--champagne);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+  }
+  a:hover { color: var(--champagne); }
+
+  /* Banner linking to gap-plan */
+  .banner {
+    background: var(--champagne-soft);
+    border-left: 3px solid var(--champagne);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .banner strong { color: var(--ink); }
+
+  /* Summary bar */
+  .summary {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin: 24px 0 8px;
+    box-shadow: var(--shadow);
+  }
+  .summary h3 {
+    margin: 0 0 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .summary-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--divider);
+    margin-bottom: 12px;
+  }
+  .summary-bar div {
+    height: 100%;
+  }
+  .summary-bar .s-merged { background: var(--merged); }
+  .summary-bar .s-review { background: var(--review); }
+  .summary-bar .s-flight { background: var(--flight); }
+  .summary-bar .s-blocked { background: var(--blocked); }
+  .summary-bar .s-todo { background: var(--todo); }
+  .summary-bar .s-defer { background: var(--defer); }
+
+  .summary-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .summary-legend .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .summary-legend .sw-merged { background: var(--merged); }
+  .summary-legend .sw-review { background: var(--review); }
+  .summary-legend .sw-flight { background: var(--flight); }
+  .summary-legend .sw-blocked { background: var(--blocked); }
+  .summary-legend .sw-todo { background: var(--todo); }
+  .summary-legend .sw-defer { background: var(--defer); }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 24px 0 40px;
+    font-size: 14px;
+  }
+  .toc strong {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .toc ol {
+    margin: 0;
+    padding-left: 22px;
+    columns: 2;
+    column-gap: 32px;
+  }
+  .toc li { margin-bottom: 4px; break-inside: avoid; }
+  .toc a { text-decoration: none; }
+  .toc a:hover { text-decoration: underline; text-decoration-color: var(--champagne); }
+
+  /* Goal cards */
+  .goal-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 16px 0 32px;
+  }
+  .goal {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-left: 3px solid var(--todo);
+    border-radius: 6px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .goal.is-todo { border-left-color: var(--todo); }
+  .goal.is-flight { border-left-color: var(--flight); }
+  .goal.is-review { border-left-color: var(--review); }
+  .goal.is-merged { border-left-color: var(--merged); }
+  .goal.is-blocked { border-left-color: var(--blocked); }
+  .goal.is-defer { border-left-color: var(--defer); opacity: 0.85; }
+
+  .goal-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .goal-code {
+    font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--code-bg);
+    border: 1px solid var(--divider);
+    color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .goal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    flex: 1;
+    min-width: 0;
+  }
+  .goal-status {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .is-todo .goal-status { background: var(--todo-soft); color: var(--todo); }
+  .is-flight .goal-status { background: var(--flight-soft); color: var(--flight); }
+  .is-review .goal-status { background: var(--review-soft); color: var(--review); }
+  .is-merged .goal-status { background: var(--merged-soft); color: var(--merged); }
+  .is-blocked .goal-status { background: var(--blocked-soft); color: var(--blocked); }
+  .is-defer .goal-status { background: var(--defer-soft); color: var(--defer); }
+
+  .goal-why {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+  .goal-body {
+    font-size: 14px;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 14px;
+    color: var(--ink-soft);
+  }
+  .goal-body dt {
+    font-weight: 600;
+    color: var(--ink-mute);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-top: 3px;
+  }
+  .goal-body dd {
+    margin: 0;
+    padding: 2px 0;
+  }
+  .goal-body dd ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .goal-body code { font-size: 12px; }
+
+  .pr-link {
+    display: inline-block;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--code-bg);
+    border: 1px solid var(--divider);
+    text-decoration: none;
+  }
+  .pr-link.placeholder { color: var(--ink-mute); }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: var(--divider);
+    margin: 48px 0;
+  }
+
+  /* How-to & footer */
+  .howto {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin: 16px 0;
+    font-size: 14px;
+    box-shadow: var(--shadow);
+  }
+  .howto code { font-size: 12px; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 32px 18px 64px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 20px; }
+    .toc ol { columns: 1; }
+    .goal-body { grid-template-columns: 1fr; gap: 2px 0; }
+    .goal-body dt { padding-top: 10px; }
+  }
+
+  @media print {
+    body { background: white; color: black; font-size: 12pt; }
+    .toc, .banner, .summary, .goal, .howto { box-shadow: none; }
+    h2 { page-break-after: avoid; }
+    .goal { page-break-inside: avoid; }
+    a { color: black; text-decoration-color: #888; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Live tracker · sprint goals</div>
+  <h1>Salvage Goals &mdash; pro&#8209;limo</h1>
+  <p class="subtitle">Breaking the gap plan into mini&#8209;goal sprints. One goal, one PR.</p>
+  <div class="meta">
+    <span>Branch: <code>feat/astc-salvage-plan</code></span>
+    <span>Last updated: 2026&ndash;05&ndash;25</span>
+    <span>Source of truth: <a href="gap-plan.html">gap-plan.html</a></span>
+  </div>
+
+  <div class="banner">
+    <strong>Grounded in <a href="gap-plan.html">gap-plan.html</a>.</strong> Every goal below corresponds to a row in the gap plan&rsquo;s &ldquo;Lift sheet&rdquo; or &ldquo;Recommended sequencing.&rdquo; If a goal stops matching the plan, fix the plan first, then update goals.
+  </div>
+</header>
+
+<section class="summary" id="summary">
+  <h3>Status snapshot</h3>
+  <!-- 12 goals total. SI2 in review on this branch; SM1 is also in review on its own branch (see PR #2). -->
+  <div class="summary-bar" aria-label="Goal status distribution">
+    <div class="s-merged"  style="width:0%"></div>
+    <div class="s-review"  style="width:8.3%"></div>
+    <div class="s-flight"  style="width:0%"></div>
+    <div class="s-blocked" style="width:0%"></div>
+    <div class="s-todo"    style="width:66.7%"></div>
+    <div class="s-defer"   style="width:25%"></div>
+  </div>
+  <div class="summary-legend">
+    <span><span class="swatch sw-merged"></span>Merged · 0</span>
+    <span><span class="swatch sw-review"></span>In review · 1</span>
+    <span><span class="swatch sw-flight"></span>In flight · 0</span>
+    <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
+    <span><span class="swatch sw-todo"></span>To do · 8</span>
+    <span><span class="swatch sw-defer"></span>Deferred · 3</span>
+  </div>
+</section>
+
+<nav class="toc">
+  <strong>Goal areas</strong>
+  <ol>
+    <li><a href="#maps">Maps (SM) &mdash; structured locations &amp; Google Maps</a></li>
+    <li><a href="#twilio">Twilio (ST) &mdash; SMS via Convex action</a></li>
+    <li><a href="#infra">Infra (SI) &mdash; queue, idempotency, audit, shares</a></li>
+    <li><a href="#deferred">Deferred (SD) &mdash; recurring, multi-stop, receipts</a></li>
+    <li><a href="#workflow">Sprint workflow</a></li>
+  </ol>
+</nav>
+
+<!-- =============================================================
+     MAPS (SM) — structured locations + Google Maps
+============================================================== -->
+<section id="maps">
+<h2>Maps <span class="area-meta">prefix: SM &middot; 4 goals</span></h2>
+<p>From gap&#8209;plan: <em>&ldquo;Google Maps + structured locations&rdquo;</em> &mdash; the biggest customer&#8209;visible win. Adopt <code>locationValidator</code>, ship Places autocomplete, wire Google Routes API for distance&#8209;based quoting.</p>
+
+<div class="goal-grid">
+
+  <article class="goal is-todo" id="SM1">
+    <div class="goal-head">
+      <span class="goal-code">SM1</span>
+      <span class="goal-title">Adopt <code>locationValidator</code> on <code>bookings</code></span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Replace <code>pickupLocation</code> / <code>dropoffLocation</code> <code>v.string()</code> with the structured shape from mobile (<code>{address?, city?, state?, zip?, lat, lng, placeId?, name?}</code>). Prerequisite for autocomplete, routing, map previews.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, <code>convex/bookings.ts</code>, <code>src/app/api/bookings/route.ts</code></dd>
+      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:148</code></dd>
+      <dt>Migration</dt><dd>Widen&#8209;migrate&#8209;narrow per <code>convex-migration-helper</code>: add optional structured field alongside the string, backfill, then narrow.</dd>
+      <dt>Done when</dt><dd>All <code>bookings</code> reads/writes use the structured field; the string column is removed; existing rows backfilled (geocoded or marked legacy).</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="SM2">
+    <div class="goal-head">
+      <span class="goal-code">SM2</span>
+      <span class="goal-title">Google Places autocomplete on the booking form</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Replace the plain text input in <code>BookingCard.tsx</code> with a Places&#8209;backed autocomplete. Restrict to service&#8209;area bounds.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>src/components/BookingCard.tsx</code>, new <code>src/components/AddressAutocomplete.tsx</code></dd>
+      <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code> (preferred) or Places JS direct.</dd>
+      <dt>Env</dt><dd><code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> (web&#8209;restricted).</dd>
+      <dt>Depends on</dt><dd><a href="#SM1">SM1</a> for the structured schema to write into.</dd>
+      <dt>Done when</dt><dd>Address field surfaces Places suggestions; selection writes <code>{lat, lng, placeId, address}</code> into the form state; submit persists structured location.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="SM3">
+    <div class="goal-head">
+      <span class="goal-code">SM3</span>
+      <span class="goal-title">Google Routes API for distance + duration</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Convex action that calls Routes API to compute miles &amp; minutes. Cached on the booking row so quoting math (<code>rateProfiles.perMileCents</code>) finally has a real input. Replaces mobile&rsquo;s Haversine shortcut.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd>new <code>convex/actions/routes.ts</code>, <code>convex/schema.ts</code> (add <code>estimatedDistance</code>, <code>estimatedDuration</code>), <code>convex/bookings.ts</code> (call at quote time)</dd>
+      <dt>Env</dt><dd><code>GOOGLE_ROUTES_API_KEY</code> (server&#8209;side, no domain restriction).</dd>
+      <dt>Depends on</dt><dd><a href="#SM1">SM1</a> &mdash; needs lat/lng to call Routes.</dd>
+      <dt>Done when</dt><dd>Bookings created with structured locations get <code>estimatedDistance</code> / <code>estimatedDuration</code> populated; dispatcher quote UI reflects distance&#8209;based math.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="SM4">
+    <div class="goal-head">
+      <span class="goal-code">SM4</span>
+      <span class="goal-title">Map preview in dispatch &amp; tracker</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Read&#8209;only map with pickup/dropoff markers + polyline. Used by dispatchers to verify trips and by customers to see their route.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd>new <code>src/components/BookingMapPreview.tsx</code>, used in <code>src/components/admin/DispatchDashboard.tsx</code> and <code>src/app/booking/[reference]/page.tsx</code></dd>
+      <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code> (Map + Marker + Polyline).</dd>
+      <dt>Depends on</dt><dd><a href="#SM1">SM1</a>, <a href="#SM3">SM3</a> (polyline comes from Routes response).</dd>
+      <dt>Done when</dt><dd>Both pages render the map with markers; polyline drawn from cached Routes geometry.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+</div>
+</section>
+
+<hr />
+
+<!-- =============================================================
+     TWILIO (ST) — SMS via Convex action
+============================================================== -->
+<section id="twilio">
+<h2>Twilio <span class="area-meta">prefix: ST &middot; 3 goals</span></h2>
+<p>From gap&#8209;plan: <em>&ldquo;Twilio integration &mdash; build fresh.&rdquo;</em> The schema already models <code>"sms"</code> as a handoff channel; we wire it. Customer phone&#8209;OTP is deferred (waits for customer accounts).</p>
+
+<div class="goal-grid">
+
+  <article class="goal is-todo" id="ST1">
+    <div class="goal-head">
+      <span class="goal-code">ST1</span>
+      <span class="goal-title">Twilio <code>sendSms</code> Convex action</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Single primitive: a Convex action that calls Twilio Messages API. Everything else (handoffs, confirmations) calls into this.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd>new <code>convex/actions/twilio.ts</code></dd>
+      <dt>Env</dt><dd><code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code>, <code>TWILIO_FROM_NUMBER</code></dd>
+      <dt>Depends on</dt><dd>None.</dd>
+      <dt>Done when</dt><dd>Calling the action with a phone + body sends a real SMS in dev; failure modes (invalid number, Twilio error) surface in result.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="ST2">
+    <div class="goal-head">
+      <span class="goal-code">ST2</span>
+      <span class="goal-title">Wire SMS handoffs through <code>notificationQueue</code></span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">When a dispatcher picks the SMS channel on a handoff, enqueue a notification; the queue processor calls <a href="#ST1">ST1</a>. No more silent &ldquo;sms&rdquo; handoffs.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/handoffs.ts</code>, the queue processor from <a href="#SI1">SI1</a></dd>
+      <dt>Depends on</dt><dd><a href="#ST1">ST1</a>, <a href="#SI1">SI1</a> (notificationQueue + cron).</dd>
+      <dt>Done when</dt><dd>Selecting SMS as channel results in a delivered text; <code>rideHandoffs.status</code> updates appropriately on send/fail.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-defer" id="ST3">
+    <div class="goal-head">
+      <span class="goal-code">ST3</span>
+      <span class="goal-title">Customer booking confirmation SMS</span>
+      <span class="goal-status">Deferred</span>
+    </div>
+    <p class="goal-why">Auto&#8209;send an SMS when a guest booking is submitted. Useful but waits until <a href="#ST2">ST2</a> proves the pipeline and we&rsquo;ve decided on opt&#8209;in copy.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/bookings.ts</code> (<code>create</code>)</dd>
+      <dt>Depends on</dt><dd><a href="#ST2">ST2</a>, copy/legal sign&#8209;off.</dd>
+      <dt>Done when</dt><dd>New booking submissions enqueue a confirmation SMS to the customer phone.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+</div>
+</section>
+
+<hr />
+
+<!-- =============================================================
+     INFRA (SI) — queue, idempotency, audit, shares
+============================================================== -->
+<section id="infra">
+<h2>Infra <span class="area-meta">prefix: SI &middot; 5 goals</span></h2>
+<p>From gap&#8209;plan: the small, safe drop&#8209;ins that unlock everything else. Lifted from mobile&rsquo;s schema; none depend on Clerk or Expo.</p>
+
+<div class="goal-grid">
+
+  <article class="goal is-todo" id="SI1">
+    <div class="goal-head">
+      <span class="goal-code">SI1</span>
+      <span class="goal-title"><code>notificationQueue</code> table + cron processor</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Queue&#8209;with&#8209;retry table for outbound notifications (SMS, email, future push). Processor runs on a cron. Foundational dependency for <a href="#ST2">ST2</a>.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, new <code>convex/notificationQueue.ts</code>, new <code>convex/crons.ts</code></dd>
+      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:438</code>, <code>convex/notificationQueue.ts</code>, <code>convex/crons.ts</code></dd>
+      <dt>Adapt</dt><dd>Use web auth (<code>requireStaff</code>) instead of Clerk&rsquo;s <code>getAuthUserId</code>. Channel union = <code>"push" | "email" | "sms"</code>. Make <code>userId</code> optional (web supports guest bookings).</dd>
+      <dt>Done when</dt><dd>Queue rows can be created, picked up by the cron, marked sent or retried with backoff; observable via <code>auditLogs</code> (after <a href="#SI3">SI3</a>) or a dispatcher view.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-review" id="SI2">
+    <div class="goal-head">
+      <span class="goal-code">SI2</span>
+      <span class="goal-title"><code>idempotencyKeys</code> on booking submission</span>
+      <span class="goal-status">In review</span>
+    </div>
+    <p class="goal-why">Prevents duplicate bookings when a client retries on a flaky network. Web&rsquo;s booking endpoint is rate&#8209;limited but not idempotent.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, <code>convex/bookings.ts</code> (<code>create</code>), <code>src/app/api/bookings/route.ts</code> (forward key)</dd>
+      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:620</code></dd>
+      <dt>Done when</dt><dd>Replaying the same submission with the same idempotency key returns the original booking instead of creating a duplicate.</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/3">#3</a></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="SI3">
+    <div class="goal-head">
+      <span class="goal-code">SI3</span>
+      <span class="goal-title">System&#8209;wide <code>auditLogs</code> table</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Web&rsquo;s <code>bookingEvents</code> is booking&#8209;scoped. Add a system&#8209;wide audit table for staff actions, role changes, rate edits, etc.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, a small <code>convex/lib/audit.ts</code> helper</dd>
+      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:525</code></dd>
+      <dt>Done when</dt><dd>Helper exists and is called from staff mutations (rates, fleet, role changes); rows include actor, entityType, old/new values.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="SI4">
+    <div class="goal-head">
+      <span class="goal-code">SI4</span>
+      <span class="goal-title"><code>tripShares</code> &mdash; public shareable trip links</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Token&#8209;based links anyone can open to see a booking&rsquo;s status. View count tracked.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, new <code>convex/tripShares.ts</code>, new public route <code>src/app/share/[token]/page.tsx</code>, &ldquo;Share trip&rdquo; button on tracker page</dd>
+      <dt>Reference</dt><dd>mobile <code>convex/schema.ts:543</code>, <code>convex/tripShares.ts</code></dd>
+      <dt>Done when</dt><dd>Customer can copy a share link from their tracker page; visiting the link (no auth) shows the booking status; view count increments.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+  <article class="goal is-todo" id="SI5">
+    <div class="goal-head">
+      <span class="goal-code">SI5</span>
+      <span class="goal-title">Status&#8209;machine helper for bookings</span>
+      <span class="goal-status">To do</span>
+    </div>
+    <p class="goal-why">Centralize allowed status transitions. Web currently scatters this. Lift mobile&rsquo;s pattern, adapt to web&rsquo;s 8&#8209;status enum.</p>
+    <dl class="goal-body">
+      <dt>Touches</dt><dd>new <code>convex/lib/statusMachine.ts</code>, callers in <code>convex/bookings.ts</code>, <code>convex/handoffs.ts</code></dd>
+      <dt>Reference</dt><dd>mobile <code>convex/lib/statusMachine.ts</code></dd>
+      <dt>Done when</dt><dd><code>isValidTransition(from, to)</code> and <code>canCancelFromStatus(s)</code> exist; all status mutations route through them; an invalid transition rejects.</dd>
+      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+    </dl>
+  </article>
+
+</div>
+</section>
+
+<hr />
+
+<!-- =============================================================
+     DEFERRED (SD) — surfaced for visibility, not in sprint scope
+============================================================== -->
+<section id="deferred">
+<h2>Deferred <span class="area-meta">prefix: SD &middot; 3 goals (out of current scope)</span></h2>
+<p>From gap&#8209;plan: useful, not urgent. Listed here so they aren&rsquo;t forgotten; pulled into a sprint only when there&rsquo;s a real customer need.</p>
+
+<div class="goal-grid">
+
+  <article class="goal is-defer" id="SD1">
+    <div class="goal-head">
+      <span class="goal-code">SD1</span>
+      <span class="goal-title"><code>recurringBookings</code> + cron generator</span>
+      <span class="goal-status">Deferred</span>
+    </div>
+    <p class="goal-why">Template + pattern (daily/weekly/monthly). Lift mobile&rsquo;s <code>recurringBookings.ts</code> when corporate accounts need scheduled trips.</p>
+  </article>
+
+  <article class="goal is-defer" id="SD2">
+    <div class="goal-head">
+      <span class="goal-code">SD2</span>
+      <span class="goal-title">Multi&#8209;stop trips (<code>bookingStops</code>)</span>
+      <span class="goal-status">Deferred</span>
+    </div>
+    <p class="goal-why">Per&#8209;stop sequencing + wait time. Lift when product confirms multi&#8209;stop is supported.</p>
+  </article>
+
+  <article class="goal is-defer" id="SD3">
+    <div class="goal-head">
+      <span class="goal-code">SD3</span>
+      <span class="goal-title">PDF receipts (<code>tripReceipts</code>)</span>
+      <span class="goal-status">Deferred</span>
+    </div>
+    <p class="goal-why">Generate &amp; store in Convex <code>_storage</code>; email link to customer. Lift after customer accounts ship (no receipts before there&rsquo;s a place to view them).</p>
+  </article>
+
+</div>
+</section>
+
+<hr />
+
+<!-- =============================================================
+     Sprint workflow
+============================================================== -->
+<section id="workflow">
+<h2>Sprint workflow</h2>
+
+<div class="howto">
+<h4>One goal = one PR</h4>
+<ol>
+  <li>Pick the next goal (respect the <code>Depends on</code> field).</li>
+  <li>Flip status to <code>is-flight</code> here, push a branch named <code>feat/sm1-location-validator</code> (lowercase goal code + kebab title).</li>
+  <li>Commit prefix mirrors existing convention: <code>feat(scope): &lt;summary&gt; (SM1)</code>. Trailing goal code lets us grep.</li>
+  <li>Open PR; flip status to <code>is-review</code> and drop the PR link in the <code>PR</code> row.</li>
+  <li>On merge, flip to <code>is-merged</code> and bump the <code>Status snapshot</code> counts.</li>
+  <li>If reality diverges from <a href="gap-plan.html">gap-plan.html</a>, update the gap plan <strong>first</strong>, then mirror here.</li>
+</ol>
+</div>
+
+<div class="howto">
+<h4>Editing goal status</h4>
+<p>Each goal&rsquo;s root <code>&lt;article&gt;</code> has a status class. Swap exactly one of these:</p>
+<ul>
+  <li><code>is-todo</code> &mdash; not started</li>
+  <li><code>is-flight</code> &mdash; branch open, work in progress</li>
+  <li><code>is-review</code> &mdash; PR open, awaiting review</li>
+  <li><code>is-merged</code> &mdash; landed on <code>main</code></li>
+  <li><code>is-blocked</code> &mdash; blocked on an external decision or upstream goal</li>
+  <li><code>is-defer</code> &mdash; pulled out of current scope</li>
+</ul>
+<p>Also update the inline <code>.goal-status</code> text (&ldquo;To do&rdquo;, &ldquo;In flight&rdquo;, &hellip;), the PR link, and the <code>Status snapshot</code> at the top.</p>
+</div>
+
+<div class="howto">
+<h4>Branch &amp; commit naming</h4>
+<dl class="goal-body">
+  <dt>Branch</dt><dd><code>feat/&lt;goalcode-lower&gt;-&lt;kebab-title&gt;</code> &mdash; e.g. <code>feat/sm1-location-validator</code></dd>
+  <dt>Commit</dt><dd><code>feat(&lt;scope&gt;): &lt;summary&gt; (&lt;GOALCODE&gt;)</code> &mdash; e.g. <code>feat(bookings): adopt locationValidator (SM1)</code></dd>
+  <dt>PR title</dt><dd><code>SM1 &mdash; &lt;goal title&gt;</code></dd>
+</dl>
+</div>
+
+</section>
+
+</div>
+</body>
+</html>

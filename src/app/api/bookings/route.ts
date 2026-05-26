@@ -45,6 +45,10 @@ export async function POST(request: Request) {
     return bookingError("Trip date, time, contact, and luggage details are required.");
   }
 
+  const idempotencyKey =
+    request.headers.get("Idempotency-Key")?.trim() ||
+    readOptionalString(formData, "idempotencyKey");
+
   try {
     const convex = new ConvexHttpClient(convexUrl);
     const result = await convex.mutation(api.bookings.create, {
@@ -68,12 +72,16 @@ export async function POST(request: Request) {
       customerEmail,
       customerPhone,
       notes: readOptionalString(formData, "notes"),
+      idempotencyKey: idempotencyKey || undefined,
     });
 
     return Response.json({
       status: "success",
-      message: "Request received. Dispatch will confirm pricing and availability.",
+      message: result.replayed
+        ? "Request already received. Dispatch will confirm pricing and availability."
+        : "Request received. Dispatch will confirm pricing and availability.",
       publicReference: result.publicReference,
+      replayed: result.replayed,
     });
   } catch (error) {
     if (isRateLimitError(error)) {

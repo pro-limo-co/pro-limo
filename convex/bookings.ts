@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { limitBookingSubmission } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
 
@@ -48,8 +49,29 @@ export const create = mutation({
     customerEmail: v.string(),
     customerPhone: v.string(),
     notes: optionalString,
+    idempotencyKey: optionalString,
   },
   handler: async (ctx, args) => {
+    const { idempotencyKey, ...bookingArgs } = args;
+
+    if (idempotencyKey) {
+      const existingKey = await ctx.db
+        .query("idempotencyKeys")
+        .withIndex("by_key", (q) => q.eq("key", idempotencyKey))
+        .unique();
+      if (existingKey) {
+        const existingBooking = await ctx.db.get(existingKey.resourceId as Id<"bookings">);
+        if (existingBooking) {
+          return {
+            bookingId: existingBooking._id,
+            publicReference: existingBooking.publicReference,
+            status: existingBooking.status,
+            replayed: true as const,
+          };
+        }
+      }
+    }
+
     await limitBookingSubmission(ctx, {
       customerEmail: args.customerEmail,
       customerPhone: args.customerPhone,
@@ -57,7 +79,7 @@ export const create = mutation({
 
     const now = Date.now();
     const bookingId = await ctx.db.insert("bookings", {
-      ...args,
+      ...bookingArgs,
       publicReference: "pending",
       status: "new",
       paymentStatus: "not_started",
@@ -66,7 +88,7 @@ export const create = mutation({
     });
     const publicReference = `PLD-${bookingId.slice(-8).toUpperCase()}`;
 
-    await Promise.all([
+    const sideEffects: Promise<unknown>[] = [
       ctx.db.patch(bookingId, {
         publicReference,
         updatedAt: now,
@@ -78,12 +100,24 @@ export const create = mutation({
         createdAt: now,
       }),
       upsertCustomerProfile(ctx, args, now),
-    ]);
+    ];
+    if (idempotencyKey) {
+      sideEffects.push(
+        ctx.db.insert("idempotencyKeys", {
+          key: idempotencyKey,
+          resourceType: "booking",
+          resourceId: bookingId,
+          createdAt: now,
+        }),
+      );
+    }
+    await Promise.all(sideEffects);
 
     return {
       bookingId,
       publicReference,
       status: "new" as const,
+      replayed: false as const,
     };
   },
 });
