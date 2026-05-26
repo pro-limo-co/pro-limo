@@ -1938,9 +1938,17 @@ function dispatchDraftReducer(state: DispatchDraft, action: DispatchDraftAction)
 
 function createRateQuoteDraft(booking: Booking): RateQuoteDraft {
   const parsedHours = parseDurationHours(booking.duration);
+  // Pre-fill distance from SM3's cached Routes API result when present.
+  // Dispatcher can still override; this just removes a manual lookup
+  // for the common case where the customer submitted with structured
+  // pickup + dropoff (SM1 + SM2).
+  const prefillMiles =
+    booking.estimatedDistanceMeters !== undefined && booking.estimatedDistanceMeters > 0
+      ? (booking.estimatedDistanceMeters / 1609.344).toFixed(1)
+      : "";
   return {
     profileKey: "",
-    distanceMiles: "",
+    distanceMiles: prefillMiles,
     billableHours: parsedHours > 0 ? String(parsedHours) : booking.bookingMode === "hourly" ? "2" : "",
     extraStops: "0",
     includeAirportFee: booking.bookingMode === "airport" ? "true" : "false",
