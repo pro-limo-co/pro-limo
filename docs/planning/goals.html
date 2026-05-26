@@ -512,11 +512,11 @@
     </dl>
   </article>
 
-  <article class="goal is-review" id="SM4">
+  <article class="goal is-merged" id="SM4">
     <div class="goal-head">
       <span class="goal-code">SM4</span>
       <span class="goal-title">Map preview in dispatch &amp; tracker</span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">Read&#8209;only map with pickup/dropoff markers. Used by dispatchers to verify trips and by customers to see their route.</p>
     <dl class="goal-body">
@@ -524,7 +524,7 @@
       <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code> (<code>Map</code> + <code>AdvancedMarker</code> + <code>useMap</code> for <code>fitBounds</code>).</dd>
       <dt>Depends on</dt><dd><a href="#SM1">SM1</a> (lat/lng on booking) &mdash; merged. <a href="#SM3">SM3</a> already cached distance + duration; SM4 also surfaces them as <code>InfoRow</code>s in dispatch.</dd>
       <dt>Done when</dt><dd>Component renders null silently when no lat/lng or no API key &mdash; safe to drop into any layout. Both pages show the map when present, fall through cleanly when not. Distance &amp; duration appear next to the map in dispatch.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/15">#15</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/15">#15</a> &middot; merged</dd>
     </dl>
   </article>
 
@@ -574,18 +574,19 @@
     </dl>
   </article>
 
-  <article class="goal is-defer" id="ST3">
+  <article class="goal is-review" id="ST3">
     <div class="goal-head">
       <span class="goal-code">ST3</span>
       <span class="goal-title">Customer booking confirmation SMS</span>
-      <span class="goal-status">Deferred</span>
+      <span class="goal-status">In review</span>
     </div>
-    <p class="goal-why">Auto&#8209;send an SMS when a guest booking is submitted. Useful but waits until <a href="#ST2">ST2</a> proves the pipeline and we&rsquo;ve decided on opt&#8209;in copy.</p>
+    <p class="goal-why">Auto&#8209;send an SMS when a guest booking is submitted. ST2&rsquo;s pipeline is live; this PR turns it on for customers.</p>
     <dl class="goal-body">
-      <dt>Touches</dt><dd><code>convex/bookings.ts</code> (<code>create</code>)</dd>
-      <dt>Depends on</dt><dd><a href="#ST2">ST2</a>, copy/legal sign&#8209;off.</dd>
-      <dt>Done when</dt><dd>New booking submissions enqueue a confirmation SMS to the customer phone.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>Touches</dt><dd><code>convex/bookings.ts</code> (<code>create</code> enqueues a <code>booking_confirmation_sms</code> queue row alongside the existing side-effects)</dd>
+      <dt>Depends on</dt><dd><a href="#ST2">ST2</a> + <a href="#ST1">ST1</a> + <a href="#SI1">SI1</a> &mdash; all merged.</dd>
+      <dt>Adapt</dt><dd>Treated as transactional (TCPA &ldquo;established business relationship&rdquo; / transactional exception): the customer just gave us their phone as part of the booking. Body: greeting + PLD ref + tracker URL + <code>Reply STOP to opt out</code>. Twilio handles STOP/HELP automatically for US 10DLC. <code>looksLikePhoneNumber</code> guard (10+ digits after stripping) avoids enqueueing on garbage input. SITE_URL env pattern reused from ST2.</dd>
+      <dt>Done when</dt><dd>New booking submissions enqueue a confirmation SMS; ST1&rsquo;s cron drains it. With env unset the row stays pending until Twilio is configured (SI1&rsquo;s skip semantics).</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/16">#16</a></dd>
     </dl>
   </article>
 
