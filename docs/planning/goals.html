@@ -463,11 +463,11 @@
 
 <div class="goal-grid">
 
-  <article class="goal is-flight" id="SM1">
+  <article class="goal is-review" id="SM1">
     <div class="goal-head">
       <span class="goal-code">SM1</span>
       <span class="goal-title">Adopt <code>locationValidator</code> on <code>bookings</code></span>
-      <span class="goal-status">In flight</span>
+      <span class="goal-status">In review</span>
     </div>
     <p class="goal-why">Replace <code>pickupLocation</code> / <code>dropoffLocation</code> <code>v.string()</code> with the structured shape from mobile (<code>{address?, city?, state?, zip?, lat, lng, placeId?, name?}</code>). Prerequisite for autocomplete, routing, map previews.</p>
     <dl class="goal-body">
@@ -475,7 +475,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:148</code></dd>
       <dt>Migration</dt><dd>Widen&#8209;migrate&#8209;narrow per <code>convex-migration-helper</code>: add optional structured field alongside the string, backfill, then narrow.</dd>
       <dt>Done when</dt><dd>All <code>bookings</code> reads/writes use the structured field; the string column is removed; existing rows backfilled (geocoded or marked legacy).</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/2">#2</a> &mdash; widening phase</dd>
     </dl>
   </article>
 
