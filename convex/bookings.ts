@@ -117,6 +117,25 @@ export const create = mutation({
         }),
       );
     }
+
+    // Customer confirmation SMS. Transactional message tied to the
+    // booking submission — uses the phone they just gave us. STOP /
+    // HELP handled automatically by Twilio for US 10DLC numbers.
+    if (looksLikePhoneNumber(args.customerPhone)) {
+      sideEffects.push(
+        ctx.runMutation(internal.notifications.internalEnqueue, {
+          bookingId,
+          channel: "sms",
+          type: "booking_confirmation_sms",
+          recipientPhone: args.customerPhone.trim(),
+          body: buildCustomerConfirmationSmsBody({
+            customerName: args.customerName,
+            publicReference,
+          }),
+          payload: { firstName: args.customerName.split(/\s+/)[0] },
+        }),
+      );
+    }
     await Promise.all(sideEffects);
 
     // Fire-and-forget route computation when both lat/lng pairs are
@@ -449,4 +468,29 @@ function normalizeEmailKey(email: string) {
 
 function normalizePhoneKey(phone: string) {
   return phone.replace(/\D/g, "") || phone.trim().toLowerCase();
+}
+
+function looksLikePhoneNumber(phone: string) {
+  // Conservative: at least 10 digits after stripping formatting.
+  // Twilio will validate further; this just avoids enqueueing
+  // obvious noise (empty, "n/a", etc.).
+  return phone.replace(/\D/g, "").length >= 10;
+}
+
+function buildCustomerConfirmationSmsBody({
+  customerName,
+  publicReference,
+}: {
+  customerName: string;
+  publicReference: string;
+}) {
+  const firstName = customerName.trim().split(/\s+/)[0] ?? "there";
+  const siteUrl = (process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+  const trackerPath = `/booking/${publicReference}`;
+  const fullUrl = siteUrl ? new URL(trackerPath, siteUrl).toString() : trackerPath;
+  return [
+    `Hi ${firstName}, Pro Limo received your booking ${publicReference}. Dispatch will confirm pricing and a chauffeur shortly.`,
+    `Track your trip: ${fullUrl}`,
+    `Reply STOP to opt out.`,
+  ].join("\n");
 }
