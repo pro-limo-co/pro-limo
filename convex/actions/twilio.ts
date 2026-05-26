@@ -25,16 +25,62 @@ export class TwilioSendError extends Error {
 
 type TwilioConfig = {
   accountSid: string;
-  authToken: string;
+  /** Basic-auth username for the API call. Account SID in classic mode, API Key SID in API-Key mode. */
+  authUser: string;
+  /** Basic-auth password. Auth Token in classic mode, API Key Secret in API-Key mode. */
+  authPass: string;
   fromNumber: string;
+  authMode: "account" | "apiKey";
 };
 
+/**
+ * Detects which Twilio auth style is configured and returns the
+ * appropriate credentials. Two supported modes:
+ *
+ * 1. **API Key** (preferred for scoped, rotatable creds):
+ *    - TWILIO_ACCOUNT_SID    (AC… — still needed for the URL path)
+ *    - TWILIO_API_KEY_SID    (SK…)
+ *    - TWILIO_API_KEY_SECRET (the key's secret)
+ *    - TWILIO_FROM_NUMBER
+ *
+ * 2. **Account auth** (classic, uses the master Auth Token):
+ *    - TWILIO_ACCOUNT_SID    (AC…)
+ *    - TWILIO_AUTH_TOKEN
+ *    - TWILIO_FROM_NUMBER
+ *
+ * If API Key vars are present, they win. Returns null when neither
+ * triplet is complete so the caller (cron) can skip without burning
+ * retries.
+ */
 function readTwilioConfig(): TwilioConfig | null {
   const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim();
-  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
   const fromNumber = process.env.TWILIO_FROM_NUMBER?.trim();
-  if (!accountSid || !authToken || !fromNumber) return null;
-  return { accountSid, authToken, fromNumber };
+  if (!accountSid || !fromNumber) return null;
+
+  const apiKeySid = process.env.TWILIO_API_KEY_SID?.trim();
+  const apiKeySecret = process.env.TWILIO_API_KEY_SECRET?.trim();
+  if (apiKeySid && apiKeySecret) {
+    return {
+      accountSid,
+      authUser: apiKeySid,
+      authPass: apiKeySecret,
+      fromNumber,
+      authMode: "apiKey",
+    };
+  }
+
+  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
+  if (authToken) {
+    return {
+      accountSid,
+      authUser: accountSid,
+      authPass: authToken,
+      fromNumber,
+      authMode: "account",
+    };
+  }
+
+  return null;
 }
 
 /**
@@ -55,7 +101,7 @@ export const sendSms = internalAction({
     const config = readTwilioConfig();
     if (!config) {
       throw new TwilioConfigError(
-        "Twilio is not configured (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / TWILIO_FROM_NUMBER).",
+        "Twilio is not configured. Set TWILIO_ACCOUNT_SID + TWILIO_FROM_NUMBER plus either (TWILIO_AUTH_TOKEN) or (TWILIO_API_KEY_SID + TWILIO_API_KEY_SECRET).",
       );
     }
 
@@ -65,7 +111,7 @@ export const sendSms = internalAction({
       From: config.fromNumber,
       Body: args.body,
     });
-    const auth = Buffer.from(`${config.accountSid}:${config.authToken}`).toString("base64");
+    const auth = Buffer.from(`${config.authUser}:${config.authPass}`).toString("base64");
 
     const response = await fetch(url, {
       method: "POST",
