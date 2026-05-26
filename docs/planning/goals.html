@@ -508,7 +508,7 @@
       <dt>Env</dt><dd><code>GOOGLE_ROUTES_API_KEY</code> (server&#8209;side, no domain restriction). <strong>Env-aware fallback:</strong> action throws <code>RoutesConfigError</code> when unset; orchestrator catches it and returns <code>{ skipped: "no-env" }</code> &mdash; no row failure, distance just stays unset until env is configured.</dd>
       <dt>Depends on</dt><dd><a href="#SM1">SM1</a> (structured locations) + <a href="#SM2">SM2</a> (autocomplete that populates them) &mdash; both merged.</dd>
       <dt>Done when</dt><dd>Bookings created with both lat/lng pairs schedule <code>computeForBooking</code> after insert; Routes API returns meters + seconds; row patched with both. Quote math wiring (dispatcher UI consuming these fields) is a follow-up so this PR stays focused on the data plane.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SM3">&mdash; pending push</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/13">#13</a></dd>
     </dl>
   </article>
 
