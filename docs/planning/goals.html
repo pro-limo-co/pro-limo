@@ -479,20 +479,20 @@
     </dl>
   </article>
 
-  <article class="goal is-todo" id="SM2">
+  <article class="goal is-review" id="SM2">
     <div class="goal-head">
       <span class="goal-code">SM2</span>
       <span class="goal-title">Google Places autocomplete on the booking form</span>
-      <span class="goal-status">To do</span>
+      <span class="goal-status">In review</span>
     </div>
     <p class="goal-why">Replace the plain text input in <code>BookingCard.tsx</code> with a Places&#8209;backed autocomplete. Restrict to service&#8209;area bounds.</p>
     <dl class="goal-body">
-      <dt>Touches</dt><dd><code>src/components/BookingCard.tsx</code>, new <code>src/components/AddressAutocomplete.tsx</code></dd>
-      <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code> (preferred) or Places JS direct.</dd>
-      <dt>Env</dt><dd><code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> (web&#8209;restricted).</dd>
+      <dt>Touches</dt><dd><code>src/components/BookingCard.tsx</code>, new <code>src/components/booking/AddressAutocomplete.tsx</code></dd>
+      <dt>Library</dt><dd><code>@vis.gl/react-google-maps</code></dd>
+      <dt>Env</dt><dd><code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> (web&#8209;restricted). <strong>Env-aware fallback:</strong> when unset, renders the plain text input verbatim &mdash; same UX as today, no broken page.</dd>
       <dt>Depends on</dt><dd><a href="#SM1">SM1</a> for the structured schema to write into.</dd>
-      <dt>Done when</dt><dd>Address field surfaces Places suggestions; selection writes <code>{lat, lng, placeId, address}</code> into the form state; submit persists structured location.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>Done when</dt><dd>Address field surfaces Places suggestions; selection writes <code>{lat, lng, placeId, address, city, state, zip, name}</code> into the form state; submit persists structured location via the FormData JSON channel SM1 added.</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SM2">&mdash; pending push</a></dd>
     </dl>
   </article>
 
