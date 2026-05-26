@@ -424,18 +424,18 @@
 
 <section class="summary" id="summary">
   <h3>Status snapshot</h3>
-  <!-- 12 goals total. SI1 + SI2 merged; SM1 in review on this branch (PR #2). -->
+  <!-- 12 goals total. SM1 + SI1 + SI2 all merged. -->
   <div class="summary-bar" aria-label="Goal status distribution">
-    <div class="s-merged"  style="width:16.7%"></div>
-    <div class="s-review"  style="width:8.3%"></div>
+    <div class="s-merged"  style="width:25%"></div>
+    <div class="s-review"  style="width:0%"></div>
     <div class="s-flight"  style="width:0%"></div>
     <div class="s-blocked" style="width:0%"></div>
     <div class="s-todo"    style="width:50%"></div>
     <div class="s-defer"   style="width:25%"></div>
   </div>
   <div class="summary-legend">
-    <span><span class="swatch sw-merged"></span>Merged · 2</span>
-    <span><span class="swatch sw-review"></span>In review · 1</span>
+    <span><span class="swatch sw-merged"></span>Merged · 3</span>
+    <span><span class="swatch sw-review"></span>In review · 0</span>
     <span><span class="swatch sw-flight"></span>In flight · 0</span>
     <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
     <span><span class="swatch sw-todo"></span>To do · 6</span>
@@ -463,11 +463,11 @@
 
 <div class="goal-grid">
 
-  <article class="goal is-review" id="SM1">
+  <article class="goal is-merged" id="SM1">
     <div class="goal-head">
       <span class="goal-code">SM1</span>
       <span class="goal-title">Adopt <code>locationValidator</code> on <code>bookings</code></span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">Replace <code>pickupLocation</code> / <code>dropoffLocation</code> <code>v.string()</code> with the structured shape from mobile (<code>{address?, city?, state?, zip?, lat, lng, placeId?, name?}</code>). Prerequisite for autocomplete, routing, map previews.</p>
     <dl class="goal-body">
@@ -475,7 +475,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:148</code></dd>
       <dt>Migration</dt><dd>Widen&#8209;migrate&#8209;narrow per <code>convex-migration-helper</code>: add optional structured field alongside the string, backfill, then narrow.</dd>
       <dt>Done when</dt><dd>All <code>bookings</code> reads/writes use the structured field; the string column is removed; existing rows backfilled (geocoded or marked legacy).</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/2">#2</a> &mdash; widening phase</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/2">#2</a> &middot; merged &middot; widening phase</dd>
     </dl>
   </article>
 
