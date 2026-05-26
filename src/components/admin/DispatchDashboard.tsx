@@ -14,6 +14,7 @@ import {
   Plus,
   Save,
   Send,
+  Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from "react";
@@ -296,6 +297,7 @@ function DispatchBookingRow({
   const addNote = useMutation(api.bookings.addNote);
   const createHandoff = useMutation(api.handoffs.create);
   const createCheckoutSession = useAction(api.payments.createCheckoutSession);
+  const createShare = useMutation(api.tripShares.create);
   const [rowUi, dispatchRowUi] = useReducer(rowUiReducer, { booking, initialOpen }, createRowUiState);
   const { expanded, handoffDraft, handoffResult, message, pending } = rowUi;
   const handoffs = useQuery(api.handoffs.listForBooking, expanded ? { bookingId: booking._id } : "skip");
@@ -409,6 +411,26 @@ function DispatchBookingRow({
     }
   }
 
+  async function shareTrip() {
+    dispatchRowUi({ type: "setPending", pending: true });
+    dispatchRowUi({ type: "setMessage", message: "" });
+    try {
+      const result = await createShare({ bookingId: booking._id });
+      const origin = typeof window === "undefined" ? "" : window.location.origin;
+      const url = `${origin}/share/${result.shareToken}`;
+      try {
+        await navigator.clipboard?.writeText(url);
+        dispatchRowUi({ type: "setMessage", message: `Share link copied. ${url}` });
+      } catch {
+        dispatchRowUi({ type: "setMessage", message: `Share link ready: ${url}` });
+      }
+    } catch (error) {
+      dispatchRowUi({ type: "setMessage", message: error instanceof Error ? error.message : "Could not create share link." });
+    } finally {
+      dispatchRowUi({ type: "setPending", pending: false });
+    }
+  }
+
   async function prepareHandoff() {
     const validationMessage = getHandoffValidationMessage(handoffDraft);
     if (validationMessage) {
@@ -475,6 +497,7 @@ function DispatchBookingRow({
             onOpenCheckout={openCheckout}
             onSaveDispatch={saveDispatch}
             onSaveNote={saveNote}
+            onShareTrip={shareTrip}
             pending={pending}
             rateProfiles={rateProfiles}
             vehicleProfiles={vehicleProfiles}
@@ -605,6 +628,7 @@ function DispatchEditorSection({
   onOpenCheckout,
   onSaveDispatch,
   onSaveNote,
+  onShareTrip,
   pending,
   rateProfiles,
   vehicleProfiles,
@@ -617,6 +641,7 @@ function DispatchEditorSection({
   onOpenCheckout: () => Promise<void>;
   onSaveDispatch: () => Promise<void>;
   onSaveNote: () => Promise<void>;
+  onShareTrip: () => Promise<void>;
   pending: boolean;
   rateProfiles: RateProfile[];
   vehicleProfiles: VehicleProfile[];
@@ -719,7 +744,7 @@ function DispatchEditorSection({
           className="mt-2 min-h-24"
         />
       </div>
-      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-3">
         <Button type="button" disabled={pending} onClick={() => void onSaveDispatch()}>
           <Save className="size-4" aria-hidden />
           Save
@@ -732,6 +757,15 @@ function DispatchEditorSection({
         >
           <CreditCard className="size-4" aria-hidden />
           Payment link
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={pending}
+          onClick={() => void onShareTrip()}
+        >
+          <Share2 className="size-4" aria-hidden />
+          Share trip
         </Button>
       </div>
       <StaffNoteEditor
