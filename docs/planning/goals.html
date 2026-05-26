@@ -661,7 +661,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:543</code>, <code>convex/tripShares.ts</code></dd>
       <dt>Adapt</dt><dd>Staff-scoped <code>create</code> + <code>deactivate</code> (no customer accounts on web). Sanitized projection on <code>getByToken</code> &mdash; omits customer contact, payment internals, dispatcher notes. Audit log via <code>logAudit</code>. 24-char base36 token via Web Crypto. Dispatcher &ldquo;Share trip&rdquo; button deferred to SI4.1 to keep this PR focused on the data + page surface.</dd>
       <dt>Done when</dt><dd>Staff can call <code>tripShares.create</code> to mint a token; <code>/share/[token]</code> renders the sanitized snapshot for anyone; <code>recordView</code> bumps the counter; deactivated/expired tokens show the right empty state.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SI4">&mdash; pending push</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/8">#8</a></dd>
     </dl>
   </article>
 
