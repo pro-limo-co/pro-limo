@@ -8,10 +8,13 @@
  * @module
  */
 
+import type * as actions_notifications from "../actions/notifications.js";
+import type * as actions_twilio from "../actions/twilio.js";
 import type * as auth from "../auth.js";
 import type * as betterAuth_adapter from "../betterAuth/adapter.js";
 import type * as betterAuth_auth from "../betterAuth/auth.js";
 import type * as bookings from "../bookings.js";
+import type * as crons from "../crons.js";
 import type * as customers from "../customers.js";
 import type * as fleet from "../fleet.js";
 import type * as handoffs from "../handoffs.js";
@@ -34,10 +37,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "actions/notifications": typeof actions_notifications;
+  "actions/twilio": typeof actions_twilio;
   auth: typeof auth;
   "betterAuth/adapter": typeof betterAuth_adapter;
   "betterAuth/auth": typeof betterAuth_auth;
   bookings: typeof bookings;
+  crons: typeof crons;
   customers: typeof customers;
   fleet: typeof fleet;
   handoffs: typeof handoffs;
