@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query, type MutationCtx } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { internalMutation, internalQuery, mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { logAudit } from "./lib/audit";
 import { limitBookingSubmission } from "./lib/rateLimits";
@@ -118,12 +119,44 @@ export const create = mutation({
     }
     await Promise.all(sideEffects);
 
+    // Fire-and-forget route computation when both lat/lng pairs are
+    // available. Action is env-aware (skips without GOOGLE_ROUTES_API_KEY).
+    if (bookingArgs.pickupLocationDetails && bookingArgs.dropoffLocationDetails) {
+      await ctx.scheduler.runAfter(0, internal.actions.routes.computeForBooking, {
+        bookingId,
+      });
+    }
+
     return {
       bookingId,
       publicReference,
       status: "new" as const,
       replayed: false as const,
     };
+  },
+});
+
+export const internalGetBooking = internalQuery({
+  args: { bookingId: v.id("bookings") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.bookingId);
+  },
+});
+
+export const internalSetRoute = internalMutation({
+  args: {
+    bookingId: v.id("bookings"),
+    distanceMeters: v.number(),
+    durationSeconds: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    await ctx.db.patch(args.bookingId, {
+      estimatedDistanceMeters: args.distanceMeters,
+      estimatedDurationSeconds: args.durationSeconds,
+      routesQueriedAt: now,
+      updatedAt: now,
+    });
   },
 });
 
@@ -148,6 +181,8 @@ export const getByReference = query({
       dropoffLocation: booking.dropoffLocation,
       pickupLocationDetails: booking.pickupLocationDetails,
       dropoffLocationDetails: booking.dropoffLocationDetails,
+      estimatedDistanceMeters: booking.estimatedDistanceMeters,
+      estimatedDurationSeconds: booking.estimatedDurationSeconds,
       airportTrip: booking.airportTrip,
       pickupDate: booking.pickupDate,
       pickupTime: booking.pickupTime,
