@@ -16,11 +16,16 @@ import type * as customers from "../customers.js";
 import type * as fleet from "../fleet.js";
 import type * as handoffs from "../handoffs.js";
 import type * as http from "../http.js";
+import type * as lib_audit from "../lib/audit.js";
 import type * as lib_rateLimits from "../lib/rateLimits.js";
 import type * as lib_staff from "../lib/staff.js";
+import type * as lib_statusMachine from "../lib/statusMachine.js";
+import type * as lib_validators from "../lib/validators.js";
+import type * as notifications from "../notifications.js";
 import type * as paymentRecords from "../paymentRecords.js";
 import type * as payments from "../payments.js";
 import type * as rates from "../rates.js";
+import type * as tripShares from "../tripShares.js";
 
 import type {
   ApiFromModules,
@@ -37,11 +42,16 @@ declare const fullApi: ApiFromModules<{
   fleet: typeof fleet;
   handoffs: typeof handoffs;
   http: typeof http;
+  "lib/audit": typeof lib_audit;
   "lib/rateLimits": typeof lib_rateLimits;
   "lib/staff": typeof lib_staff;
+  "lib/statusMachine": typeof lib_statusMachine;
+  "lib/validators": typeof lib_validators;
+  notifications: typeof notifications;
   paymentRecords: typeof paymentRecords;
   payments: typeof payments;
   rates: typeof rates;
+  tripShares: typeof tripShares;
 }>;
 
 /**
