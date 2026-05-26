@@ -424,18 +424,18 @@
 
 <section class="summary" id="summary">
   <h3>Status snapshot</h3>
-  <!-- 12 goals total. SM1 + SI1 + SI2 + SI3 + SI5 merged; SI4 in review on this branch. -->
+  <!-- 12 goals total. All SI goals (SI1–SI5) + SM1 merged; SI4.1 (dispatcher button) in review on this branch. Remaining: SM2/SM3/SM4 (Maps, need GOOGLE_MAPS_API_KEY) + ST1/ST2/ST3 (Twilio, need TWILIO_* env). -->
   <div class="summary-bar" aria-label="Goal status distribution">
-    <div class="s-merged"  style="width:41.7%"></div>
-    <div class="s-review"  style="width:8.3%"></div>
+    <div class="s-merged"  style="width:50%"></div>
+    <div class="s-review"  style="width:0%"></div>
     <div class="s-flight"  style="width:0%"></div>
     <div class="s-blocked" style="width:0%"></div>
     <div class="s-todo"    style="width:25%"></div>
     <div class="s-defer"   style="width:25%"></div>
   </div>
   <div class="summary-legend">
-    <span><span class="swatch sw-merged"></span>Merged · 5</span>
-    <span><span class="swatch sw-review"></span>In review · 1</span>
+    <span><span class="swatch sw-merged"></span>Merged · 6</span>
+    <span><span class="swatch sw-review"></span>In review · 0</span>
     <span><span class="swatch sw-flight"></span>In flight · 0</span>
     <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
     <span><span class="swatch sw-todo"></span>To do · 3</span>
@@ -649,11 +649,11 @@
     </dl>
   </article>
 
-  <article class="goal is-review" id="SI4">
+  <article class="goal is-merged" id="SI4">
     <div class="goal-head">
       <span class="goal-code">SI4</span>
       <span class="goal-title"><code>tripShares</code> &mdash; public shareable trip links</span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">Token&#8209;based links anyone can open to see a booking&rsquo;s status. View count tracked.</p>
     <dl class="goal-body">
@@ -661,7 +661,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:543</code>, <code>convex/tripShares.ts</code></dd>
       <dt>Adapt</dt><dd>Staff-scoped <code>create</code> + <code>deactivate</code> (no customer accounts on web). Sanitized projection on <code>getByToken</code> &mdash; omits customer contact, payment internals, dispatcher notes. Audit log via <code>logAudit</code>. 24-char base36 token via Web Crypto. Dispatcher &ldquo;Share trip&rdquo; button deferred to SI4.1 to keep this PR focused on the data + page surface.</dd>
       <dt>Done when</dt><dd>Staff can call <code>tripShares.create</code> to mint a token; <code>/share/[token]</code> renders the sanitized snapshot for anyone; <code>recordView</code> bumps the counter; deactivated/expired tokens show the right empty state.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/8">#8</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/8">#8</a> &middot; merged &middot; SI4.1 wires the dispatcher Share button</dd>
     </dl>
   </article>
 
