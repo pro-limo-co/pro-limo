@@ -18,6 +18,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AddressAutocomplete,
+  type AddressDetails,
+} from "@/components/booking/AddressAutocomplete";
 import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -92,6 +96,8 @@ type BookingFormState = {
   bookingMode: TabId;
   pickupLocation: string;
   dropoffLocation: string;
+  pickupLocationDetails?: AddressDetails;
+  dropoffLocationDetails?: AddressDetails;
   airportTrip: string;
   duration: string;
   pickupDate: string;
@@ -116,6 +122,11 @@ type BookingUiState = {
 
 type BookingUiAction =
   | { type: "field"; field: keyof BookingFormState; value: string }
+  | {
+      type: "addressDetails";
+      field: "pickupLocationDetails" | "dropoffLocationDetails";
+      value: AddressDetails | undefined;
+    }
   | { type: "service"; value: TabId }
   | { type: "goToStep"; step: number }
   | { type: "next" }
@@ -181,6 +192,9 @@ export function BookingCard({
               <AddressStep
                 form={state.form}
                 onFieldChange={(field, value) => dispatch({ type: "field", field, value })}
+                onAddressDetailsChange={(field, value) =>
+                  dispatch({ type: "addressDetails", field, value })
+                }
               />
             )}
             {state.step === 2 && (
@@ -398,22 +412,28 @@ function ServiceStep({
 function AddressStep({
   form,
   onFieldChange,
+  onAddressDetailsChange,
 }: {
   form: BookingFormState;
   onFieldChange: FieldChangeHandler;
+  onAddressDetailsChange: (
+    field: "pickupLocationDetails" | "dropoffLocationDetails",
+    value: AddressDetails | undefined,
+  ) => void;
 }) {
   const isAirport = form.bookingMode === "airport";
   const isHourly = form.bookingMode === "hourly";
 
   return (
     <div className="grid gap-4">
-      <Field
+      <AddressAutocomplete
+        id="booking-pickupLocation"
         label={isAirport ? "Airport or pickup address" : "Pickup address"}
-        name="pickupLocation"
         value={form.pickupLocation}
         placeholder="Address, airport, hotel, or venue"
         required
         onChange={(value) => onFieldChange("pickupLocation", value)}
+        onDetailsChange={(value) => onAddressDetailsChange("pickupLocationDetails", value)}
       />
       {isHourly ? (
         <OptionGroup
@@ -425,13 +445,14 @@ function AddressStep({
           onChange={(value) => onFieldChange("duration", value)}
         />
       ) : (
-        <Field
-          label={isAirport ? "Drop-off address" : "Drop-off address"}
-          name="dropoffLocation"
+        <AddressAutocomplete
+          id="booking-dropoffLocation"
+          label="Drop-off address"
           value={form.dropoffLocation}
           placeholder="Final destination"
           required
           onChange={(value) => onFieldChange("dropoffLocation", value)}
+          onDetailsChange={(value) => onAddressDetailsChange("dropoffLocationDetails", value)}
         />
       )}
       {isAirport && (
@@ -767,6 +788,12 @@ function bookingUiReducer(state: BookingUiState, action: BookingUiAction): Booki
         submission: initialSubmission,
         form: { ...state.form, [action.field]: action.value },
       };
+    case "addressDetails":
+      return {
+        ...state,
+        submission: initialSubmission,
+        form: { ...state.form, [action.field]: action.value },
+      };
     case "service":
       return {
         ...state,
@@ -860,6 +887,10 @@ function createBookingFormData({
   appendFormValue(formData, "serviceSlug", serviceSlug);
   appendFormValue(formData, "pickupLocation", form.pickupLocation);
   appendFormValue(formData, "dropoffLocation", form.bookingMode === "hourly" ? undefined : form.dropoffLocation);
+  appendLocationDetails(formData, "pickupLocationDetails", form.pickupLocationDetails);
+  if (form.bookingMode !== "hourly") {
+    appendLocationDetails(formData, "dropoffLocationDetails", form.dropoffLocationDetails);
+  }
   appendFormValue(formData, "airportTrip", form.bookingMode === "airport" ? form.airportTrip : undefined);
   appendFormValue(formData, "duration", form.bookingMode === "hourly" ? form.duration : undefined);
   appendFormValue(formData, "pickupDate", form.pickupDate);
@@ -879,6 +910,15 @@ function createBookingFormData({
 function appendFormValue(formData: FormData, key: string, value: string | undefined) {
   const trimmed = value?.trim();
   if (trimmed) formData.append(key, trimmed);
+}
+
+function appendLocationDetails(
+  formData: FormData,
+  key: string,
+  details: AddressDetails | undefined,
+) {
+  if (!details) return;
+  formData.append(key, JSON.stringify(details));
 }
 
 function getServiceLabel(value: TabId) {
