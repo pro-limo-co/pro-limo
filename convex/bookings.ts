@@ -4,6 +4,7 @@ import type { Id } from "./_generated/dataModel";
 import { logAudit } from "./lib/audit";
 import { limitBookingSubmission } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
+import { formatStatus } from "./lib/statusMachine";
 import { locationValidator } from "./lib/validators";
 
 const bookingMode = v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport"));
@@ -313,20 +314,6 @@ export const updateDispatch = mutation({
     ]);
   },
 });
-
-function formatStatus(status: string) {
-  const labels: Record<string, string> = {
-    arrived: "Arrived",
-    assigned: "Assigned",
-    canceled: "Canceled",
-    completed: "Completed",
-    driver_en_route: "Driver on the way",
-    in_progress: "Passenger onboard",
-    new: "New",
-    quoted: "Quoted",
-  };
-  return labels[status] ?? status.replaceAll("_", " ");
-}
 
 export const addNote = mutation({
   args: {
