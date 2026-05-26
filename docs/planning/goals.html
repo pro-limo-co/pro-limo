@@ -496,11 +496,11 @@
     </dl>
   </article>
 
-  <article class="goal is-review" id="SM3">
+  <article class="goal is-merged" id="SM3">
     <div class="goal-head">
       <span class="goal-code">SM3</span>
       <span class="goal-title">Google Routes API for distance + duration</span>
-      <span class="goal-status">In review</span>
+      <span class="goal-status">Merged</span>
     </div>
     <p class="goal-why">Convex action that calls Routes API to compute miles &amp; minutes. Cached on the booking row so quoting math (<code>rateProfiles.perMileCents</code>) finally has a real input. Replaces mobile&rsquo;s Haversine shortcut.</p>
     <dl class="goal-body">
@@ -508,7 +508,7 @@
       <dt>Env</dt><dd><code>GOOGLE_ROUTES_API_KEY</code> (server&#8209;side, no domain restriction). <strong>Env-aware fallback:</strong> action throws <code>RoutesConfigError</code> when unset; orchestrator catches it and returns <code>{ skipped: "no-env" }</code> &mdash; no row failure, distance just stays unset until env is configured.</dd>
       <dt>Depends on</dt><dd><a href="#SM1">SM1</a> (structured locations) + <a href="#SM2">SM2</a> (autocomplete that populates them) &mdash; both merged.</dd>
       <dt>Done when</dt><dd>Bookings created with both lat/lng pairs schedule <code>computeForBooking</code> after insert; Routes API returns meters + seconds; row patched with both. Quote math wiring (dispatcher UI consuming these fields) is a follow-up so this PR stays focused on the data plane.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/13">#13</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/13">#13</a> &middot; merged</dd>
     </dl>
   </article>
 
@@ -558,18 +558,19 @@
     </dl>
   </article>
 
-  <article class="goal is-todo" id="ST2">
+  <article class="goal is-review" id="ST2">
     <div class="goal-head">
       <span class="goal-code">ST2</span>
       <span class="goal-title">Wire SMS handoffs through <code>notificationQueue</code></span>
-      <span class="goal-status">To do</span>
+      <span class="goal-status">In review</span>
     </div>
     <p class="goal-why">When a dispatcher picks the SMS channel on a handoff, enqueue a notification; the queue processor calls <a href="#ST1">ST1</a>. No more silent &ldquo;sms&rdquo; handoffs.</p>
     <dl class="goal-body">
-      <dt>Touches</dt><dd><code>convex/handoffs.ts</code>, the queue processor from <a href="#SI1">SI1</a></dd>
-      <dt>Depends on</dt><dd><a href="#ST1">ST1</a>, <a href="#SI1">SI1</a> (notificationQueue + cron).</dd>
-      <dt>Done when</dt><dd>Selecting SMS as channel results in a delivered text; <code>rideHandoffs.status</code> updates appropriately on send/fail.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>Touches</dt><dd><code>convex/handoffs.ts</code> (adds <code>buildHandoffSmsBody</code> + <code>internalEnqueue</code> side-effect when channel = sms)</dd>
+      <dt>Depends on</dt><dd><a href="#ST1">ST1</a>, <a href="#SI1">SI1</a> (notificationQueue + cron) &mdash; both merged.</dd>
+      <dt>Adapt</dt><dd>SMS body is a templated string with the booking ref + full ride link + optional dispatcher message. Uses <code>SITE_URL</code> / <code>NEXT_PUBLIC_SITE_URL</code> env (same pattern as <code>convex/payments.ts</code>) so the link works in production; falls back to the path-only when env is unset (still works once the recipient opens it on the production host).</dd>
+      <dt>Done when</dt><dd>Selecting SMS as channel enqueues a row; ST1&rsquo;s cron drains it to Twilio; <code>rideHandoffs.status</code> stays <code>sent</code> on success and the queue row carries the delivery outcome / retries.</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/14">#14</a></dd>
     </dl>
   </article>
 
