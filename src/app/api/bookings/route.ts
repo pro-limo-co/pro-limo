@@ -59,6 +59,8 @@ export async function POST(request: Request) {
       serviceSlug: readOptionalString(formData, "serviceSlug"),
       pickupLocation,
       dropoffLocation,
+      pickupLocationDetails: readOptionalLocation(formData, "pickupLocationDetails"),
+      dropoffLocationDetails: readOptionalLocation(formData, "dropoffLocationDetails"),
       airportTrip: readOptionalString(formData, "airportTrip"),
       pickupDate,
       pickupTime,
@@ -121,4 +123,27 @@ function readString(formData: FormData, key: string) {
 function readOptionalString(formData: FormData, key: string) {
   const value = readString(formData, key);
   return value.length > 0 ? value : undefined;
+}
+
+function readOptionalLocation(formData: FormData, key: string) {
+  const raw = readString(formData, key);
+  if (!raw) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return undefined;
+    const candidate = parsed as Record<string, unknown>;
+    if (typeof candidate.lat !== "number" || typeof candidate.lng !== "number") return undefined;
+    return {
+      lat: candidate.lat,
+      lng: candidate.lng,
+      address: typeof candidate.address === "string" ? candidate.address : undefined,
+      city: typeof candidate.city === "string" ? candidate.city : undefined,
+      state: typeof candidate.state === "string" ? candidate.state : undefined,
+      zip: typeof candidate.zip === "string" ? candidate.zip : undefined,
+      placeId: typeof candidate.placeId === "string" ? candidate.placeId : undefined,
+      name: typeof candidate.name === "string" ? candidate.name : undefined,
+    };
+  } catch {
+    return undefined;
+  }
 }

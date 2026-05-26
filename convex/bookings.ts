@@ -3,6 +3,7 @@ import { mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { limitBookingSubmission } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
+import { locationValidator } from "./lib/validators";
 
 const bookingMode = v.union(v.literal("oneway"), v.literal("hourly"), v.literal("airport"));
 const bookingStatus = v.union(
@@ -36,6 +37,8 @@ export const create = mutation({
     serviceSlug: optionalString,
     pickupLocation: v.string(),
     dropoffLocation: optionalString,
+    pickupLocationDetails: v.optional(locationValidator),
+    dropoffLocationDetails: v.optional(locationValidator),
     airportTrip: optionalString,
     pickupDate: v.string(),
     pickupTime: v.string(),
@@ -141,6 +144,8 @@ export const getByReference = query({
       bookingMode: booking.bookingMode,
       pickupLocation: booking.pickupLocation,
       dropoffLocation: booking.dropoffLocation,
+      pickupLocationDetails: booking.pickupLocationDetails,
+      dropoffLocationDetails: booking.dropoffLocationDetails,
       airportTrip: booking.airportTrip,
       pickupDate: booking.pickupDate,
       pickupTime: booking.pickupTime,

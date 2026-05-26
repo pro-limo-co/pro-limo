@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { locationValidator } from "./lib/validators";
 
 const bookingStatus = v.union(
   v.literal("new"),
@@ -131,6 +132,8 @@ export default defineSchema({
     serviceSlug: v.optional(v.string()),
     pickupLocation: v.string(),
     dropoffLocation: v.optional(v.string()),
+    pickupLocationDetails: v.optional(locationValidator),
+    dropoffLocationDetails: v.optional(locationValidator),
     airportTrip: v.optional(v.string()),
     pickupDate: v.string(),
     pickupTime: v.string(),
