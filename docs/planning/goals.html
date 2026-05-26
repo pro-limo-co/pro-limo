@@ -676,7 +676,7 @@
       <dt>Reference</dt><dd>mobile <code>convex/lib/statusMachine.ts</code></dd>
       <dt>Adapt</dt><dd><strong>Refactor scope only.</strong> Lifted helpers (<code>formatStatus</code>, <code>requiredPreviousBookingStatusForDriverUpdate</code>, <code>isTerminalBookingStatus</code>, <code>canCancelFromStatus</code>, <code>isValidTransition</code>) collapse two duplicate <code>formatStatus</code> impls and one inline driver-status table. No behavior change &mdash; <code>isValidTransition</code> is exposed for future opt-in, not enforced on <code>updateDispatch</code> today (that&rsquo;s a deliberate follow-up so we don&rsquo;t change dispatcher UX in a refactor PR).</dd>
       <dt>Done when</dt><dd><code>convex/lib/statusMachine.ts</code> is the single source of truth for booking status logic; <code>bookings.ts</code> + <code>handoffs.ts</code> import from it; the duplicated <code>formatStatus</code> functions and inline driver-status table are removed.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SI5">&mdash; pending push</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/7">#7</a></dd>
     </dl>
   </article>
 
