@@ -264,6 +264,22 @@ export default defineSchema({
     .index("by_bookingId_and_status", ["bookingId", "status"])
     .index("by_type_and_status", ["type", "status"]),
 
+  tripShares: defineTable({
+    bookingId: v.id("bookings"),
+    shareToken: v.string(),
+    createdByTokenIdentifier: v.optional(v.string()),
+    createdByName: v.optional(v.string()),
+    expiresAt: v.number(),
+    isActive: v.boolean(),
+    viewCount: v.number(),
+    lastViewedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_bookingId", ["bookingId"])
+    .index("by_shareToken", ["shareToken"])
+    .index("by_isActive", ["isActive"]),
+
   auditLogs: defineTable({
     actorTokenIdentifier: v.optional(v.string()),
     actorName: v.optional(v.string()),
