@@ -2,6 +2,11 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { limitDriverHandoffResponse, limitDriverStatusUpdate } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
+import {
+  formatStatus,
+  requiredPreviousBookingStatusForDriverUpdate,
+  type BookingStatus,
+} from "./lib/statusMachine";
 
 const handoffChannel = v.union(v.literal("email"), v.literal("sms"), v.literal("copy"));
 const handoffResponse = v.union(v.literal("accepted"), v.literal("declined"));
@@ -11,13 +16,6 @@ const driverRideStatus = v.union(
   v.literal("in_progress"),
   v.literal("completed"),
 );
-type DriverRideStatus = "driver_en_route" | "arrived" | "in_progress" | "completed";
-const requiredPreviousBookingStatus: Record<DriverRideStatus, readonly string[]> = {
-  driver_en_route: ["assigned"],
-  arrived: ["driver_en_route"],
-  in_progress: ["arrived"],
-  completed: ["in_progress"],
-};
 
 export const create = mutation({
   args: {
@@ -236,8 +234,8 @@ export const updateRideStatus = mutation({
       throw new Error("A newer driver link exists for this ride");
     }
 
-    const allowedPreviousStatuses = requiredPreviousBookingStatus[args.status];
-    if (!allowedPreviousStatuses.includes(booking.status)) {
+    const allowedPreviousStatuses = requiredPreviousBookingStatusForDriverUpdate[args.status];
+    if (!allowedPreviousStatuses.includes(booking.status as BookingStatus)) {
       throw new Error(
         `Ride must be ${allowedPreviousStatuses.map(formatStatus).join(" or ")} before ${formatStatus(args.status)}`,
       );
@@ -275,12 +273,3 @@ function normalizeOptional(value: string | undefined) {
   return trimmed ? trimmed : undefined;
 }
 
-function formatStatus(status: string) {
-  const labels: Record<string, string> = {
-    arrived: "Arrived",
-    completed: "Completed",
-    driver_en_route: "Driver on the way",
-    in_progress: "Passenger onboard",
-  };
-  return labels[status] ?? status.replaceAll("_", " ");
-}
