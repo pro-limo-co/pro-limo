@@ -424,21 +424,21 @@
 
 <section class="summary" id="summary">
   <h3>Status snapshot</h3>
-  <!-- 12 goals total. SM1 + SI1 + SI2 all merged. -->
+  <!-- 12 goals total. SM1 + SI1 + SI2 merged; SI3 in review on this branch. -->
   <div class="summary-bar" aria-label="Goal status distribution">
     <div class="s-merged"  style="width:25%"></div>
-    <div class="s-review"  style="width:0%"></div>
+    <div class="s-review"  style="width:8.3%"></div>
     <div class="s-flight"  style="width:0%"></div>
     <div class="s-blocked" style="width:0%"></div>
-    <div class="s-todo"    style="width:50%"></div>
+    <div class="s-todo"    style="width:41.7%"></div>
     <div class="s-defer"   style="width:25%"></div>
   </div>
   <div class="summary-legend">
     <span><span class="swatch sw-merged"></span>Merged · 3</span>
-    <span><span class="swatch sw-review"></span>In review · 0</span>
+    <span><span class="swatch sw-review"></span>In review · 1</span>
     <span><span class="swatch sw-flight"></span>In flight · 0</span>
     <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
-    <span><span class="swatch sw-todo"></span>To do · 6</span>
+    <span><span class="swatch sw-todo"></span>To do · 5</span>
     <span><span class="swatch sw-defer"></span>Deferred · 3</span>
   </div>
 </section>
@@ -633,18 +633,19 @@
     </dl>
   </article>
 
-  <article class="goal is-todo" id="SI3">
+  <article class="goal is-review" id="SI3">
     <div class="goal-head">
       <span class="goal-code">SI3</span>
       <span class="goal-title">System&#8209;wide <code>auditLogs</code> table</span>
-      <span class="goal-status">To do</span>
+      <span class="goal-status">In review</span>
     </div>
     <p class="goal-why">Web&rsquo;s <code>bookingEvents</code> is booking&#8209;scoped. Add a system&#8209;wide audit table for staff actions, role changes, rate edits, etc.</p>
     <dl class="goal-body">
-      <dt>Touches</dt><dd><code>convex/schema.ts</code>, a small <code>convex/lib/audit.ts</code> helper</dd>
+      <dt>Touches</dt><dd><code>convex/schema.ts</code>, new <code>convex/lib/audit.ts</code>, wired into <code>bookings.updateDispatch</code> as proof</dd>
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:525</code></dd>
-      <dt>Done when</dt><dd>Helper exists and is called from staff mutations (rates, fleet, role changes); rows include actor, entityType, old/new values.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>Adapt</dt><dd>Drop required <code>userId</code>; use <code>actorTokenIdentifier</code> / <code>actorName</code> like <code>bookingEvents</code> already does. Helper computes per-key old/new diffs and logs alongside the existing event log.</dd>
+      <dt>Done when</dt><dd>Helper exists; first staff mutation wired; future mutations (rates, fleet, role changes) call <code>logAudit()</code> to extend coverage.</dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/6">#6</a></dd>
     </dl>
   </article>
 
