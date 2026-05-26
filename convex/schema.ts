@@ -219,4 +219,13 @@ export default defineSchema({
     .index("by_token", ["token"])
     .index("by_bookingId_and_createdAt", ["bookingId", "createdAt"])
     .index("by_status_and_createdAt", ["status", "createdAt"]),
+
+  idempotencyKeys: defineTable({
+    key: v.string(),
+    resourceType: v.string(),
+    resourceId: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_key", ["key"])
+    .index("by_createdAt", ["createdAt"]),
 });

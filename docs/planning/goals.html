@@ -424,21 +424,21 @@
 
 <section class="summary" id="summary">
   <h3>Status snapshot</h3>
-  <!-- Update widths to reflect current counts. Default: 12 goals, all todo. -->
+  <!-- 12 goals total. SI2 in review on this branch; SM1 is also in review on its own branch (see PR #2). -->
   <div class="summary-bar" aria-label="Goal status distribution">
     <div class="s-merged"  style="width:0%"></div>
-    <div class="s-review"  style="width:0%"></div>
+    <div class="s-review"  style="width:8.3%"></div>
     <div class="s-flight"  style="width:0%"></div>
     <div class="s-blocked" style="width:0%"></div>
-    <div class="s-todo"    style="width:75%"></div>
+    <div class="s-todo"    style="width:66.7%"></div>
     <div class="s-defer"   style="width:25%"></div>
   </div>
   <div class="summary-legend">
     <span><span class="swatch sw-merged"></span>Merged · 0</span>
-    <span><span class="swatch sw-review"></span>In review · 0</span>
+    <span><span class="swatch sw-review"></span>In review · 1</span>
     <span><span class="swatch sw-flight"></span>In flight · 0</span>
     <span><span class="swatch sw-blocked"></span>Blocked · 0</span>
-    <span><span class="swatch sw-todo"></span>To do · 9</span>
+    <span><span class="swatch sw-todo"></span>To do · 8</span>
     <span><span class="swatch sw-defer"></span>Deferred · 3</span>
   </div>
 </section>
@@ -618,18 +618,18 @@
     </dl>
   </article>
 
-  <article class="goal is-todo" id="SI2">
+  <article class="goal is-review" id="SI2">
     <div class="goal-head">
       <span class="goal-code">SI2</span>
       <span class="goal-title"><code>idempotencyKeys</code> on booking submission</span>
-      <span class="goal-status">To do</span>
+      <span class="goal-status">In review</span>
     </div>
     <p class="goal-why">Prevents duplicate bookings when a client retries on a flaky network. Web&rsquo;s booking endpoint is rate&#8209;limited but not idempotent.</p>
     <dl class="goal-body">
       <dt>Touches</dt><dd><code>convex/schema.ts</code>, <code>convex/bookings.ts</code> (<code>create</code>), <code>src/app/api/bookings/route.ts</code> (forward key)</dd>
       <dt>Reference</dt><dd>mobile <code>convex/schema.ts:620</code></dd>
       <dt>Done when</dt><dd>Replaying the same submission with the same idempotency key returns the original booking instead of creating a duplicate.</dd>
-      <dt>PR</dt><dd><span class="pr-link placeholder">&mdash;</span></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="SI2">&mdash; pending push</a></dd>
     </dl>
   </article>
 
