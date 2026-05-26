@@ -9,6 +9,7 @@
  */
 
 import type * as actions_notifications from "../actions/notifications.js";
+import type * as actions_routes from "../actions/routes.js";
 import type * as actions_twilio from "../actions/twilio.js";
 import type * as auth from "../auth.js";
 import type * as betterAuth_adapter from "../betterAuth/adapter.js";
@@ -38,6 +39,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "actions/notifications": typeof actions_notifications;
+  "actions/routes": typeof actions_routes;
   "actions/twilio": typeof actions_twilio;
   auth: typeof auth;
   "betterAuth/adapter": typeof betterAuth_adapter;
