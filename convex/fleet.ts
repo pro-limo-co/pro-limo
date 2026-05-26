@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { logAudit } from "./lib/audit";
 import { requireStaff } from "./lib/staff";
 
 const driverArgs = {
@@ -170,12 +171,25 @@ export const upsertDriver = mutation({
     ...driverArgs,
   },
   handler: async (ctx, args) => {
-    await requireStaff(ctx, "admin");
+    const { identity, staff } = await requireStaff(ctx, "admin");
+    const actor = {
+      tokenIdentifier: identity.tokenIdentifier,
+      name: staff.name ?? staff.email,
+    };
     const driver = normalizeDriverInput(args);
     const now = Date.now();
 
     if (args.driverId) {
+      const before = await ctx.db.get(args.driverId);
       await ctx.db.patch(args.driverId, { ...driver, updatedAt: now });
+      await logAudit(ctx, {
+        actor,
+        action: "fleet.upsertDriver",
+        entityType: "driverProfiles",
+        entityId: args.driverId,
+        oldValues: before ?? undefined,
+        newValues: driver,
+      });
       return args.driverId;
     }
 
@@ -185,14 +199,30 @@ export const upsertDriver = mutation({
       .unique();
     if (existing) {
       await ctx.db.patch(existing._id, { ...driver, updatedAt: now });
+      await logAudit(ctx, {
+        actor,
+        action: "fleet.upsertDriver",
+        entityType: "driverProfiles",
+        entityId: existing._id,
+        oldValues: existing,
+        newValues: driver,
+      });
       return existing._id;
     }
 
-    return await ctx.db.insert("driverProfiles", {
+    const insertedId = await ctx.db.insert("driverProfiles", {
       ...driver,
       createdAt: now,
       updatedAt: now,
     });
+    await logAudit(ctx, {
+      actor,
+      action: "fleet.upsertDriver",
+      entityType: "driverProfiles",
+      entityId: insertedId,
+      newValues: driver,
+    });
+    return insertedId;
   },
 });
 
@@ -202,12 +232,25 @@ export const upsertVehicle = mutation({
     ...vehicleArgs,
   },
   handler: async (ctx, args) => {
-    await requireStaff(ctx, "admin");
+    const { identity, staff } = await requireStaff(ctx, "admin");
+    const actor = {
+      tokenIdentifier: identity.tokenIdentifier,
+      name: staff.name ?? staff.email,
+    };
     const vehicle = normalizeVehicleInput(args);
     const now = Date.now();
 
     if (args.vehicleId) {
+      const before = await ctx.db.get(args.vehicleId);
       await ctx.db.patch(args.vehicleId, { ...vehicle, updatedAt: now });
+      await logAudit(ctx, {
+        actor,
+        action: "fleet.upsertVehicle",
+        entityType: "vehicleProfiles",
+        entityId: args.vehicleId,
+        oldValues: before ?? undefined,
+        newValues: vehicle,
+      });
       return args.vehicleId;
     }
 
@@ -217,14 +260,30 @@ export const upsertVehicle = mutation({
       .unique();
     if (existing) {
       await ctx.db.patch(existing._id, { ...vehicle, updatedAt: now });
+      await logAudit(ctx, {
+        actor,
+        action: "fleet.upsertVehicle",
+        entityType: "vehicleProfiles",
+        entityId: existing._id,
+        oldValues: existing,
+        newValues: vehicle,
+      });
       return existing._id;
     }
 
-    return await ctx.db.insert("vehicleProfiles", {
+    const insertedId = await ctx.db.insert("vehicleProfiles", {
       ...vehicle,
       createdAt: now,
       updatedAt: now,
     });
+    await logAudit(ctx, {
+      actor,
+      action: "fleet.upsertVehicle",
+      entityType: "vehicleProfiles",
+      entityId: insertedId,
+      newValues: vehicle,
+    });
+    return insertedId;
   },
 });
 

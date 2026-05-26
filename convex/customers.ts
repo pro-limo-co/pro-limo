@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { logAudit } from "./lib/audit";
 import { requireStaff } from "./lib/staff";
 
 const optionalString = v.optional(v.string());
@@ -27,16 +28,37 @@ export const updatePreferences = mutation({
     marketingOptIn: v.boolean(),
   },
   handler: async (ctx, args) => {
-    await requireStaff(ctx, "dispatcher");
+    const { identity, staff } = await requireStaff(ctx, "dispatcher");
     const customer = await ctx.db.get(args.customerId);
     if (!customer) throw new Error("Customer not found");
 
-    await ctx.db.patch(args.customerId, {
+    const newValues = {
       preferredVehicle: normalizeOptional(args.preferredVehicle),
       preferredDrivingStyle: normalizeOptional(args.preferredDrivingStyle),
       notes: normalizeOptional(args.notes),
       marketingOptIn: args.marketingOptIn,
+    };
+
+    await ctx.db.patch(args.customerId, {
+      ...newValues,
       updatedAt: Date.now(),
+    });
+
+    await logAudit(ctx, {
+      actor: {
+        tokenIdentifier: identity.tokenIdentifier,
+        name: staff.name ?? staff.email,
+      },
+      action: "customers.updatePreferences",
+      entityType: "customerProfiles",
+      entityId: args.customerId,
+      oldValues: {
+        preferredVehicle: customer.preferredVehicle,
+        preferredDrivingStyle: customer.preferredDrivingStyle,
+        notes: customer.notes,
+        marketingOptIn: customer.marketingOptIn,
+      },
+      newValues,
     });
   },
 });
