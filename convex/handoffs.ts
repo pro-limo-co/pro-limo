@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { limitDriverHandoffResponse, limitDriverStatusUpdate } from "./lib/rateLimits";
 import { requireStaff } from "./lib/staff";
@@ -61,7 +62,7 @@ export const create = mutation({
     });
     const token = `ride-${handoffId.slice(-12).toLowerCase()}`;
 
-    await Promise.all([
+    const sideEffects: Promise<unknown>[] = [
       ctx.db.patch(handoffId, { token, updatedAt: now }),
       ctx.db.patch(args.bookingId, {
         latestHandoffToken: token,
@@ -78,7 +79,27 @@ export const create = mutation({
         actorName: staff.name ?? staff.email,
         createdAt: now,
       }),
-    ]);
+    ];
+
+    if (args.channel === "sms" && args.recipientPhone) {
+      sideEffects.push(
+        ctx.runMutation(internal.notifications.internalEnqueue, {
+          bookingId: args.bookingId,
+          channel: "sms",
+          type: "handoff_sms",
+          recipientPhone: normalizeOptional(args.recipientPhone),
+          body: buildHandoffSmsBody({
+            publicReference: booking.publicReference,
+            recipientName,
+            ridePath: `/rides/${token}`,
+            extraMessage: normalizeOptional(args.message),
+          }),
+          payload: { handoffId, token },
+        }),
+      );
+    }
+
+    await Promise.all(sideEffects);
 
     return {
       handoffId,
@@ -88,6 +109,27 @@ export const create = mutation({
     };
   },
 });
+
+function buildHandoffSmsBody({
+  publicReference,
+  recipientName,
+  ridePath,
+  extraMessage,
+}: {
+  publicReference: string;
+  recipientName: string;
+  ridePath: string;
+  extraMessage: string | undefined;
+}) {
+  const siteUrl = (process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+  const fullUrl = siteUrl ? new URL(ridePath, siteUrl).toString() : ridePath;
+  const lines = [
+    `Hi ${recipientName}, Pro Limo dispatch has a ride for you (${publicReference}).`,
+    `Accept or decline: ${fullUrl}`,
+  ];
+  if (extraMessage) lines.push(extraMessage);
+  return lines.join("\n");
+}
 
 export const getByToken = query({
   args: {
