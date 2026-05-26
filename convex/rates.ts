@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { logAudit } from "./lib/audit";
 import { requireStaff } from "./lib/staff";
 
 const rateProfileArgs = {
@@ -169,15 +170,28 @@ export const upsert = mutation({
     ...rateProfileArgs,
   },
   handler: async (ctx, args) => {
-    await requireStaff(ctx, "admin");
+    const { identity, staff } = await requireStaff(ctx, "admin");
+    const actor = {
+      tokenIdentifier: identity.tokenIdentifier,
+      name: staff.name ?? staff.email,
+    };
 
     const profile = normalizeInput(args);
     const now = Date.now();
 
     if (args.profileId) {
+      const before = await ctx.db.get(args.profileId);
       await ctx.db.patch(args.profileId, {
         ...profile,
         updatedAt: now,
+      });
+      await logAudit(ctx, {
+        actor,
+        action: "rates.upsert",
+        entityType: "rateProfiles",
+        entityId: args.profileId,
+        oldValues: before ?? undefined,
+        newValues: profile,
       });
       return args.profileId;
     }
@@ -192,14 +206,30 @@ export const upsert = mutation({
         ...profile,
         updatedAt: now,
       });
+      await logAudit(ctx, {
+        actor,
+        action: "rates.upsert",
+        entityType: "rateProfiles",
+        entityId: existing._id,
+        oldValues: existing,
+        newValues: profile,
+      });
       return existing._id;
     }
 
-    return await ctx.db.insert("rateProfiles", {
+    const insertedId = await ctx.db.insert("rateProfiles", {
       ...profile,
       createdAt: now,
       updatedAt: now,
     });
+    await logAudit(ctx, {
+      actor,
+      action: "rates.upsert",
+      entityType: "rateProfiles",
+      entityId: insertedId,
+      newValues: profile,
+    });
+    return insertedId;
   },
 });
 

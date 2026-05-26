@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { authComponent } from "./betterAuth/auth";
+import { logAudit } from "./lib/audit";
 import { getBootstrapAdminEmails } from "./lib/staff";
 
 export const { getAuthUser } = authComponent.clientApi();
@@ -90,9 +91,24 @@ export const updateStaffRole = mutation({
       throw new Error("Unauthorized");
     }
 
+    const targetStaff = await ctx.db.get(args.staffId);
+    if (!targetStaff) throw new Error("Staff not found");
+
     await ctx.db.patch(args.staffId, {
       role: args.role,
       updatedAt: Date.now(),
+    });
+
+    await logAudit(ctx, {
+      actor: {
+        tokenIdentifier: identity.tokenIdentifier,
+        name: currentStaff.name ?? currentStaff.email,
+      },
+      action: "auth.updateStaffRole",
+      entityType: "staffProfiles",
+      entityId: args.staffId,
+      oldValues: { role: targetStaff.role, email: targetStaff.email },
+      newValues: { role: args.role },
     });
   },
 });
