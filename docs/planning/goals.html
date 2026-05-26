@@ -554,7 +554,7 @@
       <dt>Env</dt><dd><code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code>, <code>TWILIO_FROM_NUMBER</code>. <strong>Env-aware fallback:</strong> when unset, the cron skips SMS rows (TwilioConfigError) instead of burning retries &mdash; next tick tries again after env is configured.</dd>
       <dt>Depends on</dt><dd><a href="#SI1">SI1</a> (queue + helpers; landed).</dd>
       <dt>Done when</dt><dd><code>internal.actions.twilio.sendSms</code> POSTs to the Twilio Messages API (no SDK, fetch + basic auth); cron runs every minute, picks up <code>pending</code> rows, marks each <code>sent</code> or routes through SI1&rsquo;s exponential-backoff <code>markFailed</code>.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="ST1">&mdash; pending push</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/12">#12</a></dd>
     </dl>
   </article>
 
