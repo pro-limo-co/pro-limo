@@ -570,7 +570,7 @@
       <dt>Depends on</dt><dd><a href="#ST1">ST1</a>, <a href="#SI1">SI1</a> (notificationQueue + cron) &mdash; both merged.</dd>
       <dt>Adapt</dt><dd>SMS body is a templated string with the booking ref + full ride link + optional dispatcher message. Uses <code>SITE_URL</code> / <code>NEXT_PUBLIC_SITE_URL</code> env (same pattern as <code>convex/payments.ts</code>) so the link works in production; falls back to the path-only when env is unset (still works once the recipient opens it on the production host).</dd>
       <dt>Done when</dt><dd>Selecting SMS as channel enqueues a row; ST1&rsquo;s cron drains it to Twilio; <code>rideHandoffs.status</code> stays <code>sent</code> on success and the queue row carries the delivery outcome / retries.</dd>
-      <dt>PR</dt><dd><a class="pr-link" href="#" data-pr="ST2">&mdash; pending push</a></dd>
+      <dt>PR</dt><dd><a class="pr-link" href="https://github.com/pro-limo-co/pro-limo/pull/14">#14</a></dd>
     </dl>
   </article>
 
