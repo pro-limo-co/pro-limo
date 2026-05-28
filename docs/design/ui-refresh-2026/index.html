@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pro-limo · UI Refresh — Comparison Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Oswald:wght@300;400;500&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="_shared.css" />
+  <style>
+    .wrap { max-width: 1320px; margin: 0 auto; padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem) 5rem; }
+    header .eyebrow .acc { color: var(--champagne); margin-right: 0.5rem; }
+    h1.title { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 0.95; letter-spacing: -0.02em; margin: 1rem 0 0; }
+    h1.title .it { font-style: italic; color: var(--champagne); }
+    .sub { color: var(--bone-dim); font-size: 1.02rem; line-height: 1.65; max-width: 60ch; margin: 1.25rem 0 0; }
+    .meta-note { font-family: var(--font-mono); font-size: 0.74rem; color: var(--pewter); margin-top: 1rem; line-height: 1.7; }
+    .meta-note b { color: var(--champagne-bright); font-weight: 500; }
+
+    .criteria { margin: 2.5rem 0 0; border-top: 1px solid var(--divider); border-bottom: 1px solid var(--divider); padding: 1.5rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem 2rem; }
+    .crit .n { font-family: var(--font-condensed); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--champagne); }
+    .crit .h { font-family: var(--font-display); font-size: 1.15rem; color: var(--bone); margin-top: 0.3rem; }
+    .crit .d { font-size: 0.82rem; color: var(--pewter); margin-top: 0.3rem; line-height: 1.55; }
+
+    .surface-block { margin-top: 3.5rem; }
+    .surface-head { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .surface-head h2 { font-family: var(--font-display); font-weight: 300; font-size: 2.25rem; margin: 0; }
+    .surface-head .where { font-family: var(--font-mono); font-size: 0.74rem; color: var(--pewter); }
+    .surface-head .file { font-family: var(--font-mono); font-size: 0.72rem; color: var(--champagne-dim); }
+
+    .variants { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 1080px) { .variants { grid-template-columns: repeat(3, 1fr); } }
+    .vcard { border: 1px solid var(--divider); border-radius: 12px; overflow: hidden; background: var(--ink-soft); display: flex; flex-direction: column; }
+    .vcard-head { padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--divider); }
+    .vcard-head .vk { font-family: var(--font-condensed); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--champagne-bright); }
+    .vcard-head .vt { font-family: var(--font-display); font-size: 1.25rem; color: var(--bone); margin-top: 0.15rem; }
+    .vcard-head .vd { font-size: 0.78rem; color: var(--pewter); margin-top: 0.3rem; line-height: 1.5; }
+    .vcard.rec { border-color: var(--champagne-dim); }
+    .vcard.rec .vcard-head { background: color-mix(in oklab, var(--champagne) 8%, transparent); }
+    .rec-tag { display: inline-block; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.05em; color: var(--ink); background: var(--champagne); padding: 0.1rem 0.4rem; border-radius: 5px; margin-left: 0.5rem; vertical-align: middle; }
+    .frame-scroll { height: 440px; overflow: hidden; position: relative; background: var(--ink); }
+    .frame-scroll iframe { width: 200%; height: 200%; border: 0; transform: scale(0.5); transform-origin: top left; background: var(--ink); }
+    .vcard-foot { padding: 0.75rem 1.1rem; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center; }
+    .open-link { font-family: var(--font-condensed); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--champagne-bright); text-decoration: none; }
+    .open-link:hover { color: var(--champagne); }
+    .open-note { font-family: var(--font-mono); font-size: 0.66rem; color: var(--pewter-dim); }
+
+    footer { margin-top: 4rem; border-top: 1px solid var(--divider); padding-top: 1.5rem; color: var(--pewter); font-size: 0.85rem; line-height: 1.7; }
+    footer code { color: var(--champagne-bright); font-family: var(--font-mono); font-size: 0.8rem; }
+    .legend { display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:0.75rem; font-family:var(--font-mono); font-size:0.72rem; color:var(--pewter); }
+    .legend b { color: var(--bone); font-weight:500; }
+  </style>
+</head>
+<body class="grain">
+  <div class="wrap" style="position:relative; z-index:1">
+    <header>
+      <p class="eyebrow"><span class="acc">·</span> pro-limo · Design exploration · May 2026</p>
+      <h1 class="title">UI Refresh — <span class="it">three stances,</span> side by side.</h1>
+      <p class="sub">Testing one thesis: the web's editorial-luxury identity is its strongest asset, and ASTC mobile's real value is its <em>interaction patterns and density</em>, not its neutral aesthetic. Each surface below shows three variants that bracket that bet — from "change nothing visual" (A) to "go full app-mode" (C), with the hybrid (B) in the middle.</p>
+      <p class="meta-note">Mockups are hand-built HTML/CSS reusing the live design tokens from <b>src/app/globals.css</b> (champagne #C8A96A · Cormorant · Oswald · grain · the cinema-black palette). The AI-image path (/design-shotgun) was unavailable — no OpenAI key configured — so these are real, reflow-true HTML instead, which doubles as a head start on implementation.</p>
+    </header>
+
+    <section class="criteria" aria-label="Decision criteria">
+      <div class="crit"><div class="n">Criterion 1</div><div class="h">Brand fidelity</div><div class="d">Does it still feel like pro-limo, or have we accidentally rebuilt ASTC?</div></div>
+      <div class="crit"><div class="n">Criterion 2</div><div class="h">Density vs. air</div><div class="d">Dispatch needs density; marketing needs breathing room; booking needs both.</div></div>
+      <div class="crit"><div class="n">Criterion 3</div><div class="h">Mobile experience</div><div class="d">B's snap-point sheet is the biggest mobile bet — does it earn the complexity?</div></div>
+      <div class="crit"><div class="n">Criterion 4</div><div class="h">Implementation cost</div><div class="d">A is ~free, B is medium, C is expensive (replaces product-surface chrome).</div></div>
+      <div class="crit"><div class="n">Criterion 5</div><div class="h">Cross-surface coherence</div><div class="d">If marketing and product diverge (C), does the brand still feel unified?</div></div>
+    </section>
+
+    <!-- BOOKING -->
+    <section class="surface-block">
+      <div class="surface-head">
+        <h2>1 · Booking flow</h2>
+        <span class="where">Date &amp; time step · desktop + mobile</span>
+        <span class="file">src/components/BookingCard.tsx</span>
+      </div>
+      <div class="variants">
+        <div class="vcard">
+          <div class="vcard-head"><div class="vk">Variant A</div><div class="vt">Editorial Unchanged</div><div class="vd">Current card. Tightened status copy + focus micro-interactions only.</div></div>
+          <div class="frame-scroll"><iframe src="booking-flow/variant-a.html" loading="lazy" title="Booking A"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="booking-flow/variant-a.html" target="_blank">Open full ↗</a><span class="open-note">A · anchor</span></div>
+        </div>
+        <div class="vcard rec">
+          <div class="vcard-head"><div class="vk">Variant B <span class="rec-tag">RECOMMENDED</span></div><div class="vt">Editorial + Density</div><div class="vd">Quick-time carousel · status dots · two-line chips · snap-sheet · spring CTA.</div></div>
+          <div class="frame-scroll"><iframe src="booking-flow/variant-b.html" loading="lazy" title="Booking B"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="booking-flow/variant-b.html" target="_blank">Open full ↗</a><span class="open-note">B · hybrid</span></div>
+        </div>
+        <div class="vcard">
+          <div class="vcard-head"><div class="vk">Variant C</div><div class="vt">App-Mode Surface</div><div class="vd">Neutral product UI, sans-only, champagne sole accent. Editorial chrome dropped.</div></div>
+          <div class="frame-scroll"><iframe src="booking-flow/variant-c.html" loading="lazy" title="Booking C"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="booking-flow/variant-c.html" target="_blank">Open full ↗</a><span class="open-note">C · app-mode</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DISPATCH -->
+    <section class="surface-block">
+      <div class="surface-head">
+        <h2>2 · Dispatch row</h2>
+        <span class="where">Booking row card · expanded + collapsed</span>
+        <span class="file">src/components/admin/DispatchDashboard.tsx</span>
+      </div>
+      <div class="variants">
+        <div class="vcard">
+          <div class="vcard-head"><div class="vk">Variant A</div><div class="vt">Editorial Unchanged</div><div class="vd">Current row. Adds a two-line status label under each reference.</div></div>
+          <div class="frame-scroll"><iframe src="dispatch-row/variant-a.html" loading="lazy" title="Dispatch A"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="dispatch-row/variant-a.html" target="_blank">Open full ↗</a><span class="open-note">A · anchor</span></div>
+        </div>
+        <div class="vcard rec">
+          <div class="vcard-head"><div class="vk">Variant B <span class="rec-tag">RECOMMENDED</span></div><div class="vt">Editorial + Density</div><div class="vd">Status-color accent bar · stat-box trio · icon chips · dense preview · spring buttons.</div></div>
+          <div class="frame-scroll"><iframe src="dispatch-row/variant-b.html" loading="lazy" title="Dispatch B"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="dispatch-row/variant-b.html" target="_blank">Open full ↗</a><span class="open-note">B · hybrid</span></div>
+        </div>
+        <div class="vcard">
+          <div class="vcard-head"><div class="vk">Variant C</div><div class="vt">App-Mode Surface</div><div class="vd">Dense data table, sans-only, champagne sole accent. Scannable, less elevated.</div></div>
+          <div class="frame-scroll"><iframe src="dispatch-row/variant-c.html" loading="lazy" title="Dispatch C"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="dispatch-row/variant-c.html" target="_blank">Open full ↗</a><span class="open-note">C · app-mode</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARKETING -->
+    <section class="surface-block">
+      <div class="surface-head">
+        <h2>3 · Marketing</h2>
+        <span class="where">Hero + Services</span>
+        <span class="file">Hero.tsx · Services.tsx · Cities.tsx · Footer.tsx</span>
+      </div>
+      <div class="variants">
+        <div class="vcard">
+          <div class="vcard-head"><div class="vk">Variant A</div><div class="vt">Editorial Unchanged</div><div class="vd">The current hero + services, exactly as shipped.</div></div>
+          <div class="frame-scroll"><iframe src="marketing/variant-a.html" loading="lazy" title="Marketing A"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="marketing/variant-a.html" target="_blank">Open full ↗</a><span class="open-note">A · anchor</span></div>
+        </div>
+        <div class="vcard rec">
+          <div class="vcard-head"><div class="vk">Variant B <span class="rec-tag">RECOMMENDED</span></div><div class="vt">+ Interaction Polish</div><div class="vd">Spring Reserve CTA · status-colored availability chips · card hover-lift.</div></div>
+          <div class="frame-scroll"><iframe src="marketing/variant-b.html" loading="lazy" title="Marketing B"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="marketing/variant-b.html" target="_blank">Open full ↗</a><span class="open-note">B · hybrid</span></div>
+        </div>
+        <div class="vcard">
+          <div class="vcard-head"><div class="vk">Variant C</div><div class="vt">Unchanged (Bifurcation)</div><div class="vd">C leaves marketing fully editorial — only booking + dispatch go app-mode.</div></div>
+          <div class="frame-scroll"><iframe src="marketing/variant-c.html" loading="lazy" title="Marketing C"></iframe></div>
+          <div class="vcard-foot"><a class="open-link" href="marketing/variant-c.html" target="_blank">Open full ↗</a><span class="open-note">C · = A here</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>Previews are scaled-down live iframes. Click <b style="color:var(--champagne-bright)">Open full ↗</b> on any card to see it at real size and exercise hover / spring / sheet interactions. Decisions get captured in <code>notes.md</code> next to this file.</div>
+      <div class="legend">
+        <span><b>A</b> = conservative anchor (free)</span>
+        <span><b>B</b> = editorial + app density (recommended bet)</span>
+        <span><b>C</b> = bifurcate; product surfaces go app-mode (expensive)</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

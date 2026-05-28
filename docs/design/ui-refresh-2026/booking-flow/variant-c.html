@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking · Variant C — App-Mode Product Surface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../_shared.css" />
+  <style>
+    /* Variant C — neutral product UI. Sans only, no serif, no grain, no Oswald caps.
+       The ONLY brand tie is champagne #C8A96A as the sole accent. */
+    .mock-frame { background: #0c0c0e; }
+    .pc { font-family: var(--font-sans); }
+    .pcard { background: #16161a; border: 1px solid #232328; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 60px -30px rgba(0,0,0,0.9); }
+    .pc-head { padding: 1.25rem 1.4rem 0; }
+    /* segmented progress bar */
+    .seg { display: flex; gap: 4px; margin-bottom: 1.1rem; }
+    .seg span { height: 4px; flex: 1; border-radius: 999px; background: #2a2a30; }
+    .seg span.done { background: var(--champagne); }
+    .seg span.cur { background: var(--champagne); opacity: 0.55; }
+    .pc-step { font-size: 0.72rem; color: #8a8a93; font-weight: 500; }
+    .pc-title { font-size: 1.45rem; font-weight: 600; letter-spacing: -0.01em; color: #fff; margin: 0.3rem 0 0; }
+    .pc-body { padding: 1.25rem 1.4rem; display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 620px) { .pc-body.has-aside { grid-template-columns: 1.4fr 1fr; } }
+    .pc-section-label { font-size: 0.7rem; font-weight: 600; color: #8a8a93; text-transform: none; margin: 0 0 0.55rem; }
+    .pc-datebox { background: #1e1e22; border: 1px solid #2a2a30; border-radius: 12px; padding: 0.85rem 1rem; color: #fff; font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: space-between; }
+    .pc-datebox svg { stroke: var(--champagne); }
+    /* time-slot pills */
+    .slots { display: flex; gap: 0.5rem; overflow-x: auto; margin-top: 0.75rem; padding-bottom: 0.3rem; scrollbar-width: none; }
+    .slots::-webkit-scrollbar { display: none; }
+    .slot { flex: none; padding: 0.55rem 0.85rem; border-radius: 10px; background: #1e1e22; border: 1px solid #2a2a30; color: #d0d0d6; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: transform 200ms; }
+    .slot:active { transform: scale(0.95); }
+    .slot.sel { background: var(--champagne); border-color: var(--champagne); color: #0c0c0e; font-weight: 600; }
+    /* dense summary panel */
+    .pc-aside { background: #1a1a1e; border: 1px solid #232328; border-radius: 12px; padding: 1rem; align-self: start; }
+    .pc-aside h4 { font-size: 0.72rem; color: #8a8a93; margin: 0 0 0.7rem; font-weight: 600; }
+    .pc-row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px solid #232328; font-size: 0.85rem; }
+    .pc-row:last-child { border-bottom: 0; }
+    .pc-row .k { color: #8a8a93; }
+    .pc-row .v { color: #fff; font-weight: 500; text-align: right; }
+    .pc-foot { padding: 0 1.4rem 1.4rem; }
+    .pc-btn { width: 100%; padding: 0.9rem; border-radius: 12px; background: var(--champagne); color: #0c0c0e; border: 0; font-size: 0.92rem; font-weight: 600; cursor: pointer; font-family: var(--font-sans); transition: transform 200ms, background 200ms; }
+    .pc-btn:hover { background: var(--champagne-bright); }
+    .pc-btn:active { transform: scale(0.98); }
+    /* mobile bottom-sheet */
+    .pc-sheet { border-radius: 20px 20px 0 0; }
+  </style>
+</head>
+<body class="pc">
+  <div class="mock-frame">
+    <div class="mock-label"><span class="dot"></span> Booking flow · <span class="variant">Variant C — App-Mode Product Surface</span> · sans-only · neutral dark · champagne sole accent · no editorial chrome</div>
+    <div class="viewport-row">
+
+      <div class="vp vp-desktop">
+        <span class="vp-tag">Desktop</span>
+        <div class="device" style="border-color:#232328">
+          <div class="pcard">
+            <div class="pc-head">
+              <div class="seg"><span class="done"></span><span class="done"></span><span class="cur"></span><span></span><span></span><span></span></div>
+              <div class="pc-step">Step 3 of 6</div>
+              <h3 class="pc-title">Select date &amp; time</h3>
+            </div>
+            <div class="pc-body has-aside">
+              <div>
+                <p class="pc-section-label">Pickup date</p>
+                <div class="pc-datebox">
+                  Friday, June 6 2026
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </div>
+                <p class="pc-section-label" style="margin-top:1.1rem">Pickup time</p>
+                <div class="slots">
+                  <button class="slot">6:30 PM</button>
+                  <button class="slot sel">7:00 PM</button>
+                  <button class="slot">7:30 PM</button>
+                  <button class="slot">8:00 PM</button>
+                  <button class="slot">8:30 PM</button>
+                  <button class="slot">9:00 PM</button>
+                </div>
+              </div>
+              <div class="pc-aside">
+                <h4>Trip summary</h4>
+                <div class="pc-row"><span class="k">Service</span><span class="v">Airport transfer</span></div>
+                <div class="pc-row"><span class="k">Pickup</span><span class="v">PDX</span></div>
+                <div class="pc-row"><span class="k">Drop-off</span><span class="v">Pearl District</span></div>
+                <div class="pc-row"><span class="k">Vehicle</span><span class="v">Executive Sprinter</span></div>
+                <div class="pc-row"><span class="k">Est. distance</span><span class="v">12.4 mi</span></div>
+              </div>
+            </div>
+            <div class="pc-foot"><button class="pc-btn">Continue</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vp vp-mobile">
+        <span class="vp-tag">Mobile · 390px · bottom sheet</span>
+        <div class="device" style="border-color:#232328; background:#0c0c0e">
+          <div style="height:120px; display:grid; place-items:center; color:#5a5a63; font-size:0.72rem; font-weight:500;">PDX → Pearl District</div>
+          <div class="pcard pc-sheet" style="border-bottom:0; border-radius:20px 20px 0 0">
+            <div class="pc-head">
+              <div class="seg"><span class="done"></span><span class="done"></span><span class="cur"></span><span></span><span></span><span></span></div>
+              <div class="pc-step">Step 3 of 6</div>
+              <h3 class="pc-title">Select date &amp; time</h3>
+            </div>
+            <div class="pc-body">
+              <div>
+                <p class="pc-section-label">Pickup date</p>
+                <div class="pc-datebox" style="font-size:0.88rem">
+                  Fri, Jun 6 2026
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </div>
+                <p class="pc-section-label" style="margin-top:1rem">Pickup time</p>
+                <div class="slots">
+                  <button class="slot">6:30</button>
+                  <button class="slot sel">7:00 PM</button>
+                  <button class="slot">7:30</button>
+                  <button class="slot">8:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="pc-foot"><button class="pc-btn">Continue</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

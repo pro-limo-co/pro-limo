@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dispatch · Variant C — App-Mode Product Surface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../_shared.css" />
+  <style>
+    /* Variant C — neutral product table/card. Dense, scannable, sans-only, champagne sole accent. */
+    .mock-frame { background: #0c0c0e; }
+    .panel { max-width: 880px; font-family: var(--font-sans); }
+    .tbl-head { display: grid; grid-template-columns: 110px 1fr 150px 90px; gap: 1rem; padding: 0 1.1rem 0.6rem; font-size: 0.68rem; color: #6a6a73; font-weight: 600; letter-spacing: 0.02em; }
+    .prow { background: #16161a; border: 1px solid #232328; border-radius: 14px; margin-bottom: 0.7rem; overflow: hidden; }
+    .prow-main { display: grid; grid-template-columns: 110px 1fr 150px 90px; gap: 1rem; align-items: center; padding: 0.9rem 1.1rem; cursor: pointer; }
+    /* status pill — flat, colored fill */
+    .pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.6rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; }
+    .pill .pd { width: 6px; height: 6px; border-radius: 999px; }
+    .pill.enroute { background: rgba(96,165,250,0.14); color: #93c0fb; } .pill.enroute .pd { background: var(--info); }
+    .pill.new { background: rgba(245,158,11,0.14); color: #fbbf24; } .pill.new .pd { background: var(--warning); }
+    .pill.completed { background: rgba(34,197,94,0.14); color: #4ade80; } .pill.completed .pd { background: var(--success); }
+    .pill.canceled { background: rgba(239,68,68,0.14); color: #f87171; } .pill.canceled .pd { background: var(--destructive); }
+    .c-ref { font-family: var(--font-mono); font-size: 0.86rem; color: #fff; }
+    .c-who { font-size: 0.82rem; color: #b4b4bc; margin-top: 2px; }
+    .c-route { font-size: 0.82rem; color: #fff; font-weight: 500; }
+    .c-route .sub { color: #6a6a73; font-weight: 400; font-size: 0.76rem; }
+    .c-when { font-size: 0.82rem; color: #d0d0d6; text-align: right; }
+    .c-when .sub { color: #6a6a73; font-size: 0.74rem; }
+    .c-metrics { display:flex; gap:0.4rem; justify-content:flex-end; }
+    .metric { background:#1e1e22; border-radius:7px; padding:0.25rem 0.45rem; font-size:0.72rem; color:#d0d0d6; font-variant-numeric:tabular-nums; }
+    .metric.q { color: var(--champagne-bright); font-weight:600; }
+    .prow-body { border-top: 1px solid #232328; padding: 1rem 1.1rem; display: none; }
+    .prow.open .prow-body { display: block; }
+    .kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem 1.5rem; margin-bottom: 1rem; }
+    .kv .k { font-size: 0.72rem; color: #6a6a73; } .kv .v { font-size: 0.86rem; color: #fff; font-weight: 500; margin-top: 1px; }
+    .c-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .cbtn { padding: 0.55rem 0.9rem; border-radius: 9px; font-size: 0.8rem; font-weight: 600; font-family: var(--font-sans); cursor: pointer; border: 1px solid #2a2a30; background: #1e1e22; color: #fff; transition: transform 180ms; }
+    .cbtn:active { transform: scale(0.97); }
+    .cbtn.primary { background: var(--champagne); border-color: var(--champagne); color: #0c0c0e; }
+    @media (max-width: 560px) { .tbl-head { display:none; } .prow-main { grid-template-columns: 1fr auto; } .prow-main .col-when { display:none; } .c-metrics { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="mock-frame">
+    <div class="mock-label"><span class="dot"></span> Dispatch row · <span class="variant">Variant C — App-Mode Product Surface</span> · dense data table · sans-only · champagne sole accent · loses editorial admin feel, gains scannability</div>
+    <div class="panel">
+      <div class="tbl-head">
+        <div>Status</div><div>Booking</div><div style="text-align:right">Metrics</div><div style="text-align:right">Pickup</div>
+      </div>
+
+      <div class="prow open">
+        <div class="prow-main">
+          <div><span class="pill enroute"><span class="pd"></span> En route</span></div>
+          <div>
+            <div class="c-ref">PLD-7G4K</div>
+            <div class="c-who">Eleanor Whitfield</div>
+            <div class="c-route" style="margin-top:4px">PDX → Pearl District <span class="sub">· airport pickup</span></div>
+          </div>
+          <div class="c-metrics"><span class="metric">12.4mi</span><span class="metric">28m</span><span class="metric q">$145</span></div>
+          <div class="c-when col-when">7:00 PM<div class="sub">6 Jun</div></div>
+        </div>
+        <div class="prow-body">
+          <div class="kv">
+            <div><div class="k">Driver</div><div class="v">M. Okafor · ETA 6 min</div></div>
+            <div><div class="k">Vehicle</div><div class="v">Executive Sprinter</div></div>
+            <div><div class="k">Passengers</div><div class="v">3 · 2 large bags</div></div>
+            <div><div class="k">Distance</div><div class="v">12.4 mi</div></div>
+            <div><div class="k">Duration</div><div class="v">28 min</div></div>
+            <div><div class="k">Quote</div><div class="v">$145.00</div></div>
+          </div>
+          <div class="c-actions">
+            <button class="cbtn primary">Update status</button>
+            <button class="cbtn">Share trip</button>
+            <button class="cbtn">Driver link</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="prow">
+        <div class="prow-main">
+          <div><span class="pill new"><span class="pd"></span> New</span></div>
+          <div>
+            <div class="c-ref">PLD-2M9X</div>
+            <div class="c-who">Marcus Bell · 4 min ago</div>
+            <div class="c-route" style="margin-top:4px">Seattle → SEA-TAC <span class="sub">· drop-off</span></div>
+          </div>
+          <div class="c-metrics"><span class="metric">14mi</span><span class="metric">26m</span><span class="metric" style="color:#6a6a73">—</span></div>
+          <div class="c-when col-when">5:15 AM<div class="sub">7 Jun</div></div>
+        </div>
+      </div>
+
+      <div class="prow">
+        <div class="prow-main">
+          <div><span class="pill completed"><span class="pd"></span> Done</span></div>
+          <div>
+            <div class="c-ref">PLD-9Q3R</div>
+            <div class="c-who">Daniel Cho · receipt sent</div>
+            <div class="c-route" style="margin-top:4px">Portland → Cannon Beach <span class="sub">· city to city</span></div>
+          </div>
+          <div class="c-metrics"><span class="metric">78mi</span><span class="metric">96m</span><span class="metric q">$410</span></div>
+          <div class="c-when col-when">9:00 AM<div class="sub">3 Jun</div></div>
+        </div>
+      </div>
+
+      <div class="prow">
+        <div class="prow-main">
+          <div><span class="pill canceled"><span class="pd"></span> Canceled</span></div>
+          <div>
+            <div class="c-ref">PLD-5T1P</div>
+            <div class="c-who">Priya Nair · by customer</div>
+            <div class="c-route" style="margin-top:4px">Eugene → Portland <span class="sub">· refund pending</span></div>
+          </div>
+          <div class="c-metrics"><span class="metric">110mi</span><span class="metric">118m</span><span class="metric" style="color:#6a6a73">—</span></div>
+          <div class="c-when col-when">2:00 PM<div class="sub">5 Jun</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

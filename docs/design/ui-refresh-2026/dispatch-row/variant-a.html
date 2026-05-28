@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dispatch · Variant A — Editorial Unchanged</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Oswald:wght@300;400;500&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../_shared.css" />
+  <style>
+    /* Variant A — current dispatch row card. Only addition: two-line status label under the ref. */
+    .panel { max-width: 880px; }
+    .row { border: 1px solid var(--divider); border-radius: 12px; background: var(--ink-soft); overflow: hidden; margin-bottom: 1rem; }
+    .row-head { display: grid; grid-template-columns: auto 1fr auto; gap: 1.25rem; align-items: center; padding: 1.1rem 1.25rem; cursor: pointer; }
+    .badge { font-family: var(--font-condensed); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.3rem 0.6rem; border-radius: 999px; border: 1px solid var(--champagne-dim); color: var(--champagne-bright); background: color-mix(in oklab, var(--champagne) 10%, transparent); white-space: nowrap; }
+    .badge.canceled { border-color: var(--destructive); color: var(--destructive); background: color-mix(in oklab, var(--destructive) 12%, transparent); }
+    .ref { font-family: var(--font-mono); font-size: 0.95rem; color: var(--bone); letter-spacing: 0.02em; }
+    /* Variant-A addition: two-line status label */
+    .twostatus { margin-top: 0.25rem; }
+    .twostatus .l1 { font-family: var(--font-condensed); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--champagne-bright); }
+    .twostatus .l2 { font-size: 0.78rem; color: var(--pewter); }
+    .who { font-size: 0.9rem; color: var(--bone); }
+    .who .meta { color: var(--pewter); font-size: 0.8rem; }
+    .route { font-size: 0.85rem; color: var(--bone-dim); margin-top: 0.3rem; }
+    .when { text-align: right; }
+    .when .d { font-family: var(--font-condensed); font-size: 1.05rem; color: var(--bone); }
+    .when .t { font-size: 0.8rem; color: var(--pewter); }
+    .chev { color: var(--pewter); font-size: 1.2rem; }
+    .row-body { border-top: 1px solid var(--divider); padding: 1.25rem; display: none; }
+    .row.open .row-body { display: block; }
+    .section-label { font-family: var(--font-condensed); font-size: 0.64rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pewter); margin: 0 0 0.7rem; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem 2rem; }
+    .detail .k { font-size: 0.75rem; color: var(--pewter); }
+    .detail .v { font-size: 0.9rem; color: var(--bone); margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="mock-frame">
+    <div class="mock-label"><span class="dot"></span> Dispatch row · <span class="variant">Variant A — Editorial Unchanged</span> · current row card, only adds a two-line status label under each ref</div>
+    <div class="panel">
+      <div class="row open">
+        <div class="row-head">
+          <div>
+            <span class="badge">Driver en route</span>
+          </div>
+          <div>
+            <div class="ref">PLD-7G4K</div>
+            <div class="twostatus"><div class="l1">Driver en route</div><div class="l2">ETA 6 min · assigned to M. Okafor</div></div>
+            <div class="who" style="margin-top:0.5rem">Eleanor Whitfield <span class="meta">· eleanor@…  · (503) 555-0142</span></div>
+            <div class="route">PDX International → Pearl District, Portland</div>
+          </div>
+          <div>
+            <div class="when"><div class="d">6 Jun</div><div class="t">7:00 PM</div></div>
+          </div>
+        </div>
+        <div class="row-body">
+          <p class="section-label">Booking detail</p>
+          <div class="detail-grid">
+            <div class="detail"><div class="k">Mode</div><div class="v">Airport transfer · pickup</div></div>
+            <div class="detail"><div class="k">Vehicle</div><div class="v">Executive Sprinter</div></div>
+            <div class="detail"><div class="k">Distance</div><div class="v">12.4 mi</div></div>
+            <div class="detail"><div class="k">Duration</div><div class="v">28 min</div></div>
+            <div class="detail"><div class="k">Passengers</div><div class="v">3 · 2 large bags</div></div>
+            <div class="detail"><div class="k">Quote</div><div class="v">$145.00</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <div><span class="badge">New</span></div>
+          <div>
+            <div class="ref">PLD-2M9X</div>
+            <div class="twostatus"><div class="l1">New request</div><div class="l2">Awaiting quote · 4 min ago</div></div>
+            <div class="who" style="margin-top:0.5rem">Marcus Bell <span class="meta">· (971) 555-0199</span></div>
+            <div class="route">Downtown Seattle → SEA-TAC</div>
+          </div>
+          <div><div class="when"><div class="d">7 Jun</div><div class="t">5:15 AM</div></div></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-head">
+          <div><span class="badge canceled">Canceled</span></div>
+          <div>
+            <div class="ref">PLD-5T1P</div>
+            <div class="twostatus"><div class="l1" style="color:var(--destructive)">Canceled</div><div class="l2">By customer · refund pending</div></div>
+            <div class="who" style="margin-top:0.5rem">Priya Nair <span class="meta">· priya@…</span></div>
+            <div class="route">Eugene → Portland metro</div>
+          </div>
+          <div><div class="when"><div class="d">5 Jun</div><div class="t">2:00 PM</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
