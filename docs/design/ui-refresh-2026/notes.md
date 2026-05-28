@@ -96,3 +96,24 @@ One PR per surface, in this order. **PR 1 carries the shared foundation.**
    hover-lift on Cities — `Hero.tsx`, `Services.tsx`, `Cities.tsx`.
 4. **Snap-sheet (PR 4, follow-up / deferred):** `src/components/ui/snap-sheet.tsx`
    gesture primitive + mobile booking sheet. Separate goal once 1–3 land.
+
+## Shipped (2026-05-28, branch `claude/eager-chandrasekhar-c2d4d3`)
+
+- **PR 1 — booking** `ca94e80`: `press-tap` + status tokens in `globals.css`;
+  `getStatusTone`/`statusToneColor` in `lib/status.ts`; status-colored progress dots,
+  `QuickTimeCarousel` (Tonight / Tomorrow AM·PM / This weekend / Custom, fills
+  date+time), two-line summary chips, spring CTAs in `BookingCard.tsx`. Verified live
+  (carousel fills `2026-05-28` / `19:00`), dark + light themes.
+- **PR 2 — dispatch** `7dc5c0f`: status-colored 3px left-accent bar, toned badge dot,
+  stat-box trio (Distance/Duration/Quote, reusing existing formatting), dense collapsed
+  preview line, `press-tap` on actions in `DispatchDashboard.tsx`. Verified via a
+  throwaway dev page (deleted) since the real dashboard is staff-auth-gated — accent
+  bars resolve to correct per-status colors.
+- **PR 3 — marketing** `b303e63`: spring Reserve CTA (`Hero`), honest static service
+  tags + hover-lift (`Services`), hover-lift (`Cities`). Verified live in dark theme;
+  DOM confirms tag tone-dots (success green / info blue).
+- **PR 4 — snap-sheet:** deferred to its own session (spawned as a follow-up task).
+
+All three shipped PRs: clean `tsc --noEmit` + `eslint`, no console errors. Use
+shadcn semantic tokens throughout so the dark editorial theme maps champagne
+automatically. Not yet pushed / opened as GitHub PRs — local commits on the branch.
