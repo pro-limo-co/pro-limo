@@ -22,6 +22,13 @@
   --color-champagne-bright: #E5C98F;
   --color-champagne-dim: #8C7848;
 
+  /* Status tones (UI refresh — Variant B). Used for dispatch accent bars,
+     status dots, and availability chips. Semantic, mapped per theme below. */
+  --color-status-info: var(--info);
+  --color-status-success: var(--success);
+  --color-status-warning: var(--warning);
+  --color-status-danger: var(--destructive);
+
   /* ShadCN semantic primitives */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -87,6 +94,7 @@
   --destructive: #dc2626;
   --success: #16a34a;
   --warning: #d97706;
+  --info: #2563eb;
   --border: #d7dee8;
   --input: #cbd5e1;
   --ring: #2563eb;
@@ -144,6 +152,7 @@
   --destructive: #ef4444;
   --success: #22c55e;
   --warning: #f59e0b;
+  --info: #60a5fa;
   --border: var(--color-divider);
   --input: var(--color-divider);
   --ring: var(--color-champagne);
@@ -369,6 +378,19 @@ html {
   outline: 2px solid var(--color-champagne);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+/* Spring press feedback (UI refresh — Variant B). Restrained scale on active,
+   the "active state is explicit" rule made tactile. Applied to CTAs. */
+.press-tap {
+  transition: transform 320ms var(--ease-out-expo);
+}
+.press-tap:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .press-tap { transition: none; }
+  .press-tap:active { transform: none; }
 }
 
 /* Page section spacing */

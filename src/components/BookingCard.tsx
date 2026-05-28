@@ -11,7 +11,7 @@ import {
   MapPin,
   UserRound,
 } from "lucide-react";
-import { FormEvent, useReducer } from "react";
+import { FormEvent, useMemo, useReducer } from "react";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -274,6 +274,7 @@ export function BookingCard({
                   size="lg"
                   disabled={state.step === 0 || state.submitting}
                   onClick={() => dispatch({ type: "back" })}
+                  className="press-tap"
                 >
                   <ArrowLeft className="size-4" aria-hidden />
                   Back
@@ -284,13 +285,13 @@ export function BookingCard({
                     size="lg"
                     disabled={!canGoNext || state.submitting}
                     onClick={() => dispatch({ type: "next" })}
-                    className="w-full"
+                    className="press-tap w-full"
                   >
                     Continue
                     <ArrowRight className="size-4" aria-hidden />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={!canSubmit || state.submitting} size="lg" className="w-full">
+                  <Button type="submit" disabled={!canSubmit || state.submitting} size="lg" className="press-tap w-full">
                     {state.submitting ? "Sending request" : "Submit booking"}
                     <ArrowRight className="size-4" aria-hidden />
                   </Button>
@@ -353,26 +354,37 @@ function StepProgress({
   onStepChange: (step: number) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+    <div className="flex items-start gap-1.5" role="list" aria-label="Booking progress">
       {steps.map((step, index) => {
-        const Icon = step.icon;
         const active = index === currentStep;
         const complete = index < currentStep;
         return (
           <button
             key={step.label}
             type="button"
+            role="listitem"
             onClick={() => onStepChange(index)}
-            className={cn(
-              "flex min-h-14 items-center gap-2 rounded-md border px-2.5 py-2 text-left text-xs font-medium transition-colors",
-              active && "border-primary bg-primary text-primary-foreground",
-              complete && !active && "border-primary/40 bg-accent text-accent-foreground",
-              !active && !complete && "border-border bg-background text-muted-foreground hover:bg-muted",
-            )}
+            className="group flex flex-1 flex-col items-center gap-1.5 press-tap"
             aria-current={active ? "step" : undefined}
+            aria-label={`Step ${index + 1}: ${step.label}${complete ? " (complete)" : active ? " (current)" : ""}`}
           >
-            <Icon className="size-4 shrink-0" aria-hidden />
-            <span className="min-w-0 truncate">{step.label}</span>
+            <span
+              className={cn(
+                "h-2.5 w-2.5 rounded-full transition-all duration-300",
+                complete && "bg-primary",
+                active && "h-3.5 w-3.5 border-2 border-primary bg-transparent ring-4 ring-primary/15",
+                !active && !complete && "bg-muted-foreground/35 group-hover:bg-muted-foreground/60",
+              )}
+            />
+            <span
+              className={cn(
+                "font-condensed text-[0.58rem] uppercase leading-tight tracking-[0.12em] transition-colors",
+                active ? "text-foreground" : "text-muted-foreground",
+                "hidden sm:block",
+              )}
+            >
+              {step.label}
+            </span>
           </button>
         );
       })}
@@ -476,37 +488,128 @@ function DateTimeStep({
   form: BookingFormState;
   onFieldChange: FieldChangeHandler;
 }) {
+  const presets = useMemo(() => buildQuickTimePresets(), []);
+  const activePreset = presets.find(
+    (preset) => preset.date === form.pickupDate && preset.time === form.pickupTime,
+  )?.id;
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <Field
-        label="Date"
-        name="pickupDate"
-        value={form.pickupDate}
-        placeholder="June 30, 2026"
-        required
-        onChange={(value) => onFieldChange("pickupDate", value)}
+    <div className="grid gap-4">
+      <QuickTimeCarousel
+        presets={presets}
+        activeId={activePreset}
+        onSelect={(preset) => {
+          onFieldChange("pickupDate", preset.date);
+          onFieldChange("pickupTime", preset.time);
+        }}
       />
-      <Field
-        label="Time"
-        name="pickupTime"
-        value={form.pickupTime}
-        placeholder="10:30 AM"
-        required
-        onChange={(value) => onFieldChange("pickupTime", value)}
-      />
-      {form.bookingMode === "airport" && (
-        <div className="sm:col-span-2">
-          <Field
-            label="Flight number"
-            name="flightNumber"
-            value={form.flightNumber}
-            placeholder="AS 342"
-            onChange={(value) => onFieldChange("flightNumber", value)}
-          />
-        </div>
-      )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field
+          label="Date"
+          name="pickupDate"
+          value={form.pickupDate}
+          placeholder="June 30, 2026"
+          required
+          onChange={(value) => onFieldChange("pickupDate", value)}
+        />
+        <Field
+          label="Time"
+          name="pickupTime"
+          value={form.pickupTime}
+          placeholder="10:30 AM"
+          required
+          onChange={(value) => onFieldChange("pickupTime", value)}
+        />
+        {form.bookingMode === "airport" && (
+          <div className="sm:col-span-2">
+            <Field
+              label="Flight number"
+              name="flightNumber"
+              value={form.flightNumber}
+              placeholder="AS 342"
+              onChange={(value) => onFieldChange("flightNumber", value)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
+}
+
+type QuickTimePreset = {
+  id: string;
+  topLabel: string;
+  date: string;
+  time: string;
+};
+
+/**
+ * Quick-time carousel (UI refresh, Variant B): one-tap relative pickup presets
+ * that fill the date + time fields. Mirrors OptionGroup's chip pattern. The
+ * trailing "Custom" chip clears the selection so the fields below take over.
+ */
+function QuickTimeCarousel({
+  presets,
+  activeId,
+  onSelect,
+}: {
+  presets: QuickTimePreset[];
+  activeId: string | undefined;
+  onSelect: (preset: QuickTimePreset) => void;
+}) {
+  return (
+    <div>
+      <Label>Quick pick</Label>
+      <div
+        className="no-scrollbar -mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1"
+        role="radiogroup"
+        aria-label="Quick pickup times"
+      >
+        {presets.map((preset) => {
+          const selected = preset.id === activeId;
+          return (
+            <Button
+              key={preset.id}
+              type="button"
+              variant={selected ? "default" : "outline"}
+              className="press-tap h-auto shrink-0 flex-col items-start gap-0.5 px-3 py-2 text-left"
+              aria-pressed={selected}
+              onClick={() => onSelect(preset)}
+            >
+              <span className="font-condensed text-[0.66rem] uppercase tracking-[0.1em]">{preset.topLabel}</span>
+              <span className={cn("text-xs", selected ? "text-primary-foreground/80" : "text-muted-foreground")}>
+                {preset.time || "Pick date & time"}
+              </span>
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function buildQuickTimePresets(): QuickTimePreset[] {
+  const now = new Date();
+  const toDateValue = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const addDays = (base: Date, days: number) => {
+    const next = new Date(base);
+    next.setDate(next.getDate() + days);
+    return next;
+  };
+  const today = toDateValue(now);
+  const tomorrow = toDateValue(addDays(now, 1));
+  // Next Saturday (0 = Sunday … 6 = Saturday)
+  const daysToSaturday = (6 - now.getDay() + 7) % 7 || 7;
+  const saturday = toDateValue(addDays(now, daysToSaturday));
+
+  return [
+    { id: "tonight", topLabel: "Tonight", date: today, time: "19:00" },
+    { id: "tomorrow-am", topLabel: "Tomorrow AM", date: tomorrow, time: "08:00" },
+    { id: "tomorrow-pm", topLabel: "Tomorrow PM", date: tomorrow, time: "18:00" },
+    { id: "weekend", topLabel: "This weekend", date: saturday, time: "09:00" },
+    { id: "custom", topLabel: "Custom", date: "", time: "" },
+  ];
 }
 
 function VehicleStep({
@@ -650,24 +753,25 @@ function PaymentStep({
 function BookingSummary({ form }: { form: BookingFormState }) {
   const route = form.bookingMode === "hourly"
     ? `${form.pickupLocation || "Pickup"} / ${form.duration || "duration"}`
-    : `${form.pickupLocation || "Pickup"} to ${form.dropoffLocation || "drop-off"}`;
+    : `${form.pickupLocation || "Pickup"} → ${form.dropoffLocation || "drop-off"}`;
 
   return (
-    <div className="grid gap-2 rounded-md border bg-background p-4 text-sm">
-      <SummaryRow label="Service" value={getServiceLabel(form.bookingMode)} />
-      <SummaryRow label="Route" value={route} />
-      <SummaryRow label="When" value={[form.pickupDate, form.pickupTime].filter(Boolean).join(" at ") || "Not set"} />
-      <SummaryRow label="Car" value={form.requestedVehicleLabel || "Not set"} />
-      <SummaryRow label="Passenger" value={form.customerName || "Not set"} />
+    <div className="grid grid-cols-2 gap-2 rounded-md border bg-background p-3">
+      <SummaryChip label="Service" value={getServiceLabel(form.bookingMode)} />
+      <SummaryChip label="When" value={[form.pickupDate, form.pickupTime].filter(Boolean).join(" · ") || "Not set"} />
+      <SummaryChip label="Route" value={route} className="col-span-2" />
+      <SummaryChip label="Car" value={form.requestedVehicleLabel || "Not set"} />
+      <SummaryChip label="Passenger" value={form.customerName || "Not set"} />
     </div>
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
+/** Two-line summary chip (UI refresh, Variant B): uppercase label over value. */
+function SummaryChip({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
-    <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="break-words font-medium text-foreground [overflow-wrap:anywhere]">{value}</span>
+    <div className={cn("min-w-0 rounded-md border bg-muted/30 px-3 py-2", className)}>
+      <div className="font-condensed text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+      <div className="mt-0.5 break-words text-sm font-medium text-foreground [overflow-wrap:anywhere]">{value}</div>
     </div>
   );
 }
