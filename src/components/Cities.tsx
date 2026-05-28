@@ -35,7 +35,7 @@ export function Cities() {
             <Reveal key={c.slug} delay={i * 60} as="li">
               <Link
                 href={`/cities/${c.slug}`}
-                className="group flex flex-col gap-3 px-7 py-9 bg-[color:var(--color-ink)] hover:bg-[color:var(--color-ink-raised)] transition-colors"
+                className="group flex flex-col gap-3 px-7 py-9 bg-[color:var(--color-ink)] transition-[background-color,transform] duration-500 ease-[var(--ease-stage)] hover:bg-[color:var(--color-ink-raised)] hover:-translate-y-1"
               >
                 <span className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-[color:var(--color-pewter)]">
                   {c.stateCode} · {c.airports[0]?.code}
