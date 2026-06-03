@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking · Variant B — Editorial + App Density</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Oswald:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../_shared.css" />
+  <style>
+    /* Variant B — same editorial chrome as A, plus ASTC-style app density */
+    .bcard { border: 1px solid var(--divider); border-radius: 14px; overflow: hidden; background: var(--ink-soft); box-shadow: 0 30px 60px -30px rgba(0,0,0,0.8); }
+    .bcard-head { border-bottom: 1px solid var(--divider); background: color-mix(in oklab, var(--ink-raised) 40%, transparent); padding: 1.5rem; }
+    .bcard-eyebrow { display: flex; align-items: center; gap: 0.5rem; }
+    .bcard-eyebrow .dot { color: var(--champagne); }
+    .bcard-title { font-family: var(--font-display); font-weight: 300; font-size: 1.85rem; line-height: 1.05; margin: 0.6rem 0 0; }
+
+    /* (1) STATUS-COLORED PROGRESS DOTS instead of plain numbers */
+    .dots { display: flex; align-items: center; gap: 0.5rem; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--divider); }
+    .dot-step { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; flex: 1; }
+    .pdot { width: 9px; height: 9px; border-radius: 999px; background: var(--pewter-dim); transition: all 300ms var(--ease-stage); }
+    .dot-step.is-done .pdot { background: var(--champagne); }
+    .dot-step.is-current .pdot { width: 13px; height: 13px; background: transparent; border: 2px solid var(--champagne); box-shadow: 0 0 0 4px color-mix(in oklab, var(--champagne) 14%, transparent); }
+    .dot-rail { flex: 1; height: 2px; background: var(--divider); position: relative; }
+    .dot-label { font-family: var(--font-condensed); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pewter); }
+    .dot-step.is-current .dot-label { color: var(--bone); }
+    /* two-line status label under current step (ASTC density) */
+    .dot-substatus { font-family: var(--font-mono); font-size: 0.52rem; letter-spacing: 0.04em; color: var(--champagne-bright); }
+
+    .bcard-body { padding: 1.5rem; }
+    .body-h { font-family: var(--font-display); font-style: italic; font-weight: 300; font-size: 1.25rem; color: var(--champagne); margin: 0 0 1rem; }
+
+    /* (2) QUICK-TIME CAROUSEL */
+    .carousel { display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.4rem; margin-bottom: 1.25rem; scrollbar-width: none; }
+    .carousel::-webkit-scrollbar { display: none; }
+    .qchip { flex: none; border: 1px solid var(--divider); border-radius: 10px; padding: 0.7rem 0.95rem; cursor: pointer; background: transparent; text-align: left; transition: transform 320ms var(--ease-spring), border-color 220ms var(--ease-stage), background 220ms var(--ease-stage); }
+    .qchip:active { transform: scale(0.95); }
+    .qchip .q-top { font-family: var(--font-condensed); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone); white-space: nowrap; }
+    .qchip .q-bot { font-size: 0.72rem; color: var(--pewter); white-space: nowrap; margin-top: 2px; }
+    .qchip.is-selected { background: var(--champagne); border-color: var(--champagne); }
+    .qchip.is-selected .q-top, .qchip.is-selected .q-bot { color: var(--ink); }
+    .qchip.is-selected .q-bot { opacity: 0.75; }
+
+    .field-group { margin-bottom: 1.25rem; }
+    .field-label { font-family: var(--font-condensed); font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pewter); display: block; margin-bottom: 0.5rem; }
+    .field-input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--divider); color: var(--bone); font: inherit; font-size: 1rem; padding: 0.55rem 0; }
+    .field-input:focus { outline: none; border-bottom-color: var(--champagne); }
+
+    /* (3) TWO-LINE SUMMARY CHIPS */
+    .summary { display: flex; gap: 0.6rem; flex-wrap: wrap; padding-top: 0.5rem; border-top: 1px dashed var(--divider); }
+    .schip { border: 1px solid var(--divider); border-radius: 10px; padding: 0.55rem 0.8rem; min-width: 0; }
+    .schip .s-top { font-family: var(--font-condensed); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pewter); }
+    .schip .s-bot { font-size: 0.84rem; color: var(--bone); margin-top: 2px; }
+    .schip .s-bot .accent { color: var(--champagne-bright); }
+
+    .bcard-foot { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-top: 1px solid var(--divider); }
+    .back-link { color: var(--bone-dim); font-size: 0.85rem; background: none; border: 0; cursor: pointer; }
+
+    /* (4) SNAP-POINT BOTTOM SHEET on mobile */
+    .sheet-wrap { position: relative; height: 620px; background: var(--ink); }
+    .sheet-bg { position: absolute; inset: 0; padding: 1.25rem; }
+    .sheet-bg .mini-title { font-family: var(--font-display); font-style: italic; font-size: 1.4rem; color: var(--bone-dim); }
+    .sheet-bg .mini-map { margin-top: 1rem; height: 150px; border-radius: 12px; border: 1px solid var(--divider); background:
+        radial-gradient(60% 80% at 30% 30%, color-mix(in oklab, var(--champagne) 10%, transparent), transparent),
+        var(--ink-raised); display:grid; place-items:center; color: var(--pewter); font-size: 0.7rem; letter-spacing:0.1em; text-transform:uppercase; font-family:var(--font-condensed); }
+    .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--ink-soft); border-top: 1px solid var(--divider); border-radius: 18px 18px 0 0; padding: 0.75rem 1.25rem 1.25rem; box-shadow: 0 -20px 50px -20px rgba(0,0,0,0.9); }
+    .grabber { width: 38px; height: 4px; border-radius: 999px; background: var(--pewter-dim); margin: 0 auto 0.9rem; }
+    .snaphint { font-family: var(--font-mono); font-size: 0.6rem; color: var(--pewter-dim); text-align: center; margin-top: 0.5rem; letter-spacing: 0.05em; }
+  </style>
+</head>
+<body>
+  <div class="mock-frame">
+    <div class="mock-label"><span class="dot"></span> Booking flow · <span class="variant">Variant B — Editorial + App Density</span> · quick-time carousel · status dots · two-line chips · snap-sheet · spring CTA</div>
+    <div class="viewport-row">
+
+      <div class="vp vp-desktop">
+        <span class="vp-tag">Desktop</span>
+        <div class="device">
+          <div class="bcard">
+            <div class="bcard-head">
+              <p class="eyebrow bcard-eyebrow"><span class="dot">·</span> Chapter III — Reserve</p>
+              <h3 class="bcard-title">When shall we <span class="italic font-display" style="color:var(--champagne)">collect you?</span></h3>
+            </div>
+            <div class="dots">
+              <div class="dot-step is-done"><span class="pdot"></span><span class="dot-label">Service</span></div>
+              <div class="dot-step is-done"><span class="pdot"></span><span class="dot-label">Address</span></div>
+              <div class="dot-step is-current"><span class="pdot"></span><span class="dot-label">Date &amp; time</span><span class="dot-substatus">choose below</span></div>
+              <div class="dot-step"><span class="pdot"></span><span class="dot-label">Car</span></div>
+              <div class="dot-step"><span class="pdot"></span><span class="dot-label">Details</span></div>
+              <div class="dot-step"><span class="pdot"></span><span class="dot-label">Payment</span></div>
+            </div>
+            <div class="bcard-body">
+              <p class="body-h">Pick a time, or set your own.</p>
+              <div class="carousel">
+                <button class="qchip is-selected"><div class="q-top">Tonight</div><div class="q-bot">7:00 PM</div></button>
+                <button class="qchip"><div class="q-top">Tomorrow AM</div><div class="q-bot">8:00 AM</div></button>
+                <button class="qchip"><div class="q-top">Tomorrow PM</div><div class="q-bot">6:00 PM</div></button>
+                <button class="qchip"><div class="q-top">This weekend</div><div class="q-bot">Sat 9:00 AM</div></button>
+                <button class="qchip"><div class="q-top">Custom</div><div class="q-bot">Pick date…</div></button>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Selected pickup</label>
+                <input class="field-input" type="text" value="Tonight · Friday 6 June · 7:00 PM" />
+              </div>
+              <div class="summary">
+                <div class="schip"><div class="s-top">Service</div><div class="s-bot">Airport <span class="accent">pickup</span></div></div>
+                <div class="schip"><div class="s-top">From</div><div class="s-bot">PDX · Terminal</div></div>
+                <div class="schip"><div class="s-top">Drop-off</div><div class="s-bot">Pearl District</div></div>
+              </div>
+            </div>
+            <div class="bcard-foot">
+              <button class="back-link">← Back</button>
+              <button class="btn btn-primary btn-spring">Continue →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vp vp-mobile">
+        <span class="vp-tag">Mobile · 390px · snap-point bottom sheet</span>
+        <div class="device">
+          <div class="sheet-wrap">
+            <div class="sheet-bg">
+              <div class="mini-title">Your trip so far</div>
+              <div class="mini-map">PDX → Pearl District</div>
+            </div>
+            <div class="sheet">
+              <div class="grabber"></div>
+              <p class="eyebrow bcard-eyebrow"><span class="dot" style="color:var(--champagne)">·</span> Chapter III — Reserve</p>
+              <h3 class="bcard-title" style="font-size:1.5rem; margin-top:0.4rem">When shall we <span class="italic font-display" style="color:var(--champagne)">collect you?</span></h3>
+              <div class="dots" style="padding:0.9rem 0; border:0">
+                <div class="dot-step is-done"><span class="pdot"></span></div>
+                <div class="dot-step is-done"><span class="pdot"></span></div>
+                <div class="dot-step is-current"><span class="pdot"></span></div>
+                <div class="dot-step"><span class="pdot"></span></div>
+                <div class="dot-step"><span class="pdot"></span></div>
+                <div class="dot-step"><span class="pdot"></span></div>
+              </div>
+              <div class="carousel">
+                <button class="qchip is-selected"><div class="q-top">Tonight</div><div class="q-bot">7:00 PM</div></button>
+                <button class="qchip"><div class="q-top">Tmrw AM</div><div class="q-bot">8:00 AM</div></button>
+                <button class="qchip"><div class="q-top">Tmrw PM</div><div class="q-bot">6:00 PM</div></button>
+                <button class="qchip"><div class="q-top">Custom</div><div class="q-bot">Pick…</div></button>
+              </div>
+              <button class="btn btn-primary btn-spring" style="width:100%; justify-content:center; margin-top:0.4rem">Continue →</button>
+              <p class="snaphint">▲ drag sheet up for full detail · snaps at 40% / 92%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

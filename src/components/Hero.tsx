@@ -42,7 +42,7 @@ export function Hero() {
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 rise rise-4">
-              <Button asChild size="lg" className="font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
+              <Button asChild size="lg" className="press-tap font-condensed text-[0.78rem] uppercase tracking-[0.18em]">
                 <a href="#book">
                   Reserve a chauffeur
                   <ArrowRight className="size-4" aria-hidden />

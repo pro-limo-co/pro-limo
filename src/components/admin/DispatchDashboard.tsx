@@ -34,7 +34,7 @@ import {
   formatMoneyFromCents,
   type RateProfileForCalculator,
 } from "@/lib/rate-calculator";
-import { formatStatus } from "@/lib/status";
+import { formatStatus, getStatusTone, statusToneColor } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
 const statuses = [
@@ -468,7 +468,10 @@ function DispatchBookingRow({
   const rowMessage = getRowMessage(message, latestHandoffs[0]);
 
   return (
-    <Card className="overflow-hidden">
+    <Card
+      className="overflow-hidden border-l-[3px]"
+      style={{ borderLeftColor: statusToneColor(getStatusTone(booking.status)) }}
+    >
       <DispatchBookingHeader
         booking={booking}
         expanded={expanded}
@@ -531,12 +534,30 @@ function DispatchBookingHeader({
   onToggle: () => void;
   routeSummary: string;
 }) {
+  const tone = getStatusTone(booking.status);
+  const toneColor = statusToneColor(tone);
+  const distanceMi =
+    booking.estimatedDistanceMeters !== undefined
+      ? `${(booking.estimatedDistanceMeters / 1609.344).toFixed(1)} mi`
+      : undefined;
+  const durationMin =
+    booking.estimatedDurationSeconds !== undefined
+      ? `${Math.round(booking.estimatedDurationSeconds / 60)} min`
+      : undefined;
+  const quote = booking.quotedAmountCents !== undefined ? formatQuote(booking.quotedAmountCents) : undefined;
+  const hasStats = Boolean(distanceMi || durationMin || quote);
+
   return (
     <CardHeader className={cn("bg-muted/30", expanded && "border-b")}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={booking.status === "canceled" ? "destructive" : "secondary"}>
+            <Badge variant={booking.status === "canceled" ? "destructive" : "secondary"} className="gap-1.5">
+              <span
+                className="size-1.5 rounded-full"
+                style={{ backgroundColor: toneColor }}
+                aria-hidden
+              />
               {formatStatus(booking.status)}
             </Badge>
             <span className="font-mono text-xs font-medium text-muted-foreground">
@@ -550,17 +571,33 @@ function DispatchBookingHeader({
           <p className="mt-2 break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
             {routeSummary}
           </p>
+          {/* Denser collapsed preview line (UI refresh, Variant B) */}
+          {!expanded && hasStats && (
+            <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+              {[distanceMi, durationMin, quote].filter(Boolean).join(" · ")}
+            </p>
+          )}
           <DriverSummary booking={booking} />
         </div>
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] lg:min-w-[26rem]">
-          <div className="rounded-md border bg-background px-4 py-3 text-sm">
-            <p className="font-medium text-foreground">{booking.pickupDate} at {booking.pickupTime}</p>
-            <p className="mt-1 text-muted-foreground">{formatPassengerCount(booking.passengerCount)} / {booking.luggage}</p>
+          <div className="grid gap-3">
+            <div className="rounded-md border bg-background px-4 py-3 text-sm">
+              <p className="font-medium text-foreground">{booking.pickupDate} at {booking.pickupTime}</p>
+              <p className="mt-1 text-muted-foreground">{formatPassengerCount(booking.passengerCount)} / {booking.luggage}</p>
+            </div>
+            {/* Stat-box trio (UI refresh, Variant B) — only renders values that exist */}
+            {hasStats && (
+              <div className="grid grid-cols-3 overflow-hidden rounded-md border bg-background">
+                <StatBox label="Distance" value={distanceMi} />
+                <StatBox label="Duration" value={durationMin} />
+                <StatBox label="Quote" value={quote} accent />
+              </div>
+            )}
           </div>
           <Button
             type="button"
             variant="outline"
-            className="justify-center"
+            className="press-tap justify-center"
             aria-label={`${expanded ? "Hide" : "Open"} ${booking.publicReference}`}
             aria-expanded={expanded}
             onClick={onToggle}
@@ -571,6 +608,18 @@ function DispatchBookingHeader({
         </div>
       </div>
     </CardHeader>
+  );
+}
+
+/** Compact stat cell for the dispatch row header trio (UI refresh, Variant B). */
+function StatBox({ label, value, accent }: { label: string; value?: string; accent?: boolean }) {
+  return (
+    <div className="border-r px-3 py-2 last:border-r-0">
+      <div className="font-condensed text-[0.58rem] uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+      <div className={cn("mt-0.5 text-sm font-medium tabular-nums", accent ? "text-primary" : "text-foreground")}>
+        {value ?? "—"}
+      </div>
+    </div>
   );
 }
 
@@ -763,13 +812,14 @@ function DispatchEditorSection({
         />
       </div>
       <div className="grid min-w-0 gap-2 sm:grid-cols-3">
-        <Button type="button" disabled={pending} onClick={() => void onSaveDispatch()}>
+        <Button type="button" className="press-tap" disabled={pending} onClick={() => void onSaveDispatch()}>
           <Save className="size-4" aria-hidden />
           Save
         </Button>
         <Button
           type="button"
           variant="outline"
+          className="press-tap"
           disabled={pending}
           onClick={() => void onOpenCheckout()}
         >
@@ -779,6 +829,7 @@ function DispatchEditorSection({
         <Button
           type="button"
           variant="outline"
+          className="press-tap"
           disabled={pending}
           onClick={() => void onShareTrip()}
         >

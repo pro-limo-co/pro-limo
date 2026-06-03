@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking · Variant A — Editorial Unchanged</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Oswald:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../_shared.css" />
+  <style>
+    /* Variant A booking card — current editorial chrome, faithful to BookingCard.tsx */
+    .bcard { border: 1px solid var(--divider); border-radius: 14px; overflow: hidden; background: var(--ink-soft); box-shadow: 0 30px 60px -30px rgba(0,0,0,0.8); }
+    .bcard-head { border-bottom: 1px solid var(--divider); background: color-mix(in oklab, var(--ink-raised) 40%, transparent); padding: 1.5rem; }
+    .bcard-eyebrow { display: flex; align-items: center; gap: 0.5rem; }
+    .bcard-eyebrow .dot { color: var(--champagne); }
+    .bcard-title { font-family: var(--font-display); font-weight: 300; font-size: 1.85rem; line-height: 1.05; margin: 0.6rem 0 0; }
+    .bcard-sub { color: var(--bone-dim); font-size: 0.9rem; margin: 0.45rem 0 0; }
+    /* Step progress — plain numbered (current behavior) */
+    .steps { display: flex; align-items: center; gap: 0; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--divider); overflow-x: auto; }
+    .step { display: flex; align-items: center; gap: 0.55rem; flex: none; }
+    .step-num { width: 26px; height: 26px; border-radius: 999px; display: grid; place-items: center; font-family: var(--font-condensed); font-size: 0.78rem; border: 1px solid var(--divider); color: var(--pewter); }
+    .step.is-current .step-num { border-color: var(--champagne); color: var(--champagne); }
+    .step.is-done .step-num { background: color-mix(in oklab, var(--champagne) 18%, transparent); border-color: var(--champagne-dim); color: var(--champagne-bright); }
+    .step-label { font-family: var(--font-condensed); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pewter); }
+    .step.is-current .step-label { color: var(--bone); }
+    .step-sep { width: 22px; height: 1px; background: var(--divider); margin: 0 0.5rem; flex: none; }
+    .bcard-body { padding: 1.5rem; }
+    .field-group { margin-bottom: 1.25rem; }
+    .field-label { font-family: var(--font-condensed); font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pewter); display: block; margin-bottom: 0.5rem; }
+    .field-input { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--divider); color: var(--bone); font: inherit; font-size: 1rem; padding: 0.55rem 0; transition: border-color 250ms var(--ease-stage); }
+    .field-input:focus { outline: none; border-bottom-color: var(--champagne); }
+    .field-input::placeholder { color: var(--pewter-dim); }
+    .bcard-foot { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-top: 1px solid var(--divider); }
+    .back-link { color: var(--bone-dim); font-size: 0.85rem; background: none; border: 0; cursor: pointer; }
+    /* Variant-A polish only: a tightened status line under the title */
+    .statusline { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.05em; color: var(--pewter); margin-top: 0.6rem; }
+    .statusline b { color: var(--champagne-bright); font-weight: 500; }
+    @media (max-width: 480px) { .step-label { display: none; } .step-sep { width: 12px; } }
+  </style>
+</head>
+<body>
+  <div class="mock-frame">
+    <div class="mock-label"><span class="dot"></span> Booking flow · <span class="variant">Variant A — Editorial Unchanged</span> · the current card, only tightened status copy + focus micro-interactions</div>
+    <div class="viewport-row">
+
+      <div class="vp vp-desktop">
+        <span class="vp-tag">Desktop</span>
+        <div class="device">
+          <div class="bcard">
+            <div class="bcard-head">
+              <p class="eyebrow bcard-eyebrow"><span class="dot">·</span> Chapter III — Reserve</p>
+              <h3 class="bcard-title">When shall we <span class="italic font-display" style="color:var(--champagne)">collect you?</span></h3>
+              <p class="bcard-sub">One-way private transfer · Portland metro</p>
+              <p class="statusline">STEP 3 OF 6 · <b>Date &amp; time</b> · est. quote after dispatch review</p>
+            </div>
+            <div class="steps">
+              <div class="step is-done"><span class="step-num">1</span><span class="step-label">Service</span></div>
+              <span class="step-sep"></span>
+              <div class="step is-done"><span class="step-num">2</span><span class="step-label">Address</span></div>
+              <span class="step-sep"></span>
+              <div class="step is-current"><span class="step-num">3</span><span class="step-label">Date &amp; time</span></div>
+              <span class="step-sep"></span>
+              <div class="step"><span class="step-num">4</span><span class="step-label">Car</span></div>
+              <span class="step-sep"></span>
+              <div class="step"><span class="step-num">5</span><span class="step-label">Details</span></div>
+              <span class="step-sep"></span>
+              <div class="step"><span class="step-num">6</span><span class="step-label">Payment</span></div>
+            </div>
+            <div class="bcard-body">
+              <div class="field-group">
+                <label class="field-label">Pickup date</label>
+                <input class="field-input" type="text" value="Friday, 6 June 2026" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Pickup time</label>
+                <input class="field-input" type="text" placeholder="Select a time" value="7:00 PM" />
+              </div>
+            </div>
+            <div class="bcard-foot">
+              <button class="back-link">← Back</button>
+              <button class="btn btn-primary">Continue →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vp vp-mobile">
+        <span class="vp-tag">Mobile · 390px</span>
+        <div class="device">
+          <div class="bcard">
+            <div class="bcard-head">
+              <p class="eyebrow bcard-eyebrow"><span class="dot">·</span> Chapter III — Reserve</p>
+              <h3 class="bcard-title" style="font-size:1.55rem">When shall we <span class="italic font-display" style="color:var(--champagne)">collect you?</span></h3>
+              <p class="statusline">STEP 3 OF 6 · <b>Date &amp; time</b></p>
+            </div>
+            <div class="steps">
+              <div class="step is-done"><span class="step-num">1</span></div>
+              <span class="step-sep"></span>
+              <div class="step is-done"><span class="step-num">2</span></div>
+              <span class="step-sep"></span>
+              <div class="step is-current"><span class="step-num">3</span></div>
+              <span class="step-sep"></span>
+              <div class="step"><span class="step-num">4</span></div>
+              <span class="step-sep"></span>
+              <div class="step"><span class="step-num">5</span></div>
+              <span class="step-sep"></span>
+              <div class="step"><span class="step-num">6</span></div>
+            </div>
+            <div class="bcard-body">
+              <div class="field-group">
+                <label class="field-label">Pickup date</label>
+                <input class="field-input" type="text" value="Fri, 6 Jun 2026" />
+              </div>
+              <div class="field-group" style="margin-bottom:0">
+                <label class="field-label">Pickup time</label>
+                <input class="field-input" type="text" value="7:00 PM" />
+              </div>
+            </div>
+            <div class="bcard-foot">
+              <button class="back-link">← Back</button>
+              <button class="btn btn-primary">Continue →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -8,6 +8,7 @@ const services = [
     body: "Airport pickup, airport drop-off, live flight tracking for arrivals, and terminal-aware departure timing.",
     href: "/services/airport-transfer",
     icon: PlaneIcon,
+    tag: { label: "Flight tracked", tone: "success" as const },
   },
   {
     no: "02",
@@ -16,6 +17,7 @@ const services = [
     body: "Reserve a chauffeur and vehicle for two hours or twelve. Stops, detours, and changes of plan are part of the package.",
     href: "/services/hourly-chauffeur",
     icon: ClockIcon,
+    tag: { label: "2-12 hours", tone: "info" as const },
   },
   {
     no: "03",
@@ -24,6 +26,7 @@ const services = [
     body: "Regional private transfers between Portland, Seattle, Eugene, the coast, the valley, and the Gorge.",
     href: "/services/city-to-city",
     icon: RouteIcon,
+    tag: { label: "Flat fare", tone: "success" as const },
   },
   {
     no: "04",
@@ -32,8 +35,14 @@ const services = [
     body: "Centralized billing, traveler profiles, duty-of-care reporting, and a dedicated account director.",
     href: "/services/for-business",
     icon: BriefcaseIcon,
+    tag: { label: "Accounts open", tone: "info" as const },
   },
 ];
+
+const tagToneColor: Record<"success" | "info", string> = {
+  success: "var(--success)",
+  info: "var(--info)",
+};
 
 export function Services() {
   return (
@@ -63,11 +72,19 @@ export function Services() {
               <Reveal key={s.no} delay={i * 80} as="article">
                 <a
                   href={s.href}
-                  className="group flex flex-col gap-7 p-8 lg:p-12 bg-[color:var(--color-ink)] hover:bg-[color:var(--color-ink-soft)] transition-colors min-h-[340px]"
+                  className="group relative flex flex-col gap-7 p-8 lg:p-12 bg-[color:var(--color-ink)] transition-[background-color,transform] duration-500 ease-[var(--ease-stage)] hover:bg-[color:var(--color-ink-soft)] hover:-translate-y-1 min-h-[340px]"
                 >
                   <div className="flex items-start justify-between gap-6">
-                    <span className="font-mono text-[0.72rem] tracking-[0.2em] text-[color:var(--color-pewter)]">
+                    <span className="inline-flex items-center gap-2.5 font-mono text-[0.72rem] tracking-[0.2em] text-[color:var(--color-pewter)]">
                       {s.no} / 04
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-divider)] px-2 py-0.5 font-condensed text-[0.58rem] uppercase tracking-[0.14em] text-[color:var(--color-bone-dim)]">
+                        <span
+                          className="size-1 rounded-full"
+                          style={{ backgroundColor: tagToneColor[s.tag.tone] }}
+                          aria-hidden
+                        />
+                        {s.tag.label}
+                      </span>
                     </span>
                     <Icon />
                   </div>

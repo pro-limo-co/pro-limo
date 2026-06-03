@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "ui-refresh-mockups",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "http-server", "docs/design/ui-refresh-2026", "-p", "4599", "-c-1", "--silent"],
+      "port": 4599,
+      "autoPort": true
     }
   ]
 }
