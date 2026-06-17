@@ -111,12 +111,14 @@ export const internalCancelForBooking = internalMutation({
       .collect();
 
     const now = Date.now();
-    for (const notification of pending) {
-      await ctx.db.patch(notification._id, {
-        status: "cancelled",
-        updatedAt: now,
-      });
-    }
+    await Promise.all(
+      pending.map((notification) =>
+        ctx.db.patch(notification._id, {
+          status: "cancelled",
+          updatedAt: now,
+        }),
+      ),
+    );
     return { cancelledCount: pending.length };
   },
 });

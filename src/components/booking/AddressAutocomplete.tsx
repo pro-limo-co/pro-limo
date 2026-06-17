@@ -1,7 +1,7 @@
 "use client";
 
 import { APIProvider, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -104,17 +104,8 @@ function PlacesAddressField({
   const inputRef = useRef<HTMLInputElement>(null);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    if (!places || !inputRef.current) return;
-    // google.maps.places.Autocomplete is the legacy but stable widget
-    // supported by react-google-maps. The newer PlaceAutocompleteElement
-    // is still beta as of v1.8.
-    const autocomplete = new places.Autocomplete(inputRef.current, {
-      fields: ["formatted_address", "geometry", "name", "place_id", "address_components"],
-      types: ["geocode", "establishment"],
-    });
-
-    const listener = autocomplete.addListener("place_changed", () => {
+  const handlePlaceChanged = useEffectEvent(
+    (autocomplete: google.maps.places.Autocomplete) => {
       const place = autocomplete.getPlace();
       const location = place.geometry?.location;
       if (!location) {
@@ -141,11 +132,27 @@ function PlacesAddressField({
         placeId: place.place_id ?? undefined,
         name: place.name ?? undefined,
       });
+    },
+  );
+
+  useEffect(() => {
+    if (!places || !inputRef.current) return;
+    // google.maps.places.Autocomplete is the legacy but stable widget
+    // supported by react-google-maps. The newer PlaceAutocompleteElement
+    // is still beta as of v1.8.
+    const autocomplete = new places.Autocomplete(inputRef.current, {
+      fields: ["formatted_address", "geometry", "name", "place_id", "address_components"],
+      types: ["geocode", "establishment"],
+    });
+
+    const listener = autocomplete.addListener("place_changed", () => {
+      handlePlaceChanged(autocomplete);
     });
 
     setReady(true);
-    return () => listener.remove();
-  }, [places, onChange, onDetailsChange]);
+    const unsubscribe = () => listener.remove();
+    return () => unsubscribe();
+  }, [places]);
 
   return (
     <div>

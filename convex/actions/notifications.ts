@@ -44,6 +44,7 @@ export const processQueue = internalAction({
           if (!notification.body) {
             throw new Error("Missing body on SMS notification");
           }
+          // oxlint-disable-next-line react-doctor/async-await-in-loop -- Keep provider sends sequential to avoid bursty SMS dispatch.
           await ctx.runAction(internal.actions.twilio.sendSms, {
             to: notification.recipientPhone,
             body: notification.body,
@@ -54,6 +55,7 @@ export const processQueue = internalAction({
           throw new Error(`Unknown channel: ${notification.channel}`);
         }
 
+        // oxlint-disable-next-line react-doctor/async-await-in-loop -- Marking sent depends on the channel send succeeding.
         await ctx.runMutation(internal.notifications.internalMarkSent, {
           notificationId: notification._id,
         });
@@ -71,6 +73,7 @@ export const processQueue = internalAction({
             : error instanceof Error
               ? error.message
               : "Unknown send error";
+        // oxlint-disable-next-line react-doctor/async-await-in-loop -- Retry state depends on each notification's send failure.
         await ctx.runMutation(internal.notifications.internalMarkFailed, {
           notificationId: notification._id,
           error: message,

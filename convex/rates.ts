@@ -181,18 +181,20 @@ export const upsert = mutation({
 
     if (args.profileId) {
       const before = await ctx.db.get(args.profileId);
-      await ctx.db.patch(args.profileId, {
-        ...profile,
-        updatedAt: now,
-      });
-      await logAudit(ctx, {
-        actor,
-        action: "rates.upsert",
-        entityType: "rateProfiles",
-        entityId: args.profileId,
-        oldValues: before ?? undefined,
-        newValues: profile,
-      });
+      await Promise.all([
+        ctx.db.patch(args.profileId, {
+          ...profile,
+          updatedAt: now,
+        }),
+        logAudit(ctx, {
+          actor,
+          action: "rates.upsert",
+          entityType: "rateProfiles",
+          entityId: args.profileId,
+          oldValues: before ?? undefined,
+          newValues: profile,
+        }),
+      ]);
       return args.profileId;
     }
 
@@ -202,18 +204,20 @@ export const upsert = mutation({
       .unique();
 
     if (existing) {
-      await ctx.db.patch(existing._id, {
-        ...profile,
-        updatedAt: now,
-      });
-      await logAudit(ctx, {
-        actor,
-        action: "rates.upsert",
-        entityType: "rateProfiles",
-        entityId: existing._id,
-        oldValues: existing,
-        newValues: profile,
-      });
+      await Promise.all([
+        ctx.db.patch(existing._id, {
+          ...profile,
+          updatedAt: now,
+        }),
+        logAudit(ctx, {
+          actor,
+          action: "rates.upsert",
+          entityType: "rateProfiles",
+          entityId: existing._id,
+          oldValues: existing,
+          newValues: profile,
+        }),
+      ]);
       return existing._id;
     }
 

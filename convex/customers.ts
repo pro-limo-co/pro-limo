@@ -29,6 +29,7 @@ export const updatePreferences = mutation({
   },
   handler: async (ctx, args) => {
     const { identity, staff } = await requireStaff(ctx, "dispatcher");
+    // oxlint-disable-next-line react-doctor/server-sequential-independent-await -- Staff auth must gate customer profile reads.
     const customer = await ctx.db.get(args.customerId);
     if (!customer) throw new Error("Customer not found");
 

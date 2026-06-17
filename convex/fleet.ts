@@ -181,15 +181,17 @@ export const upsertDriver = mutation({
 
     if (args.driverId) {
       const before = await ctx.db.get(args.driverId);
-      await ctx.db.patch(args.driverId, { ...driver, updatedAt: now });
-      await logAudit(ctx, {
-        actor,
-        action: "fleet.upsertDriver",
-        entityType: "driverProfiles",
-        entityId: args.driverId,
-        oldValues: before ?? undefined,
-        newValues: driver,
-      });
+      await Promise.all([
+        ctx.db.patch(args.driverId, { ...driver, updatedAt: now }),
+        logAudit(ctx, {
+          actor,
+          action: "fleet.upsertDriver",
+          entityType: "driverProfiles",
+          entityId: args.driverId,
+          oldValues: before ?? undefined,
+          newValues: driver,
+        }),
+      ]);
       return args.driverId;
     }
 
@@ -198,15 +200,17 @@ export const upsertDriver = mutation({
       .withIndex("by_key", (q) => q.eq("key", driver.key))
       .unique();
     if (existing) {
-      await ctx.db.patch(existing._id, { ...driver, updatedAt: now });
-      await logAudit(ctx, {
-        actor,
-        action: "fleet.upsertDriver",
-        entityType: "driverProfiles",
-        entityId: existing._id,
-        oldValues: existing,
-        newValues: driver,
-      });
+      await Promise.all([
+        ctx.db.patch(existing._id, { ...driver, updatedAt: now }),
+        logAudit(ctx, {
+          actor,
+          action: "fleet.upsertDriver",
+          entityType: "driverProfiles",
+          entityId: existing._id,
+          oldValues: existing,
+          newValues: driver,
+        }),
+      ]);
       return existing._id;
     }
 
@@ -242,15 +246,17 @@ export const upsertVehicle = mutation({
 
     if (args.vehicleId) {
       const before = await ctx.db.get(args.vehicleId);
-      await ctx.db.patch(args.vehicleId, { ...vehicle, updatedAt: now });
-      await logAudit(ctx, {
-        actor,
-        action: "fleet.upsertVehicle",
-        entityType: "vehicleProfiles",
-        entityId: args.vehicleId,
-        oldValues: before ?? undefined,
-        newValues: vehicle,
-      });
+      await Promise.all([
+        ctx.db.patch(args.vehicleId, { ...vehicle, updatedAt: now }),
+        logAudit(ctx, {
+          actor,
+          action: "fleet.upsertVehicle",
+          entityType: "vehicleProfiles",
+          entityId: args.vehicleId,
+          oldValues: before ?? undefined,
+          newValues: vehicle,
+        }),
+      ]);
       return args.vehicleId;
     }
 
@@ -259,15 +265,17 @@ export const upsertVehicle = mutation({
       .withIndex("by_key", (q) => q.eq("key", vehicle.key))
       .unique();
     if (existing) {
-      await ctx.db.patch(existing._id, { ...vehicle, updatedAt: now });
-      await logAudit(ctx, {
-        actor,
-        action: "fleet.upsertVehicle",
-        entityType: "vehicleProfiles",
-        entityId: existing._id,
-        oldValues: existing,
-        newValues: vehicle,
-      });
+      await Promise.all([
+        ctx.db.patch(existing._id, { ...vehicle, updatedAt: now }),
+        logAudit(ctx, {
+          actor,
+          action: "fleet.upsertVehicle",
+          entityType: "vehicleProfiles",
+          entityId: existing._id,
+          oldValues: existing,
+          newValues: vehicle,
+        }),
+      ]);
       return existing._id;
     }
 
