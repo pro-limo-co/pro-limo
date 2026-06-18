@@ -109,22 +109,19 @@ export function StaffOpsShell({
         ))}
       </nav>
 
-      <div className="relative z-10 px-5 pb-10 pt-8 sm:px-8 lg:px-12">
+      <div className="relative z-10 px-5 pb-7 pt-6 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1500px]">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div className="min-w-0">
-              <Badge
-                variant="outline"
-                className="mb-5 gap-2 rounded-full border-white/10 bg-white/[0.06] px-4 py-2 text-xs uppercase text-white/70"
-              >
+              <Badge variant="outline" className="mb-4 gap-2 rounded-full border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs uppercase text-white/70">
                 <RadioTower className="size-4" aria-hidden />
                 {eyebrow}
               </Badge>
-              <h1 className="max-w-5xl text-5xl font-semibold leading-[0.94] text-white sm:text-7xl sm:leading-[0.9]">
+              <h1 className="max-w-5xl text-4xl font-semibold leading-none text-white sm:text-5xl">
                 {title}
               </h1>
               {description ? (
-                <p className="mt-5 max-w-3xl text-lg leading-8 text-white/64">
+                <p className="mt-4 max-w-3xl text-base leading-7 text-white/64">
                   {description}
                 </p>
               ) : null}

@@ -4,7 +4,7 @@ import { AuthPanel } from "@/components/auth/AuthPanel";
 import { sanitizeInternalPath } from "@/lib/redirects";
 
 export const metadata: Metadata = {
-  title: "Staff Dispatch Sign In",
+  title: "Staff Sign In",
   robots: { index: false, follow: false },
 };
 

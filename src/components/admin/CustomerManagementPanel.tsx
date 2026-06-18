@@ -93,13 +93,13 @@ export function CustomerManagementPanel() {
     <CustomersShell showSignOut>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <StatCard label="Customers" value={customers === undefined ? "Loading" : String(customers.length)} />
-        <StatCard label="Memory" value="Live" />
+        <StatCard label="Records" value="Live" />
         <StatCard label="Access" value={viewer.staff.role === "viewer" ? "View only" : "Staff"} />
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-black text-black">Customer memory</p>
+          <p className="text-sm font-black text-black">Customer records</p>
           <p className="text-sm text-black/56">
             New bookings automatically refresh contact history, addresses, preferences, and marketing consent.
           </p>
@@ -279,8 +279,8 @@ function CustomersShell({
   return (
     <StaffOpsShell
       current="customers"
-      description="Review customer history, saved addresses, preferences, notes, and marketing consent for repeat passenger service."
-      eyebrow="Customer memory"
+      description="Review customer history, saved addresses, preferences, notes, and marketing consent."
+      eyebrow="Customer records"
       showSignOut={showSignOut}
       title="Customers"
     >

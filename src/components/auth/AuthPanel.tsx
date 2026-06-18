@@ -3,14 +3,11 @@
 import { useMutation } from "convex/react";
 import {
   ArrowRight,
-  ChevronDown,
-  Clock3,
+  CheckCircle2,
+  ClipboardList,
   LockKeyhole,
   LogOut,
   Mail,
-  MapPin,
-  RadioTower,
-  Route,
   ShieldCheck,
   User,
   type LucideIcon,
@@ -22,7 +19,6 @@ import { useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
 import { staffRouteItems } from "@/components/admin/staffRoutes";
 import { useStaffRoutePrefetch } from "@/components/admin/useStaffRoutePrefetch";
-import { StaffRouteMap } from "@/components/auth/StaffRouteMap";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,18 +48,6 @@ const initialFormState: FormState = {
   email: "",
   password: "",
 };
-
-const dispatchRows = [
-  { icon: MapPin, label: "Pickup queue", value: "Portland airport, downtown, private homes" },
-  { icon: Route, label: "Dropoff desk", value: "Quotes, handoffs, payments, route notes" },
-  { icon: Clock3, label: "Shift window", value: "Tonight 6:00 PM - close" },
-];
-
-const tripStats = [
-  { label: "Open requests", value: "12" },
-  { label: "Quoted", value: "07" },
-  { label: "Drivers active", value: "04" },
-];
 
 export function AuthPanel({ next }: { next: string }) {
   const { push, refresh } = useRouter();
@@ -136,12 +120,11 @@ export function AuthPanel({ next }: { next: string }) {
 
   const isSignup = mode === "signup";
   const signedInEmail = session.data?.user.email;
+  const requestedRoute = getRequestedStaffRoute(next);
+  const requestedLabel = requestedRoute?.label ?? "staff tools";
 
   return (
     <section className="relative isolate min-h-[100svh] overflow-x-clip bg-[#050505]">
-      <div className="absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(circle_at_15%_5%,rgba(255,255,255,0.18),transparent_30%),radial-gradient(circle_at_72%_0%,rgba(200,169,106,0.16),transparent_28%)]" />
-      <div className="absolute inset-y-0 right-0 hidden w-[42%] bg-white/[0.03] lg:block" />
-
       <header className="relative z-10 flex min-h-20 items-center justify-between gap-3 overflow-hidden px-5 sm:px-8 lg:px-12">
         <Link href="/" className="flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-xl bg-white text-xl font-black text-black">
@@ -173,34 +156,27 @@ export function AuthPanel({ next }: { next: string }) {
         </Button>
       </header>
 
-      <div className="relative z-10 grid min-h-[calc(100svh-5rem)] min-w-0 overflow-x-clip px-5 pb-8 pt-4 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(420px,520px)] lg:gap-10 lg:px-12 lg:pb-12">
-        <div className="flex min-w-0 max-w-full flex-col justify-between gap-8">
-          <div className="max-w-full pt-8 lg:max-w-5xl lg:pt-16">
-            <Badge
-              variant="outline"
-              className="mb-5 gap-2 rounded-full border-white/10 bg-white/[0.06] px-4 py-2 text-xs uppercase text-white/70"
-            >
-              <RadioTower className="size-4" aria-hidden />
-              Staff operations
-            </Badge>
-            <h1 className="max-w-[calc(100vw-2.5rem)] text-5xl font-semibold leading-[0.94] text-white sm:max-w-4xl sm:text-7xl sm:leading-[0.88] lg:text-8xl">
-              Run the ride desk.
-            </h1>
-            <p className="mt-6 max-w-[calc(100vw-2.5rem)] text-lg leading-8 text-white/64 sm:max-w-2xl">
-              Sign in to quote trips, assign chauffeurs, update payment links, and keep the evening board moving.
-            </p>
-          </div>
-
-          <div className="grid min-w-0 max-w-full gap-4 overflow-x-clip xl:grid-cols-[minmax(320px,0.72fr)_minmax(420px,1fr)]">
-            <DispatchCommandPanel />
-            <DispatchMapPanel />
-          </div>
+      <div className="relative z-10 grid min-h-[calc(100svh-5rem)] min-w-0 gap-6 overflow-x-clip px-5 pb-8 pt-3 sm:px-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(390px,500px)] lg:items-start lg:gap-12 lg:px-12 lg:pb-12 lg:pt-12">
+        <div className="min-w-0 max-w-3xl">
+          <Badge
+            variant="outline"
+            className="mb-5 gap-2 rounded-full border-white/10 bg-white/[0.06] px-4 py-2 text-xs uppercase text-white/70"
+          >
+            <ShieldCheck className="size-4" aria-hidden />
+            Staff access
+          </Badge>
+          <h1 className="max-w-[calc(100vw-2.5rem)] text-4xl font-semibold leading-none text-white sm:max-w-4xl sm:text-6xl">
+            Sign in to the staff workspace.
+          </h1>
+          <p className="mt-5 max-w-[calc(100vw-2.5rem)] text-base leading-7 text-white/64 sm:max-w-2xl">
+            This is the working area for bookings, ride follow-up, fleet profiles, rate rules, and customer notes.
+          </p>
         </div>
 
-        <aside className="flex min-w-0 items-center lg:justify-end">
-          <Card className="w-full min-w-0 max-w-[calc(100vw-2.5rem)] overflow-hidden rounded-[32px] border-0 bg-white text-black shadow-[0_28px_120px_rgba(0,0,0,0.48)] sm:max-w-full">
+        <aside className="flex min-w-0 lg:col-start-2 lg:row-span-2 lg:justify-end">
+          <Card className="w-full min-w-0 max-w-[calc(100vw-2.5rem)] overflow-hidden rounded-[28px] border-0 bg-white text-black shadow-[0_24px_80px_rgba(0,0,0,0.42)] sm:max-w-full">
             {signedInEmail ? (
-              <SignedInPanel email={signedInEmail} next={next} refresh={refresh} />
+              <SignedInPanel email={signedInEmail} next={next} nextLabel={requestedLabel} refresh={refresh} />
             ) : (
               <div className="p-5 sm:p-6">
                 <CardHeader className="mb-6 flex-row items-center justify-between space-y-0 p-0">
@@ -277,7 +253,7 @@ export function AuthPanel({ next }: { next: string }) {
                           : "Signing in"
                         : isSignup
                           ? "Create staff account"
-                          : "Open dispatch"}
+                          : `Continue to ${requestedLabel}`}
                       <ArrowRight className="size-5" aria-hidden />
                     </Button>
                   </form>
@@ -288,16 +264,65 @@ export function AuthPanel({ next }: { next: string }) {
                     <div>
                       <p className="text-sm font-black">Approved staff only</p>
                       <p className="mt-1 text-sm leading-5 text-black/55">
-                        New accounts open after the email is listed for dispatch access.
+                        New accounts work only after the owner approves that email for staff access.
                       </p>
                     </div>
-                    <ChevronDown className="size-5 shrink-0 text-black/40" aria-hidden />
+                    <ShieldCheck className="size-5 shrink-0 text-black/40" aria-hidden />
                   </div>
                 </Card>
               </div>
             )}
           </Card>
         </aside>
+
+        <div className="grid gap-3 lg:col-start-1 lg:row-start-2 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
+            <Card className="rounded-[28px] border-white/10 bg-white/[0.06] p-5 text-white shadow-none">
+              <div className="flex items-start gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white text-black">
+                  <ClipboardList className="size-5" aria-hidden />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-black text-white">Requested page</p>
+                  <p className="mt-1 text-2xl font-semibold text-white">{requestedLabel}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/58">
+                    {requestedRoute?.description ?? "Choose a staff tool after sign-in."}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5 rounded-2xl bg-white/[0.06] px-4 py-3 text-sm leading-6 text-white/68">
+                Approved staff emails continue directly to the requested tool. New accounts wait for owner approval.
+              </div>
+            </Card>
+
+            <Card className="rounded-[28px] border-white/10 bg-white/[0.04] p-5 text-white shadow-none">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-5 text-white/70" aria-hidden />
+                <h2 className="text-lg font-semibold text-white">Staff tools</h2>
+              </div>
+              <div className="mt-4 grid gap-2">
+                {staffRouteItems.map((item) => (
+                  <Link
+                    key={item.key}
+                    href={`/auth/sign-in?next=${encodeURIComponent(item.href)}`}
+                    className={cn(
+                      "group grid min-w-0 gap-1 rounded-2xl border px-4 py-3 transition",
+                      requestedRoute?.key === item.key
+                        ? "border-white bg-white text-black"
+                        : "border-white/10 bg-white/[0.03] text-white hover:border-white/30 hover:bg-white/[0.08]",
+                    )}
+                  >
+                    <span className="flex min-w-0 items-center justify-between gap-3">
+                      <span className="font-semibold">{item.label}</span>
+                      <ArrowRight className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                    </span>
+                    <span className={cn("text-sm leading-5", requestedRoute?.key === item.key ? "text-black/58" : "text-white/52")}>
+                      {item.description}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </Card>
+        </div>
       </div>
     </section>
   );
@@ -309,68 +334,29 @@ export function AuthPanel({ next }: { next: string }) {
   }
 }
 
-function DispatchCommandPanel() {
-  return (
-    <Card className="w-full min-w-0 max-w-[calc(100vw-2.5rem)] rounded-[30px] border-white/10 bg-white text-black shadow-[0_18px_60px_rgba(0,0,0,0.3)] sm:max-w-full">
-      <CardHeader className="border-b border-black/10 p-5">
-        <CardDescription className="font-semibold text-black/45">Get the desk ready</CardDescription>
-        <CardTitle className="text-3xl font-black">Dispatch queue</CardTitle>
-      </CardHeader>
-
-      <CardContent className="p-5">
-        <div className="relative grid gap-3">
-          <span className="absolute left-[21px] top-12 h-20 w-px bg-[#050505]/18" aria-hidden />
-          {dispatchRows.map((row) => (
-            <div key={row.label} className="grid min-w-0 grid-cols-[44px_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-[#f3f3f3] p-4">
-              <span className="relative z-10 grid size-11 place-items-center rounded-full bg-white text-black">
-                <row.icon className="size-5" aria-hidden />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-black">{row.label}</span>
-                <span className="mt-1 block text-sm leading-5 text-black/55">{row.value}</span>
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-5 grid gap-2 sm:grid-cols-3">
-          {tripStats.map((stat) => (
-            <div key={stat.label} className="min-w-0 rounded-2xl bg-[#050505] p-4 text-white">
-              <p className="text-3xl font-black">{stat.value}</p>
-              <p className="mt-1 text-xs font-semibold leading-4 text-white/52">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function DispatchMapPanel() {
-  return <StaffRouteMap />;
-}
-
 function SignedInPanel({
   email,
   next,
+  nextLabel,
   refresh,
 }: {
   email: string;
   next: string;
+  nextLabel: string;
   refresh: () => void;
 }) {
   return (
     <CardContent className="p-5 sm:p-6">
       <div className="rounded-[28px] bg-[#050505] p-5 text-white">
         <p className="text-sm font-semibold text-white/50">Signed in</p>
-        <h2 className="mt-2 text-4xl font-semibold">Dispatch access</h2>
+        <h2 className="mt-2 text-4xl font-semibold">Staff access</h2>
         <p className="mt-3 break-all text-sm text-white/64">{email}</p>
       </div>
 
       <div className="mt-5 grid gap-3">
         <Button asChild className="min-h-14 rounded-2xl bg-[#050505] text-base font-black text-white hover:bg-[#171717]">
           <Link href={next}>
-            Continue
+            Continue to {nextLabel}
             <ArrowRight className="size-5" aria-hidden />
           </Link>
         </Button>
@@ -486,4 +472,8 @@ function formReducer(state: FormState, action: FormAction): FormState {
     ...state,
     [action.type]: action.value,
   };
+}
+
+function getRequestedStaffRoute(next: string) {
+  return staffRouteItems.find((item) => item.href === next);
 }
