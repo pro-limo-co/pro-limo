@@ -105,7 +105,7 @@ export function RateManagementPanel() {
         <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Rates are staff-only</CardTitle>
-            <CardDescription>Claim staff access from the dispatch queue first.</CardDescription>
+            <CardDescription>Open Dispatch to finish staff access for this account.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">

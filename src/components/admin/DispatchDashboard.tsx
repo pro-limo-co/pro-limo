@@ -16,7 +16,7 @@ import {
   Share2,
 } from "lucide-react";
 import Link from "next/link";
-import { type ReactNode, useEffect, useMemo, useReducer, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { api } from "@convex/_generated/api";
 import { StaffOpsShell } from "@/components/admin/StaffOpsShell";
 import { BookingMapPreview } from "@/components/booking/BookingMapPreview";
@@ -137,6 +137,7 @@ export function DispatchDashboard({
   const [status, setStatus] = useState<StatusView>("active");
   const [claimAccessMessage, setClaimAccessMessage] = useState("");
   const [claimAccessPending, setClaimAccessPending] = useState(false);
+  const claimAccessCheckedRef = useRef(false);
   const viewer = useQuery(api.auth.getViewer);
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
   const rateProfiles = useQuery(api.rates.list, viewer?.staff ? {} : "skip");
@@ -153,19 +154,35 @@ export function DispatchDashboard({
       : "skip",
   );
   const session = authClient.useSession();
-
-  async function handleClaimStaffAccess() {
+  const hasIdentity = Boolean(viewer?.identity);
+  const hasStaff = Boolean(viewer?.staff);
+  const handleClaimStaffAccess = useCallback(async (force = false) => {
+    if (claimAccessCheckedRef.current && !force) return;
+    claimAccessCheckedRef.current = true;
     setClaimAccessPending(true);
     setClaimAccessMessage("");
     try {
       await claimStaffAccess({});
-      setClaimAccessMessage("Staff access enabled. Loading the queue.");
+      setClaimAccessMessage("Staff access enabled. Loading Dispatch.");
     } catch (error) {
-      setClaimAccessMessage(error instanceof Error ? error.message : "Could not claim staff access.");
+      const message = error instanceof Error ? error.message : "";
+      setClaimAccessMessage(
+        message.includes("Unauthorized")
+          ? "This email is not enabled for staff access."
+          : "Staff access is not available for this account.",
+      );
     } finally {
       setClaimAccessPending(false);
     }
-  }
+  }, [claimStaffAccess]);
+
+  useEffect(() => {
+    if (!hasIdentity || hasStaff || claimAccessPending || claimAccessCheckedRef.current) return;
+    const autoClaimTimer = window.setTimeout(() => {
+      void handleClaimStaffAccess();
+    }, 0);
+    return () => window.clearTimeout(autoClaimTimer);
+  }, [claimAccessPending, handleClaimStaffAccess, hasIdentity, hasStaff]);
 
   if (viewer === undefined || session.isPending) {
     return (
@@ -186,7 +203,7 @@ export function DispatchDashboard({
           <CardHeader>
             <CardTitle>Staff access required</CardTitle>
             <CardDescription>
-              Sign in before using booking, quote, assignment, and driver handoff tools.
+              Sign in before opening Dispatch.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -201,18 +218,20 @@ export function DispatchDashboard({
 
   if (!viewer.staff) {
     return (
-      <DispatchShell title="Claim staff access" showSignOut>
+      <DispatchShell title="Staff access" showSignOut>
         <Card className="mt-8 max-w-xl">
           <CardHeader>
             <CardTitle>Signed in as {viewer.identity.email}</CardTitle>
             <CardDescription>
-              Claim access with an email listed in DISPATCH_ADMIN_EMAILS.
+              {claimAccessPending ? "Checking this account." : "This page is available to staff accounts."}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
-            <Button type="button" size="lg" disabled={claimAccessPending} onClick={() => void handleClaimStaffAccess()}>
-              {claimAccessPending ? "Checking access" : "Claim access"}
-            </Button>
+            {!claimAccessPending && (
+              <Button type="button" size="lg" onClick={() => void handleClaimStaffAccess(true)}>
+                Check again
+              </Button>
+            )}
             {claimAccessMessage && (
               <Alert aria-live="polite" role="status">
                 {claimAccessMessage}
