@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:vercel": "npx convex env set SITE_URL \"$SITE_URL\" && npx convex env set NEXT_PUBLIC_SITE_URL \"$NEXT_PUBLIC_SITE_URL\" && npx convex env set BETTER_AUTH_SECRET \"$BETTER_AUTH_SECRET\" && npx convex env set DISPATCH_ADMIN_EMAILS \"$DISPATCH_ADMIN_EMAILS\" && npx convex deploy --cmd \"npm run build\"",
+    "build:vercel": "node scripts/vercel-build.mjs",
     "start": "next start",
     "lint": "eslint",
     "doctor:react": "react-doctor . --verbose --full --offline --project pro-limo",
