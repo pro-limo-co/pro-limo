@@ -6,6 +6,7 @@ import { CheckCircle2, Save, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useEffect, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { StaffOpsShell, StaffPanelStat } from "@/components/admin/StaffOpsShell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -71,8 +72,8 @@ export function RateManagementPanel() {
   if (viewer === undefined || session.isPending) {
     return (
       <RatesShell>
-        <Card className="mt-8">
-          <CardContent className="py-6 text-sm text-muted-foreground">
+        <Card className="mt-8 rounded-[28px] border-black/10 bg-white shadow-none">
+          <CardContent className="py-6 text-sm text-black/56">
             Loading rate settings.
           </CardContent>
         </Card>
@@ -83,13 +84,13 @@ export function RateManagementPanel() {
   if (!viewer.identity) {
     return (
       <RatesShell>
-        <Card className="mt-8 max-w-xl">
+        <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Staff access required</CardTitle>
             <CardDescription>Sign in before editing vehicle, hourly, distance, and fee rules.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
               <Link href="/auth/sign-in?next=/admin/rates">Sign in</Link>
             </Button>
           </CardContent>
@@ -101,13 +102,13 @@ export function RateManagementPanel() {
   if (!viewer.staff) {
     return (
       <RatesShell showSignOut>
-        <Card className="mt-8 max-w-xl">
+        <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Rates are staff-only</CardTitle>
             <CardDescription>Claim staff access from the dispatch queue first.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
               <Link href="/admin/dispatch">Open dispatch</Link>
             </Button>
           </CardContent>
@@ -129,22 +130,27 @@ export function RateManagementPanel() {
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-foreground">Rate card</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-black text-black">Rate card</p>
+          <p className="text-sm text-black/56">
             Profiles cover distance, hourly, minimum, airport, meet-and-greet, stop, gratuity, tax, and peak rules.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/dispatch">Dispatch queue</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/fleet">Fleet</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/customers">Customers</Link>
           </Button>
-          <Button type="button" disabled={!canEdit || pending} onClick={() => void handleInstallDefaults()}>
+          <Button
+            type="button"
+            className="rounded-full bg-[#050505] text-white hover:bg-[#111111]"
+            disabled={!canEdit || pending}
+            onClick={() => void handleInstallDefaults()}
+          >
             <Settings2 className="size-4" aria-hidden />
             Install defaults
           </Button>
@@ -159,8 +165,8 @@ export function RateManagementPanel() {
 
       <div className="mt-6 grid gap-4">
         {profiles === undefined ? (
-          <Card>
-            <CardContent className="py-6 text-sm text-muted-foreground">
+          <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
+            <CardContent className="py-6 text-sm text-black/56">
               Loading profiles.
             </CardContent>
           </Card>
@@ -225,7 +231,7 @@ function RateProfileCard({
   const disabled = !canEdit || pending;
 
   return (
-    <Card>
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -238,7 +244,7 @@ function RateProfileCard({
             <CardTitle className="mt-3">{profile.name}</CardTitle>
             <CardDescription>{profile.vehicleType}</CardDescription>
           </div>
-          <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm font-medium text-foreground">
+          <div className="rounded-2xl border border-black/10 bg-[#f3f3f3] px-3 py-2 text-sm font-black text-black">
             Min {formatMoneyFromCents(profile.minimumFareCents)}
           </div>
         </div>
@@ -305,7 +311,12 @@ function RateProfileCard({
               {canEdit ? "Save changes before applying this profile in dispatch." : "Only admins can edit rate cards."}
             </p>
           )}
-          <Button type="button" disabled={disabled} onClick={() => void handleSave()}>
+          <Button
+            type="button"
+            className="rounded-full bg-[#050505] text-white hover:bg-[#111111]"
+            disabled={disabled}
+            onClick={() => void handleSave()}
+          >
             <Save className="size-4" aria-hidden />
             Save profile
           </Button>
@@ -323,48 +334,20 @@ function RatesShell({
   showSignOut?: boolean;
 }) {
   return (
-    <section className="pld-ui min-h-[100svh] bg-muted/30 text-foreground">
-      <div className="mx-auto max-w-[1500px] px-6 pt-28 pb-16 lg:px-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-              ProLimo OS
-            </p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-normal text-foreground">
-              Rates
-            </h1>
-          </div>
-          {showSignOut && (
-            <Button
-              type="button"
-              variant="outline"
-              className="self-start md:self-auto"
-              onClick={async () => {
-                await authClient.signOut();
-                window.location.href = "/";
-              }}
-            >
-              Sign out
-            </Button>
-          )}
-        </div>
-        {children}
-      </div>
-    </section>
+    <StaffOpsShell
+      current="rates"
+      description="Maintain vehicle, hourly, distance, airport, stop, gratuity, tax, and peak pricing rules for quote-ready staff workflows."
+      eyebrow="Pricing desk"
+      showSignOut={showSignOut}
+      title="Rates"
+    >
+      {children}
+    </StaffOpsShell>
   );
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="shadow-none">
-      <CardContent className="p-4">
-        <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
-          {label}
-        </p>
-        <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
-      </CardContent>
-    </Card>
-  );
+  return <StaffPanelStat label={label} value={value} />;
 }
 
 function TextField({

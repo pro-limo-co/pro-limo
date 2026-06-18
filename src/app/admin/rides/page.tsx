@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Nav } from "@/components/Nav";
 import { DispatchDashboard } from "@/components/admin/DispatchDashboard";
 
 export const metadata: Metadata = {
@@ -9,11 +8,8 @@ export const metadata: Metadata = {
 
 export default function RidesPage() {
   return (
-    <>
-      <Nav minimal tone="light" />
-      <main className="min-h-[100svh]">
-        <DispatchDashboard title="Rides" />
-      </main>
-    </>
+    <main className="min-h-[100svh] bg-[#050505]">
+      <DispatchDashboard title="Rides" />
+    </main>
   );
 }

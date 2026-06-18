@@ -20,6 +20,8 @@ import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
 import { useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { staffRouteItems } from "@/components/admin/staffRoutes";
+import { useStaffRoutePrefetch } from "@/components/admin/useStaffRoutePrefetch";
 import { StaffRouteMap } from "@/components/auth/StaffRouteMap";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -51,13 +53,6 @@ const initialFormState: FormState = {
   password: "",
 };
 
-const staffDestinations = [
-  { href: "/admin/dispatch", label: "Dispatch" },
-  { href: "/admin/rides", label: "Rides" },
-  { href: "/admin/fleet", label: "Fleet" },
-  { href: "/admin/rates", label: "Rates" },
-];
-
 const dispatchRows = [
   { icon: MapPin, label: "Pickup queue", value: "Portland airport, downtown, private homes" },
   { icon: Route, label: "Dropoff desk", value: "Quotes, handoffs, payments, route notes" },
@@ -72,6 +67,7 @@ const tripStats = [
 
 export function AuthPanel({ next }: { next: string }) {
   const { push, refresh } = useRouter();
+  useStaffRoutePrefetch(next);
   const session = authClient.useSession();
   const claimStaffAccess = useMutation(api.auth.claimStaffAccess);
   const [mode, setMode] = useState<Mode>("signin");
@@ -148,16 +144,16 @@ export function AuthPanel({ next }: { next: string }) {
 
       <header className="relative z-10 flex min-h-20 items-center justify-between gap-3 overflow-hidden px-5 sm:px-8 lg:px-12">
         <Link href="/" className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-white text-xl font-black tracking-[-0.08em] text-black">
+          <span className="grid size-10 place-items-center rounded-xl bg-white text-xl font-black text-black">
             PL
           </span>
-          <span className="hidden text-sm font-semibold tracking-tight text-white sm:block">
+          <span className="hidden text-sm font-semibold text-white sm:block">
             Professional Limousine Driver
           </span>
         </Link>
 
         <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1 text-sm text-white/70 md:flex">
-          {staffDestinations.map((item) => (
+          {staffRouteItems.map((item) => (
             <Link
               key={item.href}
               href={`/auth/sign-in?next=${encodeURIComponent(item.href)}`}
@@ -182,12 +178,12 @@ export function AuthPanel({ next }: { next: string }) {
           <div className="max-w-full pt-8 lg:max-w-5xl lg:pt-16">
             <Badge
               variant="outline"
-              className="mb-5 gap-2 rounded-full border-white/10 bg-white/[0.06] px-4 py-2 text-xs uppercase tracking-[0.22em] text-white/70"
+              className="mb-5 gap-2 rounded-full border-white/10 bg-white/[0.06] px-4 py-2 text-xs uppercase text-white/70"
             >
               <RadioTower className="size-4" aria-hidden />
               Staff operations
             </Badge>
-            <h1 className="max-w-[calc(100vw-2.5rem)] text-5xl font-semibold leading-[0.94] tracking-[-0.06em] text-white sm:max-w-4xl sm:text-7xl sm:leading-[0.88] lg:text-8xl">
+            <h1 className="max-w-[calc(100vw-2.5rem)] text-5xl font-semibold leading-[0.94] text-white sm:max-w-4xl sm:text-7xl sm:leading-[0.88] lg:text-8xl">
               Run the ride desk.
             </h1>
             <p className="mt-6 max-w-[calc(100vw-2.5rem)] text-lg leading-8 text-white/64 sm:max-w-2xl">
@@ -210,7 +206,7 @@ export function AuthPanel({ next }: { next: string }) {
                 <CardHeader className="mb-6 flex-row items-center justify-between space-y-0 p-0">
                   <div className="space-y-1">
                     <CardDescription className="font-semibold text-black/45">Staff access</CardDescription>
-                    <CardTitle className="text-4xl font-black tracking-[-0.045em]">
+                    <CardTitle className="text-4xl font-black">
                       {isSignup ? "Create account" : "Sign in"}
                     </CardTitle>
                   </div>
@@ -318,12 +314,12 @@ function DispatchCommandPanel() {
     <Card className="w-full min-w-0 max-w-[calc(100vw-2.5rem)] rounded-[30px] border-white/10 bg-white text-black shadow-[0_18px_60px_rgba(0,0,0,0.3)] sm:max-w-full">
       <CardHeader className="border-b border-black/10 p-5">
         <CardDescription className="font-semibold text-black/45">Get the desk ready</CardDescription>
-        <CardTitle className="text-3xl font-black tracking-[-0.04em]">Dispatch queue</CardTitle>
+        <CardTitle className="text-3xl font-black">Dispatch queue</CardTitle>
       </CardHeader>
 
       <CardContent className="p-5">
         <div className="relative grid gap-3">
-          <span className="absolute left-[21px] top-12 h-20 w-px bg-black/18" aria-hidden />
+          <span className="absolute left-[21px] top-12 h-20 w-px bg-[#050505]/18" aria-hidden />
           {dispatchRows.map((row) => (
             <div key={row.label} className="grid min-w-0 grid-cols-[44px_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-[#f3f3f3] p-4">
               <span className="relative z-10 grid size-11 place-items-center rounded-full bg-white text-black">
@@ -340,7 +336,7 @@ function DispatchCommandPanel() {
         <div className="mt-5 grid gap-2 sm:grid-cols-3">
           {tripStats.map((stat) => (
             <div key={stat.label} className="min-w-0 rounded-2xl bg-[#050505] p-4 text-white">
-              <p className="text-3xl font-black tracking-[-0.04em]">{stat.value}</p>
+              <p className="text-3xl font-black">{stat.value}</p>
               <p className="mt-1 text-xs font-semibold leading-4 text-white/52">{stat.label}</p>
             </div>
           ))}
@@ -367,7 +363,7 @@ function SignedInPanel({
     <CardContent className="p-5 sm:p-6">
       <div className="rounded-[28px] bg-[#050505] p-5 text-white">
         <p className="text-sm font-semibold text-white/50">Signed in</p>
-        <h2 className="mt-2 text-4xl font-semibold tracking-[-0.045em]">Dispatch access</h2>
+        <h2 className="mt-2 text-4xl font-semibold">Dispatch access</h2>
         <p className="mt-3 break-all text-sm text-white/64">{email}</p>
       </div>
 
@@ -444,7 +440,7 @@ function AuthField({
 }) {
   return (
     <div className="rounded-3xl bg-[#f3f3f3] p-4 transition focus-within:shadow-sm">
-      <Label htmlFor={name} className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-black/42">
+      <Label htmlFor={name} className="mb-2 flex items-center gap-2 text-xs font-black uppercase text-black/42">
         <Icon className="size-4" aria-hidden />
         {label}
       </Label>

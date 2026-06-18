@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Nav } from "@/components/Nav";
 import { FleetManagementPanel } from "@/components/admin/FleetManagementPanel";
 
 export const metadata: Metadata = {
@@ -9,11 +8,8 @@ export const metadata: Metadata = {
 
 export default function FleetPage() {
   return (
-    <>
-      <Nav minimal tone="light" />
-      <main className="min-h-[100svh]">
-        <FleetManagementPanel />
-      </main>
-    </>
+    <main className="min-h-[100svh] bg-[#050505]">
+      <FleetManagementPanel />
+    </main>
   );
 }

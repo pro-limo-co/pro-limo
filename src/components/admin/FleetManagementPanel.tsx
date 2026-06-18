@@ -2,10 +2,11 @@
 
 import type { FunctionReturnType } from "convex/server";
 import { useMutation, useQuery } from "convex/react";
-import { CarFront, CheckCircle2, LogOut, Save, Settings2, UserRound } from "lucide-react";
+import { CarFront, CheckCircle2, Save, Settings2, UserRound } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useEffect, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { StaffOpsShell, StaffPanelStat } from "@/components/admin/StaffOpsShell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -79,8 +80,8 @@ export function FleetManagementPanel() {
   if (viewer === undefined || session.isPending) {
     return (
       <FleetShell>
-        <Card className="mt-8">
-          <CardContent className="py-6 text-sm text-muted-foreground">
+        <Card className="mt-8 rounded-[28px] border-black/10 bg-white shadow-none">
+          <CardContent className="py-6 text-sm text-black/56">
             Loading fleet settings.
           </CardContent>
         </Card>
@@ -91,13 +92,13 @@ export function FleetManagementPanel() {
   if (!viewer.identity) {
     return (
       <FleetShell>
-        <Card className="mt-8 max-w-xl">
+        <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Staff access required</CardTitle>
             <CardDescription>Sign in before managing saved drivers and vehicles.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
               <Link href="/auth/sign-in?next=/admin/fleet">Sign in</Link>
             </Button>
           </CardContent>
@@ -109,13 +110,13 @@ export function FleetManagementPanel() {
   if (!viewer.staff) {
     return (
       <FleetShell showSignOut>
-        <Card className="mt-8 max-w-xl">
+        <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Fleet is staff-only</CardTitle>
             <CardDescription>Claim staff access from the dispatch queue first.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
               <Link href="/admin/dispatch">Open dispatch</Link>
             </Button>
           </CardContent>
@@ -138,22 +139,27 @@ export function FleetManagementPanel() {
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-foreground">Operating roster</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-black text-black">Operating roster</p>
+          <p className="text-sm text-black/56">
             Saved profiles feed dispatch assignment and driver handoff details.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/dispatch">Dispatch queue</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/rates">Rates</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/customers">Customers</Link>
           </Button>
-          <Button type="button" disabled={!canEdit || pending} onClick={() => void handleInstallDefaults()}>
+          <Button
+            type="button"
+            className="rounded-full bg-[#050505] text-white hover:bg-[#111111]"
+            disabled={!canEdit || pending}
+            onClick={() => void handleInstallDefaults()}
+          >
             <Settings2 className="size-4" aria-hidden />
             Install defaults
           </Button>
@@ -240,7 +246,7 @@ function DriverProfileCard({
   const disabled = !canEdit || pending;
 
   return (
-    <Card className="shadow-none">
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
       <CardHeader>
         <ProfileHeader
           active={profile.active}
@@ -308,7 +314,7 @@ function VehicleProfileCard({
   const disabled = !canEdit || pending;
 
   return (
-    <Card className="shadow-none">
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
       <CardHeader>
         <ProfileHeader
           active={profile.active}
@@ -343,46 +349,15 @@ function FleetShell({
   showSignOut?: boolean;
 }) {
   return (
-    <section className="pld-ui min-h-[100svh] bg-muted/30 text-foreground">
-      <div className="mx-auto max-w-[1500px] px-6 pt-28 pb-16 lg:px-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-              ProLimo OS
-            </p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-normal text-foreground">
-              Fleet
-            </h1>
-          </div>
-          {showSignOut && (
-            <div className="flex flex-col gap-2 sm:flex-row md:self-auto">
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/dispatch">Dispatch</Link>
-              </Button>
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/rates">Rates</Link>
-              </Button>
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/customers">Customers</Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="self-start sm:self-auto"
-                onClick={async () => {
-                  await authClient.signOut();
-                  window.location.href = "/";
-                }}
-              >
-                <LogOut className="size-4" aria-hidden />
-                Sign out
-              </Button>
-            </div>
-          )}
-        </div>
-        {children}
-      </div>
-    </section>
+    <StaffOpsShell
+      current="fleet"
+      description="Manage chauffeurs and vehicles that dispatchers can assign, contact, and hand off without leaving the ride queue."
+      eyebrow="Fleet desk"
+      showSignOut={showSignOut}
+      title="Fleet"
+    >
+      {children}
+    </StaffOpsShell>
   );
 }
 
@@ -403,9 +378,9 @@ function FleetColumn({
         <div>
           <div className="flex items-center gap-2">
             {icon}
-            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+            <h2 className="text-lg font-semibold text-black">{title}</h2>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1 text-sm text-black/56">{description}</p>
         </div>
       </div>
       {children}
@@ -431,7 +406,7 @@ function ProfileHeader({
           <Badge variant={active ? "default" : "outline"}>{active ? "Active" : "Inactive"}</Badge>
           <Badge variant="secondary">{source === "saved" ? "Saved" : "Default preview"}</Badge>
         </div>
-        <CardTitle className="mt-3 text-xl">{title}</CardTitle>
+        <CardTitle className="mt-3 text-xl text-black">{title}</CardTitle>
         <CardDescription>{detail}</CardDescription>
       </div>
     </div>
@@ -490,7 +465,12 @@ function ProfileSaveBar({
           {canEdit ? "Save changes before assigning this profile in dispatch." : "Only admins can edit fleet profiles."}
         </p>
       )}
-      <Button type="button" disabled={disabled} onClick={() => void onSave()}>
+      <Button
+        type="button"
+        className="rounded-full bg-[#050505] text-white hover:bg-[#111111]"
+        disabled={disabled}
+        onClick={() => void onSave()}
+      >
         <Save className="size-4" aria-hidden />
         Save profile
       </Button>
@@ -499,22 +479,13 @@ function ProfileSaveBar({
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="shadow-none">
-      <CardContent className="p-4">
-        <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
-          {label}
-        </p>
-        <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
-      </CardContent>
-    </Card>
-  );
+  return <StaffPanelStat label={label} value={value} />;
 }
 
 function LoadingCard({ label }: { label: string }) {
   return (
-    <Card className="shadow-none">
-      <CardContent className="py-6 text-sm text-muted-foreground">
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
+      <CardContent className="py-6 text-sm text-black/56">
         Loading {label}.
       </CardContent>
     </Card>

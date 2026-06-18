@@ -2,10 +2,11 @@
 
 import type { FunctionReturnType } from "convex/server";
 import { useMutation, useQuery } from "convex/react";
-import { CheckCircle2, LogOut, Mail, MapPin, Phone, Save, UsersRound } from "lucide-react";
+import { CheckCircle2, Mail, MapPin, Phone, Save, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useEffect, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { StaffOpsShell, StaffPanelStat } from "@/components/admin/StaffOpsShell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,8 +44,8 @@ export function CustomerManagementPanel() {
   if (viewer === undefined || session.isPending) {
     return (
       <CustomersShell>
-        <Card className="mt-8">
-          <CardContent className="py-6 text-sm text-muted-foreground">
+        <Card className="mt-8 rounded-[28px] border-black/10 bg-white shadow-none">
+          <CardContent className="py-6 text-sm text-black/56">
             Loading customer profiles.
           </CardContent>
         </Card>
@@ -55,13 +56,13 @@ export function CustomerManagementPanel() {
   if (!viewer.identity) {
     return (
       <CustomersShell>
-        <Card className="mt-8 max-w-xl">
+        <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Staff access required</CardTitle>
             <CardDescription>Sign in before viewing customer history and preferences.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
               <Link href="/auth/sign-in?next=/admin/customers">Sign in</Link>
             </Button>
           </CardContent>
@@ -73,13 +74,13 @@ export function CustomerManagementPanel() {
   if (!viewer.staff) {
     return (
       <CustomersShell showSignOut>
-        <Card className="mt-8 max-w-xl">
+        <Card className="mt-8 max-w-xl rounded-[28px] border-black/10 bg-white shadow-none">
           <CardHeader>
             <CardTitle>Customers are staff-only</CardTitle>
             <CardDescription>Claim staff access from the dispatch queue first.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
               <Link href="/admin/dispatch">Open dispatch</Link>
             </Button>
           </CardContent>
@@ -98,16 +99,16 @@ export function CustomerManagementPanel() {
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-foreground">Customer memory</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-black text-black">Customer memory</p>
+          <p className="text-sm text-black/56">
             New bookings automatically refresh contact history, addresses, preferences, and marketing consent.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/dispatch">Dispatch queue</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white">
             <Link href="/admin/fleet">Fleet</Link>
           </Button>
         </div>
@@ -170,7 +171,7 @@ function CustomerProfileCard({
   const disabled = !canEdit || pending;
 
   return (
-    <Card>
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
       <CardHeader>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -186,7 +187,7 @@ function CustomerProfileCard({
               <ContactLine icon={<Phone className="size-4" aria-hidden />} label={profile.phone} />
             </CardDescription>
           </div>
-          <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-black/10 bg-[#f3f3f3] px-3 py-2 text-sm font-medium text-black/56">
             Last booking {customerDateFormatter.format(profile.lastBookingAt)}
           </div>
         </div>
@@ -252,7 +253,12 @@ function CustomerProfileCard({
                 {canEdit ? "Keep notes short and operator-useful." : "Viewers cannot edit customer profiles."}
               </p>
             )}
-            <Button type="button" disabled={disabled} onClick={() => void handleSave()}>
+            <Button
+              type="button"
+              className="rounded-full bg-[#050505] text-white hover:bg-[#111111]"
+              disabled={disabled}
+              onClick={() => void handleSave()}
+            >
               <Save className="size-4" aria-hidden />
               Save profile
             </Button>
@@ -271,62 +277,31 @@ function CustomersShell({
   showSignOut?: boolean;
 }) {
   return (
-    <section className="pld-ui min-h-[100svh] bg-muted/30 text-foreground">
-      <div className="mx-auto max-w-[1500px] px-6 pt-28 pb-16 lg:px-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-              ProLimo OS
-            </p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-normal text-foreground">
-              Customers
-            </h1>
-          </div>
-          {showSignOut && (
-            <div className="flex flex-col gap-2 sm:flex-row md:self-auto">
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/dispatch">Dispatch</Link>
-              </Button>
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/fleet">Fleet</Link>
-              </Button>
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/rates">Rates</Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="self-start sm:self-auto"
-                onClick={async () => {
-                  await authClient.signOut();
-                  window.location.href = "/";
-                }}
-              >
-                <LogOut className="size-4" aria-hidden />
-                Sign out
-              </Button>
-            </div>
-          )}
-        </div>
-        {children}
-      </div>
-    </section>
+    <StaffOpsShell
+      current="customers"
+      description="Review customer history, saved addresses, preferences, notes, and marketing consent for repeat passenger service."
+      eyebrow="Customer memory"
+      showSignOut={showSignOut}
+      title="Customers"
+    >
+      {children}
+    </StaffOpsShell>
   );
 }
 
 function AddressList({ title, values }: { title: string; values: string[] }) {
   return (
-    <div className="rounded-md border bg-background p-3">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-normal text-muted-foreground">
+    <div className="rounded-2xl border border-black/10 bg-[#f3f3f3] p-3">
+      <div className="flex items-center gap-2 text-xs font-black uppercase text-black/42">
         <MapPin className="size-3.5" aria-hidden />
         {title}
       </div>
       <div className="mt-3 grid gap-2">
         {values.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No addresses saved yet.</p>
+          <p className="text-sm text-black/56">No addresses saved yet.</p>
         ) : (
           values.map((value) => (
-            <p key={value} className="break-words rounded-md bg-muted/50 px-2.5 py-2 text-sm text-foreground [overflow-wrap:anywhere]">
+            <p key={value} className="break-words rounded-2xl bg-white px-2.5 py-2 text-sm text-black [overflow-wrap:anywhere]">
               {value}
             </p>
           ))
@@ -346,22 +321,13 @@ function ContactLine({ icon, label }: { icon: ReactNode; label: string }) {
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="shadow-none">
-      <CardContent className="p-4">
-        <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
-          {label}
-        </p>
-        <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
-      </CardContent>
-    </Card>
-  );
+  return <StaffPanelStat label={label} value={value} />;
 }
 
 function LoadingCard() {
   return (
-    <Card>
-      <CardContent className="py-6 text-sm text-muted-foreground">
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
+      <CardContent className="py-6 text-sm text-black/56">
         Loading customers.
       </CardContent>
     </Card>
@@ -370,7 +336,7 @@ function LoadingCard() {
 
 function EmptyCustomersState() {
   return (
-    <Card>
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
       <CardHeader>
         <div className="flex items-center gap-2">
           <UsersRound className="size-5" aria-hidden />
@@ -381,7 +347,7 @@ function EmptyCustomersState() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Button asChild>
+        <Button asChild className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
           <Link href="/#book">Open booking form</Link>
         </Button>
       </CardContent>

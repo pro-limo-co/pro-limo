@@ -172,7 +172,7 @@ export function StaffRouteMap({ className }: StaffRouteMapProps) {
       ) : null}
 
       <div className="absolute left-4 top-4 max-w-[calc(100%-5.5rem)] rounded-2xl bg-white px-4 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.14)] sm:left-5 sm:top-5">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-black/40">Live route</p>
+        <p className="text-xs font-black uppercase text-black/40">Live route</p>
         <p className="mt-1 truncate text-lg font-black">PDX to Pearl District</p>
       </div>
 
@@ -207,7 +207,7 @@ export function StaffRouteMap({ className }: StaffRouteMapProps) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-black/45">From PDX arrivals</p>
-              <p className="truncate text-xl font-black tracking-[-0.03em]">To Pearl District hotel</p>
+              <p className="truncate text-xl font-black">To Pearl District hotel</p>
             </div>
           </div>
           <ArrowRight className="size-5 shrink-0" aria-hidden />

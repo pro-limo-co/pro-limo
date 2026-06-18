@@ -8,7 +8,6 @@ import {
   Copy,
   CreditCard,
   ExternalLink,
-  LogOut,
   Mail,
   Phone,
   Plus,
@@ -19,6 +18,7 @@ import {
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from "react";
 import { api } from "@convex/_generated/api";
+import { StaffOpsShell } from "@/components/admin/StaffOpsShell";
 import { BookingMapPreview } from "@/components/booking/BookingMapPreview";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -469,7 +469,7 @@ function DispatchBookingRow({
 
   return (
     <Card
-      className="overflow-hidden border-l-[3px]"
+      className="overflow-hidden rounded-[28px] border border-black/10 border-l-[4px] bg-white shadow-none"
       style={{ borderLeftColor: statusToneColor(getStatusTone(booking.status)) }}
     >
       <DispatchBookingHeader
@@ -548,7 +548,7 @@ function DispatchBookingHeader({
   const hasStats = Boolean(distanceMi || durationMin || quote);
 
   return (
-    <CardHeader className={cn("bg-muted/30", expanded && "border-b")}>
+    <CardHeader className={cn("bg-[#fbfbfa]", expanded && "border-b border-black/10")}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -581,13 +581,13 @@ function DispatchBookingHeader({
         </div>
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] lg:min-w-[26rem]">
           <div className="grid gap-3">
-            <div className="rounded-md border bg-background px-4 py-3 text-sm">
+            <div className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm">
               <p className="font-medium text-foreground">{booking.pickupDate} at {booking.pickupTime}</p>
               <p className="mt-1 text-muted-foreground">{formatPassengerCount(booking.passengerCount)} / {booking.luggage}</p>
             </div>
             {/* Stat-box trio (UI refresh, Variant B) — only renders values that exist */}
             {hasStats && (
-              <div className="grid grid-cols-3 overflow-hidden rounded-md border bg-background">
+              <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-black/10 bg-white">
                 <StatBox label="Distance" value={distanceMi} />
                 <StatBox label="Duration" value={durationMin} />
                 <StatBox label="Quote" value={quote} accent />
@@ -597,7 +597,7 @@ function DispatchBookingHeader({
           <Button
             type="button"
             variant="outline"
-            className="press-tap justify-center"
+            className="press-tap justify-center rounded-full border-black/10 bg-white text-black hover:bg-[#050505] hover:text-white"
             aria-label={`${expanded ? "Hide" : "Open"} ${booking.publicReference}`}
             aria-expanded={expanded}
             onClick={onToggle}
@@ -615,7 +615,7 @@ function DispatchBookingHeader({
 function StatBox({ label, value, accent }: { label: string; value?: string; accent?: boolean }) {
   return (
     <div className="border-r px-3 py-2 last:border-r-0">
-      <div className="font-condensed text-[0.58rem] uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+      <div className="font-condensed text-[0.58rem] uppercase text-muted-foreground">{label}</div>
       <div className={cn("mt-0.5 text-sm font-medium tabular-nums", accent ? "text-primary" : "text-foreground")}>
         {value ?? "—"}
       </div>
@@ -637,7 +637,7 @@ function DriverSummary({ booking }: { booking: Booking }) {
   return (
     <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
       {driverName && (
-        <span className="rounded-md border bg-background px-2.5 py-1 font-medium text-foreground">
+        <span className="rounded-full border border-black/10 bg-white px-3 py-1 font-medium text-foreground">
           Driver: {driverName}
         </span>
       )}
@@ -663,6 +663,7 @@ function BookingDetailsSection({
       <BookingMapPreview
         pickup={booking.pickupLocationDetails}
         dropoff={booking.dropoffLocationDetails}
+        className="min-h-[300px] rounded-[24px]"
         mapId="pro-limo-dispatch"
       />
       <InfoRow label="Mode" value={booking.bookingMode} />
@@ -732,7 +733,7 @@ function DispatchEditorSection({
         {booking.vehicleLabel && <InfoRow label="Vehicle" value={booking.vehicleLabel} />}
         {booking.assignedChauffeurName && <InfoRow label="Chauffeur" value={booking.assignedChauffeurName} />}
         {booking.dispatchNotes && <InfoBlock label="Dispatch notes">{booking.dispatchNotes}</InfoBlock>}
-        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-black/10 bg-[#f3f3f3] px-3 py-2 text-sm text-black/56">
           Payment links and dispatch changes are closed for {formatStatusInSentence(booking.status)} rides.
         </p>
         <StaffNoteEditor
@@ -999,7 +1000,7 @@ function RateQuoteCalculator({
       <div className="rounded-md border bg-background p-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
+            <p className="text-xs font-medium uppercase text-muted-foreground">
               Estimate
             </p>
             <p className="mt-1 text-2xl font-semibold text-foreground">
@@ -1134,17 +1135,17 @@ function OperationsLogSection({
         description="Live dispatch, payment, handoff, driver-status, and staff-note updates."
       />
       {loading ? (
-        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-black/10 bg-[#f3f3f3] px-3 py-2 text-sm text-black/56">
           Loading updates.
         </p>
       ) : events.length === 0 ? (
-        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-black/10 bg-[#f3f3f3] px-3 py-2 text-sm text-black/56">
           No updates recorded yet.
         </p>
       ) : (
         <ol className="grid min-w-0 gap-2">
           {events.slice(0, 8).map((event) => (
-            <li key={event._id} className="min-w-0 rounded-md border bg-background p-3">
+            <li key={event._id} className="min-w-0 rounded-2xl border border-black/10 bg-white p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={getEventBadgeVariant(event.kind)}>
                   {formatStatus(event.kind)}
@@ -1238,8 +1239,8 @@ function RecentHandoffs({
   if (visibleHandoffs.length === 0) return null;
 
   return (
-    <div className="grid min-w-0 gap-3 rounded-md border bg-muted/30 p-3">
-      <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+      <div className="grid min-w-0 gap-3 rounded-2xl border border-black/10 bg-[#f3f3f3] p-3">
+      <p className="text-xs font-semibold uppercase text-muted-foreground">
         Recent links
       </p>
       {visibleHandoffs.map((handoff) => {
@@ -1279,63 +1280,23 @@ function DispatchShell({
   stats?: DashboardStat[];
   showSignOut?: boolean;
 }) {
+  const current = title === "Rides" ? "rides" : "dispatch";
+  const description =
+    current === "rides"
+      ? "Review the full ride ledger, open trip records, resend links, and keep passenger-facing state in sync."
+      : "Work the active queue: quote trips, assign chauffeurs, send payment links, share trips, and hand off rides.";
+
   return (
-    <section className="pld-ui min-h-[100svh] bg-muted/30 text-foreground">
-      <div className="mx-auto max-w-[1500px] px-6 pt-28 pb-16 lg:px-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-              ProLimo OS
-            </p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-normal text-foreground">
-              {title}
-            </h1>
-          </div>
-          {showSignOut && (
-            <div className="flex flex-col gap-2 sm:flex-row md:self-auto">
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/rates">Rates</Link>
-              </Button>
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/fleet">Fleet</Link>
-              </Button>
-              <Button asChild variant="outline" className="self-start sm:self-auto">
-                <Link href="/admin/customers">Customers</Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="self-start sm:self-auto"
-                onClick={async () => {
-                  await authClient.signOut();
-                  window.location.href = "/";
-                }}
-              >
-                <LogOut className="size-4" aria-hidden />
-                Sign out
-              </Button>
-            </div>
-          )}
-        </div>
-        {stats.length > 0 && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {stats.map((stat) => (
-              <Card key={stat.label} className="shadow-none">
-                <CardContent className="p-4">
-                  <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p className="mt-1 text-lg font-semibold text-foreground">
-                    {stat.value}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-        {children}
-      </div>
-    </section>
+    <StaffOpsShell
+      current={current}
+      description={description}
+      eyebrow="Ride operations"
+      showSignOut={showSignOut}
+      stats={stats}
+      title={title}
+    >
+      {children}
+    </StaffOpsShell>
   );
 }
 
@@ -1349,7 +1310,16 @@ function FilterButton({
   onClick: () => void;
 }) {
   return (
-    <Button type="button" variant={active ? "default" : "outline"} size="sm" className="shrink-0" onClick={onClick}>
+    <Button
+      type="button"
+      variant={active ? "default" : "outline"}
+      size="sm"
+      className={cn(
+        "shrink-0 rounded-full border-black/10 px-4 font-black",
+        active ? "bg-[#050505] text-white hover:bg-[#111111]" : "bg-white text-black hover:bg-[#050505] hover:text-white",
+      )}
+      onClick={onClick}
+    >
       {label}
     </Button>
   );
@@ -1367,7 +1337,7 @@ function EmptyQueueState({
   const active = status === "active";
 
   return (
-    <Card>
+    <Card className="rounded-[28px] border-black/10 bg-white shadow-none">
       <CardHeader>
         <CardTitle className="text-xl">
           {active ? "Active queue is clear" : "No bookings in this view"}
@@ -1378,15 +1348,15 @@ function EmptyQueueState({
       </CardHeader>
       <CardContent className="grid gap-2 pt-0 sm:grid-cols-[auto_auto] sm:justify-start">
         {active ? (
-          <Button type="button" variant="outline" onClick={onViewAll}>
+          <Button type="button" variant="outline" className="rounded-full border-black/10" onClick={onViewAll}>
             View all bookings
           </Button>
         ) : (
-          <Button type="button" variant="outline" onClick={onViewActive}>
+          <Button type="button" variant="outline" className="rounded-full border-black/10" onClick={onViewActive}>
             View active queue
           </Button>
         )}
-        <Button asChild>
+        <Button asChild className="rounded-full bg-[#050505] text-white hover:bg-[#111111]">
           <Link href="/#book">
             <Plus className="size-4" aria-hidden />
             Open booking form
@@ -1434,8 +1404,8 @@ function getVehicleProfileSelectValue(value: string, vehicles: VehicleProfile[])
 function SectionHeading({ title, description }: { title: string; description: string }) {
   return (
     <div>
-      <h2 className="text-base font-semibold text-foreground">{title}</h2>
-      <p className="mt-1 break-words text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">{description}</p>
+      <h2 className="text-base font-semibold text-black">{title}</h2>
+      <p className="mt-1 break-words text-sm leading-6 text-black/56 [overflow-wrap:anywhere]">{description}</p>
     </div>
   );
 }
@@ -1455,18 +1425,18 @@ function RowMessage({ children, tone = "neutral" }: { children: ReactNode; tone?
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border bg-background p-3">
-      <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm text-foreground">{formatStatus(value)}</p>
+    <div className="rounded-2xl border border-black/10 bg-white p-3">
+      <p className="text-xs font-black uppercase text-black/42">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-black">{formatStatus(value)}</p>
     </div>
   );
 }
 
 function InfoBlock({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="rounded-md border bg-background p-3">
-      <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">{label}</p>
-      <p className="mt-2 text-sm leading-6 text-foreground">{children}</p>
+    <div className="rounded-2xl border border-black/10 bg-white p-3">
+      <p className="text-xs font-black uppercase text-black/42">{label}</p>
+      <p className="mt-2 text-sm leading-6 text-black">{children}</p>
     </div>
   );
 }

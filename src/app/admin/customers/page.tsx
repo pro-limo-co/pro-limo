@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Nav } from "@/components/Nav";
 import { CustomerManagementPanel } from "@/components/admin/CustomerManagementPanel";
 
 export const metadata: Metadata = {
@@ -9,11 +8,8 @@ export const metadata: Metadata = {
 
 export default function CustomersPage() {
   return (
-    <>
-      <Nav minimal tone="light" />
-      <main className="min-h-[100svh]">
-        <CustomerManagementPanel />
-      </main>
-    </>
+    <main className="min-h-[100svh] bg-[#050505]">
+      <CustomerManagementPanel />
+    </main>
   );
 }
