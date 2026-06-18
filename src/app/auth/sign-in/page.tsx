@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Nav } from "@/components/Nav";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { sanitizeInternalPath } from "@/lib/redirects";
 
 export const metadata: Metadata = {
-  title: "Dispatch Sign In",
+  title: "Staff Dispatch Sign In",
   robots: { index: false, follow: false },
 };
 
@@ -15,15 +14,18 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
   const next = sanitizeInternalPath((await searchParams).next);
 
   return (
-    <>
-      <Nav minimal tone="light" />
-      <main className="pld-ui min-h-[100svh] bg-background px-6 pt-32 pb-20 text-foreground lg:px-10">
-        <div className="mx-auto max-w-xl">
-          <Suspense fallback={<div className="rounded-lg border bg-card p-8 text-card-foreground">Loading</div>}>
-            <AuthPanel next={next} />
-          </Suspense>
-        </div>
-      </main>
-    </>
+    <main className="min-h-[100svh] bg-[#050505] text-white">
+      <Suspense fallback={<AuthLoading />}>
+        <AuthPanel next={next} />
+      </Suspense>
+    </main>
+  );
+}
+
+function AuthLoading() {
+  return (
+    <div className="grid min-h-[100svh] place-items-center px-6">
+      <div className="h-40 w-full max-w-md rounded-[28px] border border-white/10 bg-white/5" />
+    </div>
   );
 }
